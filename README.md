@@ -1,1 +1,1 @@
-# Rotten_Tomatoes_DatabaSet
+# Rotten_Tomatoes_DataSet
