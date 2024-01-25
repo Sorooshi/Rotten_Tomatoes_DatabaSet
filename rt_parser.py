@@ -17,6 +17,8 @@ urls = get_urls("https://www.rottentomatoes.com/browse/movies_at_home/?page=", 4
 print(urls)
 print(len(urls))
 
+with open ("urls_text.txt", "w") as fp:
+    fp.writelines(urls)
 
 
 
