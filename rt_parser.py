@@ -2,19 +2,20 @@ import requests
 from bs4 import BeautifulSoup
 
 def get_urls(ref_url: str, max_page_range: int) -> list:
-    if max_page_range:
-        ref_url = ref_url + str(max_page_range)
     
-    requested_urls = requests.get(ref_url)
-    soup = BeautifulSoup(requested_urls.text, "html.parser")
-    urls = list()
-    contents = list()
-    for url in soup.find_all("a"):
-        link = url.get("href")
-        content = url.content
-        if link not in urls:
-            urls.append(link)
-            contents.append(content)
+    urls, contents = list(), list()
+
+    for page in range(0, max_page_range, 1):
+        if page != 0:
+            ref_url = ref_url + str(max_page_range)    
+        requested_urls = requests.get(ref_url)
+        soup = BeautifulSoup(requested_urls.text, "html.parser")
+        for url in soup.find_all("a"):
+            link = url.get("href")
+            content = url.get("")
+            if link not in urls:
+                urls.append(link)
+                contents.append(content)
     return urls, contents
 
 
