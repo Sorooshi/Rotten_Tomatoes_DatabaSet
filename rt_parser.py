@@ -1,17 +1,22 @@
+import pickle
 import requests 
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
-def get_urls(ref_url: str, max_page_range: int) -> list:
-    
+
+def get_urls_2(base_url: str, max_page_range: int) -> list:
+
     urls, contents = list(), list()
 
-    for page in range(0, max_page_range, 1):
-        if page != 0:
-            ref_url = ref_url + str(max_page_range)    
+    for page in range(1, max_page_range, 1):
+        ref_url = base_url + "?page=" + str(page)
+        print("ref_url:\n", ref_url)
         requested_urls = requests.get(ref_url)
         soup = BeautifulSoup(requested_urls.text, "html.parser")
         for url in soup.find_all("a"):
             link = url.get("href")
+            # print("link\n", link)
             content = url.get("")
             if link not in urls:
                 urls.append(link)
@@ -19,21 +24,35 @@ def get_urls(ref_url: str, max_page_range: int) -> list:
     return urls, contents
 
 
-urls, contents = get_urls(
-    "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~sort:a_z?page=9", 10
-    )
-    # "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~sort:a_z?page=6"
-print(urls)
-print(len(urls))
-print(len(contents))
+def get_urls(base_url: str, max_page_range: int) -> list:
+    
+    urls = list()
+    driver = webdriver.Safari()
+    for page in range(1, max_page_range):
+        ref_url = base_url + "?page=" + str(page)
+        print("page:", page, ref_url)        
+        driver.get(ref_url)
+        all_links = driver.find_elements(By.TAG_NAME, 'a')
+        for link in all_links:
+            url = link.text
+            # print("link:\n", url)
+            if url not in urls:
+                urls.append(url)
+    driver.quit()
+    
+    return urls
 
-with open ("urls.txt", "w") as fp:
+url = "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~sort:a_z"
+
+# urls = get_urls(base_url=url, max_page_range=3)
+
+# urls, _ = get_urls_2(base_url=url, max_page_range=15)
+
+print(urls)
+
+print(len(urls))
+
+
+with open("urls.txt", "w") as fp:
     for url in urls:
         fp.write(f"{url}\n")
-
-
-with open ("contents.txt", "w") as fp:
-    for content in contents:
-        fp.write(f"{content}\n")
-
-
