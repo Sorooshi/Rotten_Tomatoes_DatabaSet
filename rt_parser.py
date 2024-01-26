@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import pickle
 import requests 
 from bs4 import BeautifulSoup
@@ -87,10 +88,10 @@ def get_urls_per_genre(base_url: str, max_page_range: int = 5) -> list:
 
 def get_urls(urls_to_scrape: list, max_page_range: int = 5) -> dict:
     urls = {}
-    for genre in range(len(GENRES)):
+    for genre in range(tqdm(len(urls_to_scrape))):
         urls[GENRES[genre]] = {}
         urls_per_genre = get_urls_per_genre(
-            base_url=URLS_TO_SCRAPE[genre], max_page_range=max_page_range
+            base_url=urls_to_scrape[genre], max_page_range=max_page_range
             )
         urls[GENRES[genre]] = urls_per_genre
 
