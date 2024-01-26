@@ -29,17 +29,19 @@ def get_urls(base_url: str, max_page_range: int) -> list:
     urls = list()
 
     for page in range(1, max_page_range):
-        driver = webdriver.Safari()
-        ref_url = base_url + "?page=" + str(page)
-        print("page:", page, ref_url)        
-        driver.get(ref_url)
-        all_links = driver.find_elements(By.TAG_NAME, "a")
-        for link in all_links:
-            url = link.get_attribute("href")  # "text", etc.
-            if url not in urls:
-                urls.append(url)
-    driver.quit()
-    
+        try:
+            driver = webdriver.Safari()
+            ref_url = base_url + "?page=" + str(page)
+            print("page:", page, ref_url)        
+            driver.get(ref_url)
+            all_links = driver.find_elements(By.TAG_NAME, "a")
+            for link in all_links:
+                url = link.get_attribute("href")  # "text", etc.
+                if url not in urls:
+                    urls.append(url)
+            driver.quit()
+        except:
+            print("web page issue!")
     return urls
 
 url = "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~sort:a_z"
