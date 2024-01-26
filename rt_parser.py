@@ -3,6 +3,9 @@ import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 
 
 def get_urls_2(base_url: str, max_page_range: int) -> list:
@@ -29,24 +32,30 @@ def get_urls(base_url: str, max_page_range: int) -> list:
     urls = list()
 
     for page in range(1, max_page_range):
-        try:
-            driver = webdriver.Safari()
-            ref_url = base_url + "?page=" + str(page)
-            print("page:", page, ref_url)        
-            driver.get(ref_url)
-            all_links = driver.find_elements(By.TAG_NAME, "a")
-            for link in all_links:
-                url = link.get_attribute("href")  # "text", etc.
-                if url not in urls:
-                    urls.append(url)
-            driver.quit()
-        except:
-            print("web page issue!")
+        # try:
+        driver = webdriver.Safari()
+        ref_url = base_url   # + "?page=" + str(page)
+        print("page:", page, ref_url)        
+        driver.get(ref_url)
+        all_links = driver.find_elements(By.TAG_NAME, "a")
+        
+        for link in all_links:
+            url = link.get_attribute("href")  # "text", etc.
+            if url not in urls:
+                urls.append(url)
+        # WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button#onetrust-accept-btn-handler"))).click()
+        # WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a[title='Load more']"))).click()
+        WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//button[@id='onetrust-accept-btn-handler']"))).click()
+        WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//a[@title='Load more']"))).click()
+        driver.quit()
+
+        # except:
+        #     print("web page issue!")
     return urls
 
 url = "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~sort:a_z"
 
-urls = get_urls(base_url=url, max_page_range=20)
+urls = get_urls(base_url=url, max_page_range=7)
 
 # urls, _ = get_urls_2(base_url=url, max_page_range=15)
 
