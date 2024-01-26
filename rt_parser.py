@@ -13,14 +13,14 @@ from selenium.webdriver.support import expected_conditions as EC
 "TALK SHOW", "TRAVEL", "VARIETY",   were empty
 "SHORT" has one movie
 """
-genres = [
+GENRES = [
     "action", "adventure", "animation", "anime", "biography", "comedy", "crime", 
     "documentary", "drama", "fantasy", "lgbtq", "history", "holiday", "horror", 
     "kids_and_family", "music", "musical", "mystery_and_thriller", "romance", 
     "sci_fi", "sports", "stand_up", "war", "western"
 ]
 
-urls_to_scrape = [
+URLS_TO_SCRAPE = [
     "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~genres:action~sort:popular", 
     "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~genres:adventure~sort:popular",
     "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~genres:animation~sort:popular",
@@ -32,7 +32,6 @@ urls_to_scrape = [
     "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~genres:drama~sort:popular",
     "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~genres:fantasy~sort:popular",
     "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~genres:lgbtq~sort:popular",
-    "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~genres:history~sort:popular",
     "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~genres:holiday~sort:popular"
     "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~genres:horror~sort:popular", 
     "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~genres:kids_and_family~sort:popular",
@@ -47,8 +46,6 @@ urls_to_scrape = [
     "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~genres:western~sort:popular", 
 ]
 
-
-print(len(genres), len(urls_to_scrape))
 
 def get_urls_2(base_url: str, max_page_range: int) -> list:
 
@@ -69,35 +66,37 @@ def get_urls_2(base_url: str, max_page_range: int) -> list:
     return urls, contents
 
 
-def get_urls(base_url: str, max_page_range: int) -> list:
+def get_urls_per_genre(base_url: str, max_page_range: int = 5) -> list:
     
     urls = list()
-
     for page in range(1, max_page_range):
-        # try:
-        driver = webdriver.Safari()
-        ref_url = base_url   # + "?page=" + str(page)
-        print("page:", page, ref_url)        
-        driver.get(ref_url)
-        all_links = driver.find_elements(By.TAG_NAME, "a")
-        
-        for link in all_links:
-            url = link.get_attribute("href")  # "text", etc.
-            if url not in urls:
-                urls.append(url)
-        driver.quit()
-
-        # except:
-        #     print("web page issue!")
+        try:
+            driver = webdriver.Safari()
+            ref_url = base_url + "?page=" + str(page)
+            print("page:", page, ref_url)        
+            driver.get(ref_url)
+            all_links = driver.find_elements(By.TAG_NAME, "a")
+            for link in all_links:
+                url = link.get_attribute("href")  # "text", etc.
+                if url not in urls:
+                    urls.append(url)
+            driver.quit()
+        except:
+            print("web page issue!")
     return urls
 
-url = "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~sort:a_z"
+def get_urls(urls_to_scrape: list, max_page_range: int = 5) -> dict:
+    urls = {}
+    for genre in range(len(GENRES)):
+        urls[GENRES[genre]] = {}
+        urls_per_genre = get_urls_per_genre(
+            base_url=URLS_TO_SCRAPE[genre], max_page_range=max_page_range
+            )
+        urls[GENRES[genre]] = urls_per_genre
 
-urls = get_urls(base_url=url, max_page_range=7)
+    return urls
 
-# urls, _ = get_urls_2(base_url=url, max_page_range=15)
-
-# print(urls)
+urls = get_urls(urls_to_scrape=URLS_TO_SCRAPE[:2], max_page_range=2)
 
 print(len(urls))
 
