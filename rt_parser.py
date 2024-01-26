@@ -87,6 +87,7 @@ def get_urls_per_genre(base_url: str, max_page_range: int) -> list:
 def get_urls(urls_to_scrape: list, max_page_range: int = 5) -> dict:
     urls = {}
     for i in range(len(urls_to_scrape)):
+        print(f"Genres: {GENRES[i]}")
         urls[GENRES[i]] = {}
         urls_per_genre = get_urls_per_genre(
             base_url=urls_to_scrape[i], max_page_range=max_page_range
