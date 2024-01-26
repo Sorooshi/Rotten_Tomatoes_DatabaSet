@@ -1,12 +1,11 @@
-from tqdm import tqdm
+import os
 import pickle
 import requests 
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
+# os.system("sudo safaridriver --enable")
 
 """ 
 "ENTERTAINMENT",  "FAITH & SPIRITUALITY", "HEALTH & WELLNESS", 
@@ -14,6 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 "TALK SHOW", "TRAVEL", "VARIETY",   were empty
 "SHORT" has one movie
 """
+
 GENRES = [
     "action", "adventure", "animation", "anime", "biography", "comedy", "crime", 
     "documentary", "drama", "fantasy", "lgbtq", "history", "holiday", "horror", 
@@ -67,41 +67,52 @@ def get_urls_2(base_url: str, max_page_range: int) -> list:
     return urls, contents
 
 
-def get_urls_per_genre(base_url: str, max_page_range: int = 5) -> list:
+def get_urls_per_genre(base_url: str, max_page_range: int) -> list:
     
-    urls = list()
-    for page in range(1, max_page_range):
-        try:
-            driver = webdriver.Safari()
-            ref_url = base_url + "?page=" + str(page)
-            print("page:", page, ref_url)        
-            driver.get(ref_url)
-            all_links = driver.find_elements(By.TAG_NAME, "a")
-            for link in all_links:
-                url = link.get_attribute("href")  # "text", etc.
-                if url not in urls:
-                    urls.append(url)
-            driver.quit()
-        except:
-            print("web page issue!")
+    urls = list()        
+    driver = webdriver.Chrome()
+    ref_url = base_url + "?page=" + str(max_page_range)
+    driver.get(ref_url)
+    all_links = driver.find_elements(By.TAG_NAME, "a")
+    for link in all_links:
+        url = link.get_attribute("href")  # "text", etc.
+        if isinstance(url, str):
+            if url not in urls and "m" in url.split("/"):  # movies are separated by a "m"
+                urls.append(url)
+    driver.quit()
     return urls
+
+
 
 def get_urls(urls_to_scrape: list, max_page_range: int = 5) -> dict:
     urls = {}
-    for genre in range(len(urls_to_scrape)):
-        urls[GENRES[genre]] = {}
+    for i in range(len(urls_to_scrape)):
+        urls[GENRES[i]] = {}
         urls_per_genre = get_urls_per_genre(
-            base_url=urls_to_scrape[genre], max_page_range=max_page_range
+            base_url=urls_to_scrape[i], max_page_range=max_page_range
             )
-        urls[GENRES[genre]] = urls_per_genre
+        for url in range(len(urls_per_genre)):
+            # print("url:", urls_per_genre[url])
+            name = urls_per_genre[url].split("/")[-1]
+            urls[GENRES[i]][name] = urls_per_genre[url]
 
     return urls
 
-urls = get_urls(urls_to_scrape=URLS_TO_SCRAPE[:2], max_page_range=2)
+urls = get_urls(urls_to_scrape=URLS_TO_SCRAPE[1:3], max_page_range=3)
+
+
+
+# urls = get_urls_per_genre(
+#     base_url=URLS_TO_SCRAPE[0], max_page_range=2
+    # )  
 
 print(len(urls))
 
+# with open("urls.txt", "w") as fp:
+#     for url in urls:
+#         fp.write(f"{url}\n")
 
-with open("urls.txt", "w") as fp:
-    for url in urls:
-        fp.write(f"{url}\n")
+with open ("urls.json", "wb") as fp: 
+    pickle.dump(urls, fp)
+
+
