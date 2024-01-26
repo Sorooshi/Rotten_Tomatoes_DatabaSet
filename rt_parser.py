@@ -20,7 +20,7 @@ def get_urls(ref_url: str, max_page_range: int) -> list:
 
 
 urls, contents = get_urls(
-    "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~sort:a_z?page=9", None
+    "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~sort:a_z?page=9", 10
     )
     # "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~sort:a_z?page=6"
 print(urls)
