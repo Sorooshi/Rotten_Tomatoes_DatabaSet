@@ -92,27 +92,20 @@ def get_urls(urls_to_scrape: list, max_page_range: int = 5) -> dict:
             base_url=urls_to_scrape[i], max_page_range=max_page_range
             )
         for url in range(len(urls_per_genre)):
-            # print("url:", urls_per_genre[url])
             name = urls_per_genre[url].split("/")[-1]
             urls[GENRES[i]][name] = urls_per_genre[url]
 
     return urls
 
-urls = get_urls(urls_to_scrape=URLS_TO_SCRAPE[1:3], max_page_range=3)
+urls_per_genres = get_urls(urls_to_scrape=URLS_TO_SCRAPE, max_page_range=5)
 
-
-
-# urls = get_urls_per_genre(
-#     base_url=URLS_TO_SCRAPE[0], max_page_range=2
-    # )  
-
-print(len(urls))
+print(len(urls_per_genres))
 
 # with open("urls.txt", "w") as fp:
 #     for url in urls:
 #         fp.write(f"{url}\n")
 
-with open ("urls.json", "wb") as fp: 
-    pickle.dump(urls, fp)
+with open ("urls_per_genres.pickle", "wb") as fp: 
+    pickle.dump(urls_per_genres, fp)
 
 
