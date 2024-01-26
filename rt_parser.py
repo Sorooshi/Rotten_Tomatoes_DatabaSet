@@ -27,15 +27,18 @@ def get_urls_2(base_url: str, max_page_range: int) -> list:
 def get_urls(base_url: str, max_page_range: int) -> list:
     
     urls = list()
+
     driver = webdriver.Safari()
     for page in range(1, max_page_range):
         ref_url = base_url + "?page=" + str(page)
         print("page:", page, ref_url)        
         driver.get(ref_url)
-        all_links = driver.find_elements(By.TAG_NAME, 'a')
+        all_links = driver.find_elements(By.TAG_NAME, "a")
+        # all_titles = driver.find_elements(By.CLASS_NAME, "p--small")
         for link in all_links:
-            url = link.text
-            # print("link:\n", url)
+            url = link.get_attribute("href")
+            # title = link.get_attribute("text")
+            # print("link:\n", url, title)
             if url not in urls:
                 urls.append(url)
     driver.quit()
@@ -44,11 +47,11 @@ def get_urls(base_url: str, max_page_range: int) -> list:
 
 url = "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~sort:a_z"
 
-# urls = get_urls(base_url=url, max_page_range=3)
+urls = get_urls(base_url=url, max_page_range=2)
 
 # urls, _ = get_urls_2(base_url=url, max_page_range=15)
 
-print(urls)
+# print(urls)
 
 print(len(urls))
 
