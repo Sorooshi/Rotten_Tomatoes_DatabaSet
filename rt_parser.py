@@ -49,7 +49,7 @@ URLS_TO_SCRAPE = [
 ]
 
 
-def get_urls_2(base_url: str, max_page_range: int) -> list:
+def get_urls_bu(base_url: str, max_page_range: int) -> list:
 
     urls, contents = list(), list()
 
