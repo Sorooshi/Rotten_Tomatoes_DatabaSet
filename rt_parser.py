@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver import FirefoxOptions
 
 # os.system("sudo safaridriver --enable")
 
@@ -70,7 +71,9 @@ def get_urls_2(base_url: str, max_page_range: int) -> list:
 def get_urls_per_genre(base_url: str, max_page_range: int) -> list:
     
     urls = list()        
-    driver = webdriver.Firefox()
+    opts = FirefoxOptions()
+    opts.add_argument("--headless")
+    driver = webdriver.Firefox(options=opts)
     ref_url = base_url + "?page=" + str(max_page_range)
     driver.get(ref_url)
     all_links = driver.find_elements(By.TAG_NAME, "a")
