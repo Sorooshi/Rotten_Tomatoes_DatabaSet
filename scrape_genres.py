@@ -1,6 +1,11 @@
+import os
 import pickle
-from bs4 import BeautifulSoup
+import requests 
 import pandas as pd 
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver import FirefoxOptions
 
 
 
@@ -8,6 +13,17 @@ def get_pickled_urls_all_genres(path):
     with open (path + ".pickle", "rb") as fp:
         genres_urls = pickle.load(fp)
     return genres_urls
+
+
+def get_data_per_url(ref_url):
+    opts = FirefoxOptions()
+    opts.add_argument("--headless")
+    driver = webdriver.Firefox(option=opts)
+    driver.get(ref_url)
+    synopsis = driver.find_elements(By.CLASS_NAME, "...")
+    
+
+    return None 
 
 
 row_data = pd.DataFrame(
