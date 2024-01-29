@@ -20,8 +20,12 @@ def get_data_per_url(ref_url):
     opts.add_argument("--headless")
     driver = webdriver.Firefox(option=opts)
     driver.get(ref_url)
-    synopsis = driver.find_elements(By.CLASS_NAME, "...")
+    # by_class = driver.find_elements(By.CLASS_NAME, "")
+    # synopsis = driver.find_element("xpath", '//*[@data-qa="movie-info-synopsis"]').text
+    # this will extract: synopsis, .... (sorted in the extraction order)
+    movie_info = driver.find_elements("xpath", '//*[@data-qa="movie-info-synopsis"]')
     
+
 
     return None 
 
