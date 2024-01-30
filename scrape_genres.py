@@ -52,8 +52,9 @@ if __name__ == "__main__":
     idx = 0
     for k, v in all_genres_urls.items():
         for kk, vv in v.items():
+            tmp = kk.title().replace("_", " ")
             print(
-                f"Title:{kk.title().replace("_", " ")}  "
+                f"Title:{tmp} "
                 f"Link: {vv}"
             )
             movie_data_df.loc[idx, "Title"] = kk.title().replace("_", " ")
