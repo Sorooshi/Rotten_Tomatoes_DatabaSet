@@ -15,17 +15,6 @@ GENRES = [
     "sci_fi", "sports", "stand_up", "war", "western"
 ]
 
-movie_data_df = pd.DataFrame(
-    index=np.arange(int(len(GENRES)*150)), 
-    columns=[
-        "Title", "Synopsis", "Rating", "Genre", "Original Language", "Director", "Producer", "Writer", 
-        "Release Date (Theaters)", "Release Date (Streaming)", "Box Office (Gross USA)", "Runtime", 
-        "Distributor", "Production Co", "Sound Mix", "Top Cast 1", "Top Cast 2", "Top Cast 3",
-        "Top Cast 4", "Top Cast 5", "Top cast 6", "Link", "Initial Genre", 
-    ]
-)
-
-
 def get_pickled_urls_all_genres(path: str) -> pickle:
     with open (path + ".pickle", "rb") as fp:
         genres_urls = pickle.load(fp)
