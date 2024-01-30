@@ -27,9 +27,9 @@ def get_data_per_url(ref_url: str) -> callable:
     driver = webdriver.Firefox(options=opts)
     driver.get(ref_url)
     # by_class = driver.find_elements(By.CLASS_NAME, "blah blah")
-    synopsis = driver.find_element("xpath", "//*[@data-qa=movie-info-synopsis]")
-    movie_info = driver.find_elements("xpath", "//*[@data-qa=movie-info-item-value]")
-    top_casts = driver.find_elements("xpath", "//*[@data-qa=cast-crew-item-link]")
+    synopsis = driver.find_element("xpath", '//*[@data-qa="movie-info-synopsis"]')
+    movie_info = driver.find_elements("xpath", '//*[@data-qa="movie-info-item-value"]')
+    top_casts = driver.find_elements("xpath", '//*[@data-qa="cast-crew-item-link"]')
     
     return synopsis, movie_info, top_casts
     
@@ -54,7 +54,7 @@ if __name__ == "__main__":
         for kk, vv in v.items():
             tmp = kk.title().replace("_", " ")
             print(
-                f"Title:{tmp} "
+                f"Title:{tmp}, "
                 f"Link: {vv}"
             )
             movie_data_df.loc[idx, "Title"] = kk.title().replace("_", " ")
@@ -68,8 +68,8 @@ if __name__ == "__main__":
             for j in range(len(movie_info)):
                 movie_data_df.iloc[idx, j+2] = movie_info[j].text
             # insert info of top 6 cast
-            for j in range(len(top_casts)):
-                movie_info.iloc[idx, j+2+13] = movie_info[j].text
+            for j in range(6):
+                movie_data_df.iloc[idx, j+2+13] = top_casts[j].text
             idx += 1
 
             
