@@ -75,6 +75,7 @@ if __name__ == "__main__":
             movie_data_df.loc[idx, "Link"] = vv
             movie_data_df.loc[idx, "Initial Genre"] = k
             movie_data_df.loc[idx, "Synopsis"] = synopsis.text
+            movie_data_df.loc[idx, "Top Six Cast"] = [top_casts[i].text for i in range(6)]
             if len(movie_info) < 13:
                 print(f"issues in {vv}")
                 issues.append(vv)
@@ -82,8 +83,6 @@ if __name__ == "__main__":
             # insert info from rating to sound mix
             for j in range(len(movie_info)):
                 movie_data_df.iloc[idx, j+2] = movie_info[j].text
-            # insert info of the top 6 casts as a list
-            movie_data_df.iloc[idx, j+2+12] = [top_casts[i].text for i in range(6)] 
             idx += 1
 
             
