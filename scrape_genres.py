@@ -26,7 +26,7 @@ def get_data_per_url(ref_url: str) -> callable:
     opts.add_argument("--headless")
     driver = webdriver.Firefox(options=opts)
     driver.get(ref_url)
-    # by_class = driver.find_elements(By.CLASS_NAME, "")
+    # by_class = driver.find_elements(By.CLASS_NAME, "blah blah")
     synopsis = driver.find_element("xpath", "//*[@data-qa=movie-info-synopsis]")
     movie_info = driver.find_elements("xpath", "//*[@data-qa=movie-info-item-value]")
     top_casts = driver.find_elements("xpath", "//*[@data-qa=cast-crew-item-link]")
