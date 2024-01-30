@@ -48,22 +48,25 @@ if __name__ == "__main__":
         )
     
     all_genres_urls = get_pickled_urls_all_genres(path="urls_per_genres")
-    
+    issues = list()
     idx = 0
     for k, v in all_genres_urls.items():
+        print(f" Genre: {k}")
         for kk, vv in v.items():
             tmp = kk.title().replace("_", " ")
             print(
                 f"Title: {tmp}, "
                 f"Link: {vv}"
             )
+            synopsis, movie_info, top_casts = get_data_per_url(ref_url=vv)
             movie_data_df.loc[idx, "Title"] = kk.title().replace("_", " ")
             movie_data_df.loc[idx, "Link"] = vv
             movie_data_df.loc[idx, "Initial Genre"] = k
-            synopsis, movie_info, top_casts = get_data_per_url(ref_url=vv)
-            movie_data_df[idx, "Synopsis"] = synopsis.text
+            movie_data_df.loc[idx, "Synopsis"] = synopsis.text
             if len(movie_info) < 13:
-                break
+                print(f"issues in {vv}")
+                issues.append(vv)
+            
             # insert info from rating to sound mix
             for j in range(len(movie_info)):
                 movie_data_df.iloc[idx, j+2] = movie_info[j].text
