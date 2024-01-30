@@ -34,6 +34,19 @@ def get_data_per_url(ref_url: str) -> callable:
     return synopsis, movie_info, top_casts
     
 
+def get_data_per_url_detailed(ref_url: str) -> callable:
+    opts = FirefoxOptions()
+    opts.add_argument("--headless")
+    driver = webdriver.Firefox(options=opts)
+    driver.get(ref_url)
+    # by_class = driver.find_elements(By.CLASS_NAME, "blah blah")
+    synopsis = driver.find_element("xpath", '//*[@data-qa="movie-info-synopsis"]')
+    top_casts = driver.find_elements("xpath", '//*[@data-qa="cast-crew-item-link"]')
+
+
+    
+    return synopsis, movie_info, top_casts
+
 if __name__ == "__main__":
 
     # create an initial data frame to store the extracted information
@@ -41,9 +54,8 @@ if __name__ == "__main__":
         index=np.arange(int(len(GENRES)*150)), 
         columns=[
             "Title", "Synopsis", "Rating", "Genre", "Original Language", "Director", "Producer", "Writer", 
-            "Release Date (Theaters)", "Release Date (Streaming)", "Box Office (Gross USA)", "Runtime", 
-            "Distributor", "Production Co", "Sound Mix", "Top Cast 1", "Top Cast 2", "Top Cast 3",
-            "Top Cast 4", "Top Cast 5", "Top cast 6", "Link", "Initial Genre", 
+            "Release Date (Theaters)", "Box Office (Gross USA)", "Runtime", "Distributor", "Production Co", 
+            "Sound Mix", "Top six Cast", "Link", "Initial Genre", 
             ]
         )
     
@@ -70,9 +82,8 @@ if __name__ == "__main__":
             # insert info from rating to sound mix
             for j in range(len(movie_info)):
                 movie_data_df.iloc[idx, j+2] = movie_info[j].text
-            # insert info of top 6 cast
-            for j in range(6):
-                movie_data_df.iloc[idx, j+2+13] = top_casts[j].text
+            # insert info of the top 6 casts as a list
+            movie_data_df.iloc[idx, j+2+12] = top_casts.text
             idx += 1
 
             
