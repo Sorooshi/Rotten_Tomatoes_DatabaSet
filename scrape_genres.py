@@ -80,6 +80,7 @@ if __name__ == "__main__":
             # insert info of top 6 cast
             for j in range(len(top_casts)):
                 movie_info.iloc[idx, j+2+13] = movie_info[j].text
+            idx += 1
 
             
 
