@@ -63,6 +63,10 @@ if __name__ == "__main__":
     idx = 0
     for k, v in all_genres_urls.items():
         for kk, vv in v.items():
+            print(
+                f"Title:{kk.title().replace("_", " ")}  "
+                f"Link: {vv}"
+            )
             movie_data_df.loc[idx, "Title"] = kk.title().replace("_", " ")
             movie_data_df.loc[idx, "Link"] = vv
             movie_data_df.loc[idx, "Initial Genre"] = k
