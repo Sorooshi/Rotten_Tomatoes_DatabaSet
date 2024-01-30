@@ -83,7 +83,7 @@ if __name__ == "__main__":
             for j in range(len(movie_info)):
                 movie_data_df.iloc[idx, j+2] = movie_info[j].text
             # insert info of the top 6 casts as a list
-            movie_data_df.iloc[idx, j+2+12] = top_casts.text
+            movie_data_df.iloc[idx, j+2+12] = [top_casts[i].text for i in range(6)] 
             idx += 1
 
             
