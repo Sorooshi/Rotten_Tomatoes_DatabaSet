@@ -48,7 +48,7 @@ URLS_TO_SCRAPE = [
     "https://www.rottentomatoes.com/browse/movies_at_home/critics:certified_fresh~genres:western~sort:popular", 
 ]
 
-
+# the function "get_urls_bu"  is not used
 def get_urls_bu(base_url: str, max_page_range: int) -> list:
 
     urls, contents = list(), list()

@@ -54,7 +54,7 @@ if __name__ == "__main__":
         for kk, vv in v.items():
             tmp = kk.title().replace("_", " ")
             print(
-                f"Title:{tmp}, "
+                f"Title: {tmp}, "
                 f"Link: {vv}"
             )
             movie_data_df.loc[idx, "Title"] = kk.title().replace("_", " ")
