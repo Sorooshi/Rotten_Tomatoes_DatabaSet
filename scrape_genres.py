@@ -65,12 +65,21 @@ if __name__ == "__main__":
         for kk, vv in v.items():
             movie_data_df.loc[idx, "Title"] = kk.title().replace("_", " ")
             movie_data_df.loc[idx, "Link"] = vv
+            movie_data_df.loc[idx, "Initial Genre"] = k
             synopsis, movie_info, top_casts = get_data_per_url(ref_url=vv)
             movie_data_df[idx, "Synopsis"] = synopsis.text
             if len(movie_info) < 13:
                 break
+            # insert info from rating to sound mix
             for j in range(len(movie_info)):
                 movie_data_df.iloc[idx, j+2] = movie_info[j].text
+            # insert info of top 6 cast
+            for j in range(len(top_casts)):
+                movie_info.iloc[idx, j+2+13] = movie_info[j].text
+
+            
+
+
 
 
     
