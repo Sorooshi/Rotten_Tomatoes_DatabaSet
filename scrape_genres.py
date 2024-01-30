@@ -28,8 +28,8 @@ def get_data_per_url(ref_url: str) -> callable:
     driver.get(ref_url)
     # by_class = driver.find_elements(By.CLASS_NAME, "")
     synopsis = driver.find_element("xpath", "//*[@data-qa=movie-info-synopsis]")
-    movie_info = driver.find_elements("xpath", '//*[@data-qa="movie-info-item-value"]')
-    top_casts = driver.find_elements("xpath", '//*[@data-qa="cast-crew-item-link"]')
+    movie_info = driver.find_elements("xpath", "//*[@data-qa=movie-info-item-value]")
+    top_casts = driver.find_elements("xpath", "//*[@data-qa=cast-crew-item-link]")
     
     return synopsis, movie_info, top_casts
     
