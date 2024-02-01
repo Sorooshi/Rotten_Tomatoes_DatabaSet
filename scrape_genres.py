@@ -45,7 +45,7 @@ def get_data_per_url_detailed(ref_url: str) -> callable:
     return synopsis, movie_info, top_casts
 
 
-class RT_scraper:
+class RTScraper:
     """ scrapes the required contents of the given url. """
 
     def __init__(self, url_to_scrape: str) -> None:
