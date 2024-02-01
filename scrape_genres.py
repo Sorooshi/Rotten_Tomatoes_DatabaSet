@@ -100,20 +100,28 @@ if __name__ == "__main__":
                 f"Title: {tmp_title}, "
                 f"Link: {vv}"
             )
-            rts = RTScraper(vv)
-            synopsis, movie_info, top_casts = rts.get_all_required_info()
+            try:
+                rts = RTScraper(vv)
+                synopsis, movie_info, top_casts = rts.get_all_required_info()
 
-            movie_data_df.loc[idx, "Link"] = vv
-            movie_data_df.loc[idx, "Title"] = tmp_title
-            movie_data_df.loc[idx, "Initial Genre"] = k
-            movie_data_df.loc[idx, "Synopsis"] = synopsis
-            movie_data_df.loc[idx, "Top Cast"] = top_casts
-            
-            for kkk, vvv in movie_info.items():
-                movie_data_df.loc[idx, kkk] = vvv
+                movie_data_df.loc[idx, "Link"] = vv
+                movie_data_df.loc[idx, "Title"] = tmp_title
+                movie_data_df.loc[idx, "Initial Genre"] = k
+                movie_data_df.loc[idx, "Synopsis"] = synopsis
+                movie_data_df.loc[idx, "Top Cast"] = top_casts
+                
+                for kkk, vvv in movie_info.items():
+                    movie_data_df.loc[idx, kkk] = vvv
+            except:
+                issues.append(vv)
+                print("There was an issue in {vv} website")
             idx += 1
 
-            
+
+    movie_data_df.to_csv("rotten_tomatoes_info.csv")
+    with open ("issues.txt", "w") as fp:
+        for issue in issues:
+            fp.write(f"{issue}\n")
 
 
 
