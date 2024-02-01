@@ -102,15 +102,19 @@ if __name__ == "__main__":
             )
             rts = RTScraper(vv)
             synopsis, movie_info, top_casts = rts.get_all_required_info()
+            try:
+                movie_data_df.loc[idx, "Link"] = vv
+                movie_data_df.loc[idx, "Title"] = tmp_title
+                movie_data_df.loc[idx, "Initial Genre"] = k
+                movie_data_df.loc[idx, "Synopsis"] = synopsis
+                movie_data_df.loc[idx, "Top Cast"] = top_casts
+                
+                for kkk, vvv in movie_info.items():
+                    movie_data_df.loc[idx, kkk] = vvv
+            except:
+                print(f" There is an issue in {vv}")
+                issues.append(vv)
 
-            movie_data_df.loc[idx, "Link"] = vv
-            movie_data_df.loc[idx, "Title"] = tmp_title
-            movie_data_df.loc[idx, "Initial Genre"] = k
-            movie_data_df.loc[idx, "Synopsis"] = synopsis
-            movie_data_df.loc[idx, "Top Cast"] = top_casts
-            
-            for kkk, vvv in movie_info.items():
-                movie_data_df.loc[idx, kkk] = vvv
             idx += 1
 
 
