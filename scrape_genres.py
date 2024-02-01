@@ -56,7 +56,7 @@ class RTScraper:
         self.driver.get(self.url_to_scrape)
        
 
-    def get_synopsis(self ) -> str:
+    def get_synopsis(self, ) -> str:
         return self.driver.find_element('xpath', '//*[@data-qa="movie-info-synopsis"]').text
     
     def get_movie_info(self) -> dict:
@@ -77,25 +77,25 @@ class RTScraper:
         return synopsis, movie_info, top_casts
     
 
-def init_get_driver_per_url(ref_url: str):
-    """ Returns selenium webdriver and get the contents of the ref_url. """
-    opts = FirefoxOptions()
-    opts.add_argument("--headless")
-    driver = webdriver.Firefox(options=opts)
-    return driver.get(ref_url)
+# def init_get_driver_per_url(ref_url: str):
+#     """ Returns selenium webdriver and get the contents of the ref_url. """
+#     opts = FirefoxOptions()
+#     opts.add_argument("--headless")
+#     driver = webdriver.Firefox(options=opts)
+#     return driver.get(ref_url)
 
-def get_synopsis(driver ) -> str:
-    synopsis = driver.find_element('xpath', '//*[@data-qa="movie-info-synopsis"]').text
-    return synopsis
+# def get_synopsis(driver ) -> str:
+#     synopsis = driver.find_element('xpath', '//*[@data-qa="movie-info-synopsis"]').text
+#     return synopsis
 
-def get_movie_info(driver) -> dict:
-    movie_info = driver.find_element('xpath', '//*[@id="info"]').text.split("\n")
-    movie_info = {i.split(":")[0]: i.split(":")[1] for i in movie_info}
-    return movie_info
+# def get_movie_info(driver) -> dict:
+#     movie_info = driver.find_element('xpath', '//*[@id="info"]').text.split("\n")
+#     movie_info = {i.split(":")[0]: i.split(":")[1] for i in movie_info}
+#     return movie_info
 
-def get_top_casts(driver,):
-    top_casts = driver.find_element('xpath', '//*[@id="cast-and-crew"]').text.split("\n")[1:-1]
-    return top_casts
+# def get_top_casts(driver,):
+#     top_casts = driver.find_element('xpath', '//*[@id="cast-and-crew"]').text.split("\n")[1:-1]
+#     return top_casts
 
 
 if __name__ == "__main__":
