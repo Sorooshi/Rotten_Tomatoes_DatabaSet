@@ -77,27 +77,6 @@ class RTScraper:
         return synopsis, movie_info, top_casts
     
 
-# def init_get_driver_per_url(ref_url: str):
-#     """ Returns selenium webdriver and get the contents of the ref_url. """
-#     opts = FirefoxOptions()
-#     opts.add_argument("--headless")
-#     driver = webdriver.Firefox(options=opts)
-#     return driver.get(ref_url)
-
-# def get_synopsis(driver ) -> str:
-#     synopsis = driver.find_element('xpath', '//*[@data-qa="movie-info-synopsis"]').text
-#     return synopsis
-
-# def get_movie_info(driver) -> dict:
-#     movie_info = driver.find_element('xpath', '//*[@id="info"]').text.split("\n")
-#     movie_info = {i.split(":")[0]: i.split(":")[1] for i in movie_info}
-#     return movie_info
-
-# def get_top_casts(driver,):
-#     top_casts = driver.find_element('xpath', '//*[@id="cast-and-crew"]').text.split("\n")[1:-1]
-#     return top_casts
-
-
 if __name__ == "__main__":
 
     # create an initial data frame to store the extracted information
@@ -106,7 +85,7 @@ if __name__ == "__main__":
         columns=[
             "Title", "Synopsis", "Rating", "Genre", "Original Language", "Director", "Producer", "Writer", 
             "Release Date (Theaters)", "Release Date (Streaming)", "Box Office (Gross USA)", "Runtime", "Distributor", "Production Co", 
-            "Sound Mix", "Top six Cast", "Link", "Initial Genre", 
+            "Sound Mix", "Top Cast", "Aspect Ratio", "Link", "Initial Genre", 
             ]
         )
     
@@ -116,26 +95,22 @@ if __name__ == "__main__":
     for k, v in all_genres_urls.items():
         print(f" Genre: {k}")
         for kk, vv in v.items():
-            tmp = kk.title().replace("_", " ")
+            tmp_title = kk.title().replace("_", " ")
             print(
-                f"Title: {tmp}, "
+                f"Title: {tmp_title}, "
                 f"Link: {vv}"
             )
-            driver = init_get_driver_per_url(ref_url=vv)
+            rts = RTScraper(vv)
+            synopsis, movie_info, top_casts = rts.get_all_required_info()
 
             movie_data_df.loc[idx, "Link"] = vv
+            movie_data_df.loc[idx, "Title"] = tmp_title
             movie_data_df.loc[idx, "Initial Genre"] = k
-            movie_data_df.loc[idx, "Title"] = kk.title().replace("_", " ")
-            movie_data_df.loc[idx, "Synopsis"] = get_synopsis(driver=driver)
-
-            movie_data_df.loc[idx, "Top Six Cast"] =get_top_casts
-            if len(movie_info) < 13:
-                print(f"issues in {vv}")
-                issues.append(vv)
+            movie_data_df.loc[idx, "Synopsis"] = synopsis
+            movie_data_df.loc[idx, "Top Cast"] = top_casts
             
-            # insert info from rating to sound mix
-            for j in range(len(movie_info)):
-                movie_data_df.iloc[idx, j+2] = movie_info[j].text
+            for kkk, vvv in movie_info.items():
+                movie_data_df.loc[idx, kkk] = vvv
             idx += 1
 
             
