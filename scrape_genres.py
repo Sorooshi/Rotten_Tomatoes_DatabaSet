@@ -85,7 +85,7 @@ if __name__ == "__main__":
         columns=[
             "Title", "Synopsis", "Rating", "Genre", "Original Language", "Director", "Producer", "Writer", 
             "Release Date (Theaters)", "Release Date (Streaming)", "Box Office (Gross USA)", "Runtime", "Distributor", "Production Co", 
-            "Sound Mix", "Top Cast", "Aspect Ratio", "Link", "Initial Genre", 
+            "Sound Mix", "Top Cast", "Aspect Ratio", "View the collection", "Link", "Initial Genre", 
             ]
         )
     
@@ -100,21 +100,17 @@ if __name__ == "__main__":
                 f"Title: {tmp_title}, "
                 f"Link: {vv}"
             )
-            try:
-                rts = RTScraper(vv)
-                synopsis, movie_info, top_casts = rts.get_all_required_info()
+            rts = RTScraper(vv)
+            synopsis, movie_info, top_casts = rts.get_all_required_info()
 
-                movie_data_df.loc[idx, "Link"] = vv
-                movie_data_df.loc[idx, "Title"] = tmp_title
-                movie_data_df.loc[idx, "Initial Genre"] = k
-                movie_data_df.loc[idx, "Synopsis"] = synopsis
-                movie_data_df.loc[idx, "Top Cast"] = top_casts
-                
-                for kkk, vvv in movie_info.items():
-                    movie_data_df.loc[idx, kkk] = vvv
-            except:
-                issues.append(vv)
-                print(f"There was an issue in {vv} website")
+            movie_data_df.loc[idx, "Link"] = vv
+            movie_data_df.loc[idx, "Title"] = tmp_title
+            movie_data_df.loc[idx, "Initial Genre"] = k
+            movie_data_df.loc[idx, "Synopsis"] = synopsis
+            movie_data_df.loc[idx, "Top Cast"] = top_casts
+            
+            for kkk, vvv in movie_info.items():
+                movie_data_df.loc[idx, kkk] = vvv
             idx += 1
 
 
