@@ -114,7 +114,7 @@ if __name__ == "__main__":
                     movie_data_df.loc[idx, kkk] = vvv
             except:
                 issues.append(vv)
-                print("There was an issue in {vv} website")
+                print(f"There was an issue in {vv} website")
             idx += 1
 
 
