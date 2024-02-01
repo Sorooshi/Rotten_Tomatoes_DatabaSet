@@ -70,9 +70,9 @@ class RTScraper:
 
     def get_all_required_info(self, ):
 
-        synopsis = get_synopsis()
-        movie_info = get_movie_info()
-        top_casts = get_top_casts()
+        synopsis = self.get_synopsis()
+        movie_info = self.get_movie_info()
+        top_casts = self.get_top_casts()
 
         return synopsis, movie_info, top_casts
     
