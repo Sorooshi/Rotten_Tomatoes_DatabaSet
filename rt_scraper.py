@@ -38,8 +38,8 @@ class RTScraper:
         return movie_info
 
     def get_top_casts(self, ):
-        top_casts = self.driver.find_element('xpath', '//*[@id="cast-and-crew"]').text.split("\n")[1:-1]
-        return top_casts
+        top_cast = self.driver.find_element('xpath', '//*[@id="cast-and-crew"]').text.split("\n")[1:-1]
+        return top_cast
 
     def get_all_required_info(self, ):
 
@@ -52,39 +52,78 @@ class RTScraper:
     
 
 if __name__ == "__main__":
+     
+    to_json = True
+    # all_urls = get_all_collected_urls(path="collected_urls")
+    all_urls = [
+        "https://www.rottentomatoes.com/m/godzilla_king_of_the_monsters_2019",
+        "https://www.rottentomatoes.com/m/to_catch_a_killer_2023",
+        "https://www.rottentomatoes.com/m/star_wars_episode_i_the_phantom_menace",
+        "https://www.rottentomatoes.com/m/f9",
+        "https://www.rottentomatoes.com/m/black_adam",
+    ]
 
-    # create an initial data frame to store the extracted information
-    movie_data_df = pd.DataFrame(
-        # index=np.arange(int(len(GENRES)*150)), 
-        columns=[
-            "Title", "Synopsis", "Rating", "Genre", "Original Language", "Director", "Producer", "Writer", 
-            "Release Date (Theaters)", "Release Date (Streaming)", "Box Office (Gross USA)", "Runtime", "Distributor", "Production Co", 
-            "Sound Mix", "Top Cast", "Aspect Ratio", "View the collection", "Link", 
-            ]
-        )
-    
-    all_urls = get_all_collected_urls(path="collected_urls")
     issues = list()
-    idx = 0
-    for u in trange(len(all_urls)):
-        url = all_urls[u]
-        title_ = url.split("m/")[-1].title().replace("_", " ")
-        try:
-            rts = RTScraper(url)
-            synopsis, movie_info, top_casts = rts.get_all_required_info()
-            movie_data_df.loc[idx, "Link"] = url
-            movie_data_df.loc[idx, "Title"] = title_
-            movie_data_df.loc[idx, "Synopsis"] = synopsis
-            movie_data_df.loc[idx, "Top Cast"] = top_casts
+
+    if to_json == True:
+        movies_data = dict()
+        for u in trange(len(all_urls)):
+            url = all_urls[u]
+            title_ = url.split("m/")[-1].title().replace("_", " ")
+            # Construct an inner dict to store the movie info
+            movies_data[url] = {}
+            movies_data[url]["Title"] = title_
+            try:
+                rts = RTScraper(url)
+                synopsis, movie_info, top_cast = rts.get_all_required_info()
+                movies_data[url]["Synopsis"] = synopsis
+                movies_data[url]["Info"] = movie_info
+                movies_data[url]["Top Cast"] = top_cast
+            except:
+                print(f"There was an issue in {url}")
+                issues.append(url)
+        
+        with open("rotten_tomatoes_movies_data.pickle", "wb") as fp:
+            fp.pickle.dump(movies_data)
+
+    else:
+
+        # create an initial data frame to store the extracted information
+        movies_data = pd.DataFrame(
+            # index=np.arange(int(len(GENRES)*150)), 
+            columns=[
+                "Title", "Synopsis", "Rating", "Genre", "Original Language", "Director", "Producer", "Writer", 
+                "Release Date (Theaters)", "Rerelease Date (Theaters)", "Release Date (Streaming)", "Rerelease Date (Streaming)", 
+                "Box Office (Gross USA)", "Runtime", "Distributor", "Production Co", 
+                "Sound Mix", "Top Cast", "Aspect Ratio", "View the collection", "Link", 
+                ]
+            )
+
+        all_urls = get_all_collected_urls(path="collected_urls")
+        issues = list()
+        for u in trange(len(all_urls)):
+            url = all_urls[u]
+            title_ = url.split("m/")[-1].title().replace("_", " ")
+            try:
+                rts = RTScraper(url)
+                synopsis, movie_info, top_cast = rts.get_all_required_info()
+                idx = 0
+        
+            except:
+                print()
+
+
+            movies_data.loc[idx, "Link"] = url
+            movies_data.loc[idx, "Title"] = title_
+            movies_data.loc[idx, "Synopsis"] = synopsis
+            movies_data.loc[idx, "Top Cast"] = top_cast
             for kk, vv in movie_info.items():
-                movie_data_df.loc[idx, kk] = vv
-        except:
-            print(f" There is an issue in {url}")
-            issues.append(url)
+                movies_data.loc[idx, kk] = vv
+            idx += 1
 
-        idx += 1
+        movies_data.to_csv("rotten_tomatoes_movies_data.csv")
 
-    movie_data_df.to_csv("rotten_tomatoes_info.csv")
+
     with open ("issues.txt", "w") as fp:
         for issue in issues:
             fp.write(f"{issue}\n")
