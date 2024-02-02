@@ -18,31 +18,6 @@ def get_all_collected_urls(path):
     return all_urls
 
 
-def get_data_per_url(ref_url: str) -> callable:
-    opts = FirefoxOptions()
-    opts.add_argument("--headless")
-    driver = webdriver.Firefox(options=opts)
-    driver.get(ref_url)
-    # by_class = driver.find_elements(By.CLASS_NAME, "blah blah")
-    synopsis = driver.find_element("xpath", '//*[@data-qa="movie-info-synopsis"]')
-    movie_info = driver.find_elements("xpath", '//*[@data-qa="movie-info-item-value"]')
-    top_casts = driver.find_elements("xpath", '//*[@data-qa="cast-crew-item-link"]')
-    
-    return synopsis, movie_info, top_casts
-    
-
-def get_data_per_url_detailed(ref_url: str) -> callable:
-    opts = FirefoxOptions()
-    opts.add_argument("--headless")
-    driver = webdriver.Firefox(options=opts)
-    driver.get(ref_url)
-    synopsis = driver.find_element('xpath', '//*[@data-qa="movie-info-synopsis"]')
-    top_casts = driver.find_element('xpath', '//*[@id="cast-and-crew"]')
-    movie_info = driver.find_element('xpath', '//*[@id="info"]')
-
-    return synopsis, movie_info, top_casts
-
-
 class RTScraper:
     """ scrapes the required contents of the given url. """
 
@@ -93,19 +68,14 @@ if __name__ == "__main__":
     idx = 0
     for u in trange(len(all_urls)):
         url = all_urls[u]
-        tmp_title = url.split("m/")[-1].title().replace("_", " ")
-        print(
-            f"Title: {tmp_title}, "
-            f"Link: {url}"
-            )
-        rts = RTScraper(url)
-        synopsis, movie_info, top_casts = rts.get_all_required_info()
+        title_ = url.split("m/")[-1].title().replace("_", " ")
         try:
+            rts = RTScraper(url)
+            synopsis, movie_info, top_casts = rts.get_all_required_info()
             movie_data_df.loc[idx, "Link"] = url
-            movie_data_df.loc[idx, "Title"] = tmp_title
+            movie_data_df.loc[idx, "Title"] = title_
             movie_data_df.loc[idx, "Synopsis"] = synopsis
             movie_data_df.loc[idx, "Top Cast"] = top_casts
-
             for kk, vv in movie_info.items():
                 movie_data_df.loc[idx, kk] = vv
         except:
