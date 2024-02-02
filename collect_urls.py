@@ -26,6 +26,7 @@ CRITICS = [
 
 def collect_all_urls(max_page_range: int = 5) -> list:
     urls = list()        
+    issues = list()
 
     for genre in GENRES:
         for critic in CRITICS:
@@ -43,10 +44,14 @@ def collect_all_urls(max_page_range: int = 5) -> list:
             driver.get(ref_url)
             all_links = driver.find_elements(By.TAG_NAME, "a")
             for link in all_links:
-                url = link.get_attribute("href")  # "text", etc.
-                if isinstance(url, str):
-                    if url not in urls and "m" in url.split("/"):  # movies are separated by a "m"
-                        urls.append(url)
+                try:
+                    url = link.get_attribute("href")  # "text", etc.
+                    if isinstance(url, str):
+                        if url not in urls and "m" in url.split("/"):  # movies are separated by a "m"
+                            urls.append(url)
+                except:
+                    print(f"An error occurred in {link}")
+                    issues.append(link)
             driver.quit()
 
     return urls
@@ -62,3 +67,7 @@ if __name__ == "__main__":
     with open("collected_urls.txt", "w") as fp:
         for url in urls:
             fp.write(f"{url}\n")
+
+    with open("issues.txt", "w") as fp:
+        for issue in issues:
+            fp.write(f"{issue}\n")
