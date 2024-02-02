@@ -84,7 +84,7 @@ if __name__ == "__main__":
                 print(f"There was an issue in {url}")
                 issues.append(url)
         
-        with open("rotten_tomatoes_movies_data.json", "wb") as fp:
+        with open("rotten_tomatoes_movies_data.json", "w") as fp:
             json.dump(movies_data, fp)
 
     else:
