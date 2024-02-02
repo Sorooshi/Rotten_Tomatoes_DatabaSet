@@ -111,8 +111,8 @@ if __name__ == "__main__":
                 idx = 0
         
             except:
-                print()
-
+                print(f"There was an issue in {url}")
+                issues.append(url)
 
             movies_data.loc[idx, "Link"] = url
             movies_data.loc[idx, "Title"] = title_
