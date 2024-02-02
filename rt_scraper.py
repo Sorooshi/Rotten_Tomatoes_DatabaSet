@@ -55,15 +55,7 @@ class RTScraper:
 if __name__ == "__main__":
      
     to_json = True
-    # all_urls = get_all_collected_urls(path="collected_urls")
-    all_urls = [
-        "https://www.rottentomatoes.com/m/godzilla_king_of_the_monsters_2019",
-        "https://www.rottentomatoes.com/m/to_catch_a_killer_2023",
-        "https://www.rottentomatoes.com/m/star_wars_episode_i_the_phantom_menace",
-        "https://www.rottentomatoes.com/m/f9",
-        "https://www.rottentomatoes.com/m/black_adam",
-    ]
-
+    all_urls = get_all_collected_urls(path="collected_urls")
     issues = list()
 
     if to_json == True:
