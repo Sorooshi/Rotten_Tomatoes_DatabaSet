@@ -1,3 +1,4 @@
+import json
 import pickle
 import numpy as np
 import pandas as pd 
@@ -83,8 +84,8 @@ if __name__ == "__main__":
                 print(f"There was an issue in {url}")
                 issues.append(url)
         
-        with open("rotten_tomatoes_movies_data.pickle", "wb") as fp:
-            fp.pickle.dump(movies_data)
+        with open("rotten_tomatoes_movies_data.json", "wb") as fp:
+            json.dump(movies_data, fp)
 
     else:
 
