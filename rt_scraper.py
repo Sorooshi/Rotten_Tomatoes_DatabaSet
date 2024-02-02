@@ -80,8 +80,12 @@ if __name__ == "__main__":
                 movies_data[url]["Synopsis"] = synopsis
                 movies_data[url]["Info"] = movie_info
                 movies_data[url]["Top Cast"] = top_cast
-            except:
-                print(f"There was an issue in {url}")
+            except Exception as error:
+                print(
+                    f"In {url} \n"
+                    f"{error} \n"
+                    f"occurred !"
+                    )
                 issues.append(url)
         
         with open("rotten_tomatoes_movies_data.json", "w") as fp:
@@ -102,26 +106,30 @@ if __name__ == "__main__":
 
         all_urls = get_all_collected_urls(path="collected_urls")
         issues = list()
+        idx = 0
         for u in trange(len(all_urls)):
             url = all_urls[u]
             title_ = url.split("m/")[-1].title().replace("_", " ")
             try:
                 rts = RTScraper(url)
                 synopsis, movie_info, top_cast = rts.get_all_required_info()
-                idx = 0
-        
-            except:
-                print(f"There was an issue in {url}")
+                movies_data.loc[idx, "Link"] = url
+                movies_data.loc[idx, "Title"] = title_
+                movies_data.loc[idx, "Synopsis"] = synopsis
+                movies_data.loc[idx, "Top Cast"] = top_cast
+                for kk, vv in movie_info.items():
+                    movies_data.loc[idx, kk] = vv
+                idx += 1
+
+            except Exception as error:
+                print(
+                    f"In {url} \n"
+                    f"{error} \n"
+                    f"occurred !"
+                    )
                 issues.append(url)
 
-            movies_data.loc[idx, "Link"] = url
-            movies_data.loc[idx, "Title"] = title_
-            movies_data.loc[idx, "Synopsis"] = synopsis
-            movies_data.loc[idx, "Top Cast"] = top_cast
-            for kk, vv in movie_info.items():
-                movies_data.loc[idx, kk] = vv
-            idx += 1
-
+           
         movies_data.to_csv("rotten_tomatoes_movies_data.csv")
 
 
