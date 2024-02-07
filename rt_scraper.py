@@ -41,15 +41,19 @@ class RTScraper:
     def get_top_casts(self, ):
         top_cast = self.driver.find_element('xpath', '//*[@id="cast-and-crew"]').text.split("\n")[1:-1]
         return top_cast
+    def get_score_panel(self, ):
+        score_panel = self.driver.find_element('xpath', '//*[@data-qa="score-panel"]').text.split("\n")
+        return score_panel
 
     def get_all_required_info(self, ):
 
         synopsis = self.get_synopsis()
         movie_info = self.get_movie_info()
         top_casts = self.get_top_casts()
+        score_panel = self.get_score_panel() 
         self.driver.quit()
     
-        return synopsis, movie_info, top_casts
+        return synopsis, movie_info, top_casts, score_panel
     
 
 if __name__ == "__main__":
@@ -68,10 +72,11 @@ if __name__ == "__main__":
             movies_data[url]["Title"] = title_
             try:
                 rts = RTScraper(url)
-                synopsis, movie_info, top_cast = rts.get_all_required_info()
+                synopsis, movie_info, top_cast, score_panel = rts.get_all_required_info()
                 movies_data[url]["Synopsis"] = synopsis
                 movies_data[url]["Info"] = movie_info
                 movies_data[url]["Top Cast"] = top_cast
+                movies_data[url]["Score Panel"] = score_panel
             except Exception as error:
                 print(
                     f"In {url} \n"
