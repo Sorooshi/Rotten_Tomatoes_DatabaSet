@@ -34,28 +34,26 @@ class RTScraper:
     
 
 if __name__ == "__main__":
-     
-    to_json = True
-    movies_data = get_movies_data(path="rotten_tomatoes_movies_data.json")
+
+    movies_data = get_movies_data(path="rotten_tomatoes_movies_data")
     issues = list()
 
-    if to_json == True:
-        for url, v in movies_data.items():
-            title_ = url.split("m/")[-1].title().replace("_", " ")
-            try:
-                rts = RTScraper(url)
-                score_panel = rts.get_score_panel()
-                movies_data[url]["Score Panel"] = score_panel
-            except Exception as error:
-                print(
-                    f"In {url} \n"
-                    f"{error} \n"
-                    f"occurred !"
-                    )
-                issues.append(url)
-        
-        with open("rotten_tomatoes_movies_data_with_score_panels.json", "w") as fp:
-            json.dump(movies_data, fp)
+    for url, v in movies_data.items():
+        title_ = url.split("m/")[-1].title().replace("_", " ")
+        try:
+            rts = RTScraper(url)
+            score_panel = rts.get_score_panel()
+            movies_data[url]["Score Panel"] = score_panel
+        except Exception as error:
+            print(
+                f"In {url} \n"
+                f"{error} \n"
+                f"occurred !"
+                )
+            issues.append(url)
+    
+    with open("rotten_tomatoes_movies_data_with_score_panels.json", "w") as fp:
+        json.dump(movies_data, fp)
 
     with open ("issues_score_panels.txt", "w") as fp:
         for issue in issues:
