@@ -40,6 +40,7 @@ if __name__ == "__main__":
 
     for url, v in movies_data.items():
         title_ = url.split("m/")[-1].title().replace("_", " ")
+        print(f"Adding score panel of {title_} from {url}")
         try:
             rts = RTScraper(url)
             score_panel = rts.get_score_panel()
