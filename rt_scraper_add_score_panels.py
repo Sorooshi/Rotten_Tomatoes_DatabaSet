@@ -36,14 +36,12 @@ class RTScraper:
 if __name__ == "__main__":
      
     to_json = True
-    movies_data = get_pickled_data(path="rotten_tomatoes_movies_data.json")
+    movies_data = get_movies_data(path="rotten_tomatoes_movies_data.json")
     issues = list()
 
     if to_json == True:
-        for k, v in movies_data.items():
-            url = k
+        for url, v in movies_data.items():
             title_ = url.split("m/")[-1].title().replace("_", " ")
-            # Construct an inner dict to store the movie info
             try:
                 rts = RTScraper(url)
                 score_panel = rts.get_score_panel()
@@ -56,52 +54,10 @@ if __name__ == "__main__":
                     )
                 issues.append(url)
         
-        with open("rotten_tomatoes_movies_data.json", "w") as fp:
+        with open("rotten_tomatoes_movies_data_with_score_panels.json", "w") as fp:
             json.dump(movies_data, fp)
 
-    else:
-
-        # create an initial data frame to store the extracted information
-        movies_data = pd.DataFrame(
-            # index=np.arange(int(len(GENRES)*150)), 
-            columns=[
-                "Title", "Synopsis", "Rating", "Genre", "Original Language", "Director", "Producer", "Writer", 
-                "Release Date (Theaters)", "Rerelease Date (Theaters)", "Release Date (Streaming)", "Rerelease Date (Streaming)", 
-                "Box Office (Gross USA)", "Runtime", "Distributor", "Production Co", 
-                "Sound Mix", "Top Cast", "Aspect Ratio", "View the collection", "Link", 
-                ]
-            )
-
-        all_urls = get_all_collected_urls(path="collected_urls")
-        issues = list()
-        idx = 0
-        for u in trange(len(all_urls)):
-            url = all_urls[u]
-            title_ = url.split("m/")[-1].title().replace("_", " ")
-            try:
-                rts = RTScraper(url)
-                synopsis, movie_info, top_cast = rts.get_all_required_info()
-                movies_data.loc[idx, "Link"] = url
-                movies_data.loc[idx, "Title"] = title_
-                movies_data.loc[idx, "Synopsis"] = synopsis
-                movies_data.loc[idx, "Top Cast"] = top_cast
-                for kk, vv in movie_info.items():
-                    movies_data.loc[idx, kk] = vv
-                idx += 1
-
-            except Exception as error:
-                print(
-                    f"In {url} \n"
-                    f"{error} \n"
-                    f"occurred !"
-                    )
-                issues.append(url)
-
-           
-        movies_data.to_csv("rotten_tomatoes_movies_data.csv")
-
-
-    with open ("issues.txt", "w") as fp:
+    with open ("issues_score_panels.txt", "w") as fp:
         for issue in issues:
             fp.write(f"{issue}\n")
 
