@@ -30,6 +30,7 @@ class RTScraper:
        
     def get_score_panel(self, ):
         score_panel = self.driver.find_element('xpath', '//*[@data-qa="score-panel"]').text.split("\n")
+        self.driver.quit()
         return score_panel
     
 
