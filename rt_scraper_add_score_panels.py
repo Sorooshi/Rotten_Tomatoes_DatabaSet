@@ -1,7 +1,4 @@
 import json
-import pickle
-import pandas as pd 
-from tqdm import trange
 from selenium import webdriver
 from selenium.webdriver import FirefoxOptions
 
