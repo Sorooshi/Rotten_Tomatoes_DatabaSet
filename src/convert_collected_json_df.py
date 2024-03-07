@@ -2,7 +2,7 @@ import json
 import numpy as np
 import pandas as pd
 
-EXTRACT_LARGE = False
+EXTRACT_LARGE = True
 
 FEATURES_1 = [
     'Title', 'Synopsis', 'Original Language', 'Runtime', 
@@ -22,12 +22,10 @@ def append_row(df, row):
         df, pd.DataFrame([row], columns=row.index)
     ]).reset_index(drop=True)
 
-
 def load_collected_json(path):
     with open(path,  'r') as fp:
         data = json.load(fp)
     return data
-
 
 def get_medium_movies_df(json_data):
     links_with_issue = []
