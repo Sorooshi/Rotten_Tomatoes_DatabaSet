@@ -20,8 +20,7 @@ FEATURES_2 = [
 parser = argparse.ArgumentParser(description="Convert JSON to DF")
 
 parser.add_argument(
-        "-s"
-        "--size", default=0, type=int,
+        "-s", "--size", default=0, type=int,
         help="To extract large-size data when it is set to 1, and medium-size else."
         )
 
