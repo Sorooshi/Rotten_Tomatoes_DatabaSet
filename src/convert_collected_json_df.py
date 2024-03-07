@@ -2,6 +2,8 @@ import json
 import numpy as np
 import pandas as pd
 
+EXTRACT_LARGE = True
+
 FEATURES_1 = [
     'Title', 'Synopsis', 'Original Language', 'Runtime', 
     'Director', 'Producer', 'Writer', 'Top Cast',
@@ -10,6 +12,10 @@ FEATURES_1 = [
     'Release Date (Theaters)', 'Release Date (Streaming)', 'Link'
 ]
 
+FEATURES_2 = [
+        'Title', 'Synopsis', 'Original Language', 'Runtime', 
+        'Director', 'Top Cast', 'Tomato Meter', 'Audience Score',
+        'No. Reviews', 'Genre', 'Link']
 
 def append_row(df, row):
     return pd.concat([
@@ -24,7 +30,7 @@ def load_collected_json(path):
 
 
 def get_movies_df_med(json_data):
-    link_with_issue = []
+    links_with_issue = []
     errors = []
     movies_data_med = pd.DataFrame(columns=FEATURES_1)
 
@@ -69,7 +75,7 @@ def get_movies_df_med(json_data):
                 f"{error} \n"
                 f"occurred !"
             )
-            link_with_issue.append(k)
+            links_with_issue.append(k)
             errors.append(error)
 
     languages = list(movies_data_med["Original Language"].unique())
@@ -80,7 +86,49 @@ def get_movies_df_med(json_data):
 
     return movies_data_med
 
+def get_movies_df_lar(json_data):
+    links_with_issue = []
+    errors = []
 
+    movies_data_lar = pd.DataFrame(columns=FEATURES_2)
+
+
+
+    for k, v in json_data.items():
+        try:
+            run_time =  int(v['Info']['Runtime'].split()[0].split("h")[0]) * 60 + int(v['Info']['Runtime'].split()[1].split("m")[0])
+            a_row = pd.Series({
+                'Title': v['Title'].strip(),
+                'Synopsis': v['Synopsis'].strip(), 
+                'Original Language': v['Info']['Original Language'].strip(), 
+                'Runtime': run_time,
+                'Director': v['Info']['Director'].strip(), 
+                'Top Cast': v["Top Cast"], 
+                'Tomato Meter': float(v["Score Panel"][2].strip("%"))/100,
+                'Audience Score': float(v["Score Panel"][5].strip("%"))/100,
+                'No. Reviews': int(v["Score Panel"][4].split(" ")[0]),
+                'All Genres': v['Info']['Genre'].strip(), 
+                'Genre': v['Info']['Genre'].strip().split(", ")[0],
+                'Link': k.strip()
+            })
+            movies_data_lar = append_row(df=movies_data_lar, row=a_row)
+        except Exception as error:
+            print(
+                f"In {k} \n"
+                f"{error} \n"
+                f"occurred !"
+            )
+            links_with_issue.append(k)
+            errors.append(error)
+
+        languages = list(movies_data_lar["Original Language"].unique())
+        for language in languages:
+            movies_data_lar['Original Language'].replace(language, language[:3], inplace=True)
+
+        movies_data_lar.to_csv("../data/movies_data_lar.csv", index=False)
+
+        return movies_data_lar
+                
     
 if __name__ == "__main__":
 
@@ -91,15 +139,26 @@ if __name__ == "__main__":
         f" size of collected data: {len(collected_json_data)}"
         )
     
-    movies_data_med = get_movies_df_med(
-        json_data=collected_json_data
+    if not EXTRACT_LARGE:
+        movies_data_med = get_movies_df_med(
+            json_data=collected_json_data
+            )
+        
+        print(movies_data_med.head())
+
+        print(
+            f"medium df data {movies_data_med.shape}"
         )
     
-    print(movies_data_med.head())
+    if EXTRACT_LARGE:
+        movies_data_lar = get_movies_df_med(
+            json_data=collected_json_data
+            )
+        
+        print(movies_data_lar.head())
 
-    print(
-        f"medium df data {movies_data_med.shape}"
-    )
-    
-
+        print(
+            f"medium df data {movies_data_lar.shape}"
+        )
+        
     
