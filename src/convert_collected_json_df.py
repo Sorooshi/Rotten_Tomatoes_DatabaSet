@@ -2,7 +2,7 @@ import json
 import numpy as np
 import pandas as pd
 
-EXTRACT_LARGE = True
+EXTRACT_LARGE = False
 
 FEATURES_1 = [
     'Title', 'Synopsis', 'Original Language', 'Runtime', 
@@ -146,7 +146,7 @@ if __name__ == "__main__":
         print(medium_movies_data.head())
 
         print(
-            f"medium df data {medium_movies_data.shape}"
+            f"Medium df data DF: {medium_movies_data.shape}"
         )
     
     if EXTRACT_LARGE:
@@ -157,7 +157,7 @@ if __name__ == "__main__":
         print(large_movies_data.head())
 
         print(
-            f"medium df data {large_movies_data.shape}"
+            f"Large df data DF: {large_movies_data.shape}"
         )
         
     
