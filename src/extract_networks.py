@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import argparse
 
 parser = argparse.ArgumentParser(description="Convert JSON to DF")
 
@@ -93,4 +94,4 @@ if __name__ == "__main__":
         
     elif extract_large == 1:
         print("....")
-        
+
