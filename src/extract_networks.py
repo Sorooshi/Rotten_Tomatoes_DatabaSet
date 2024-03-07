@@ -141,5 +141,5 @@ if __name__ == "__main__":
             f"Medium-size data shape: {large_df.shape} \n", 
             )
 
-        data_df_a, data_a = get_medium_adjacency_matrix(df=large_df)
+        data_df_a, data_a = get_large_adjacency_matrix(df=large_df)
 
