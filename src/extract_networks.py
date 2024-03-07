@@ -67,14 +67,14 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         index=df.Title.values,
         )
     
-    data_df_a.set_index([df.Title.values], inplace=True)
+    # data_df_a.set_index(df.Title.values, inplace=True)
     
     data_a = pd.DataFrame(
         data=adjacency, 
         columns=None,
         )
     
-    data_df_a.to_csv("./data/medium_data_df_a.csv", index=False)
+    data_df_a.to_csv("./data/medium_data_df_a.csv", index=True)
     data_a.to_csv("./data/medium_data_a.csv", header=False, index=False)
 
     return data_df_a, data_a
