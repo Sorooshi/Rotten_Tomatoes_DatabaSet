@@ -62,6 +62,7 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
     
     data_a = pd.DataFrame(
         data=adjacency, 
+        columns=None,
         )
     
     data_df_a.to_csv("./data/medium_data_df_a.csv", index=False)
