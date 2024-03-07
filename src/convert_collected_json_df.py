@@ -139,25 +139,25 @@ if __name__ == "__main__":
         )
     
     if EXTRACT_LARGE is False:
-        movies_data_med = get_movies_df_med(
+        medium_movies_data = get_medium_movies_df(
             json_data=collected_json_data
             )
         
-        print(movies_data_med.head())
+        print(medium_movies_data.head())
 
         print(
-            f"medium df data {movies_data_med.shape}"
+            f"medium df data {medium_movies_data.shape}"
         )
     
     if EXTRACT_LARGE:
-        movies_data_lar = get_movies_df_lar(
+        large_movies_data = get_large_movies_df(
             json_data=collected_json_data
             )
         
-        print(movies_data_lar.head())
+        print(large_movies_data.head())
 
         print(
-            f"medium df data {movies_data_lar.shape}"
+            f"medium df data {large_movies_data.shape}"
         )
         
     
