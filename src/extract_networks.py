@@ -83,7 +83,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     extract_large = args.size
 
-    if extract_large != 0:
+    if extract_large != 1:
         medium_df = pd.read_csv('./data/medium_movies_data.csv')
         print(
             f"Medium-size data head: {medium_df.head()} \n"
