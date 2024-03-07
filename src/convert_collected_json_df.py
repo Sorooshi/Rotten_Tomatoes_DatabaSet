@@ -139,7 +139,7 @@ if __name__ == "__main__":
         f" size of collected data: {len(collected_json_data)}"
         )
     
-    if not EXTRACT_LARGE:
+    if EXTRACT_LARGE is False:
         movies_data_med = get_movies_df_med(
             json_data=collected_json_data
             )
