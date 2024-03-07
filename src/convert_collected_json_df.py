@@ -14,7 +14,16 @@ FEATURES_1 = [
 FEATURES_2 = [
         'Title', 'Synopsis', 'Original Language', 'Runtime', 
         'Director', 'Top Cast', 'Tomato Meter', 'Audience Score',
-        'No. Reviews', 'Genre', 'Link']
+        'No. Reviews', 'Genre', 'Link'
+        ]
+
+parser = argparse.ArgumentParser(description="Convert JSON to DF")
+
+parser.add_argument(
+        "-s"
+        "--size", default=0, type=int,
+        help="To extract large-size data when it is set to 1, and medium-size else."
+        )
 
 def append_row(df, row):
     return pd.concat([
@@ -128,13 +137,9 @@ def get_large_movies_df(json_data):
     
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser()
-    
-    parser.add_argument(
-        "--extract_large", default=0, type=int,
-        help="To extract large-size data, when set to 1 and medium-size else."
-        )
-    
+    args = parser.parse_args()
+    extract_large = args.size
+
     collected_json_data = load_collected_json(
         path="./data/rotten_tomatoes_movies_data_with_score_panels.json"
         )
@@ -142,7 +147,7 @@ if __name__ == "__main__":
         f" size of collected data: {len(collected_json_data)}"
         )
     
-    if EXTRACT_LARGE is False:
+    if extract_large != 1:
         medium_movies_data = get_medium_movies_df(
             json_data=collected_json_data
             )
@@ -153,7 +158,7 @@ if __name__ == "__main__":
             f"Medium df data DF: {medium_movies_data.shape}"
         )
     
-    if EXTRACT_LARGE:
+    if extract_large == 1:
         large_movies_data = get_large_movies_df(
             json_data=collected_json_data
             )
