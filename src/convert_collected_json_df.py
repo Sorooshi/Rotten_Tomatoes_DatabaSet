@@ -118,13 +118,13 @@ def get_large_movies_df(json_data):
             links_with_issue.append(k)
             errors.append(error)
 
-        languages = list(large_movies_data["Original Language"].unique())
-        for language in languages:
-            large_movies_data['Original Language'].replace(language, language[:3], inplace=True)
+    languages = list(large_movies_data["Original Language"].unique())
+    for language in languages:
+        large_movies_data['Original Language'].replace(language, language[:3], inplace=True)
 
-        large_movies_data.to_csv("./data/large_movies_data.csv", index=False)
+    large_movies_data.to_csv("./data/large_movies_data.csv", index=False)
 
-        return large_movies_data
+    return large_movies_data
                 
     
 if __name__ == "__main__":
