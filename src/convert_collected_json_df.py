@@ -82,7 +82,7 @@ def get_movies_df_med(json_data):
     for language in languages:
         movies_data_med['Original Language'].replace(language, language[:3], inplace=True)
 
-    movies_data_med.to_csv("../data/movies_data_med.csv", index=False)
+    movies_data_med.to_csv("./data/movies_data_med.csv", index=False)
 
     return movies_data_med
 
@@ -125,7 +125,7 @@ def get_movies_df_lar(json_data):
         for language in languages:
             movies_data_lar['Original Language'].replace(language, language[:3], inplace=True)
 
-        movies_data_lar.to_csv("../data/movies_data_lar.csv", index=False)
+        movies_data_lar.to_csv("./data/movies_data_lar.csv", index=False)
 
         return movies_data_lar
                 
