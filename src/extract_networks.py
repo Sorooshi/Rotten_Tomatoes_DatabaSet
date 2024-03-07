@@ -55,10 +55,10 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
                     b = get_list_of_casts(df_np[j, 7])
                 )
                 weight = weight_dir + weight_pro + weight_wri + weight_casts
-        else:
-            weight = 0.
+            else:
+                weight = 0.
             
-        adjacency[i, j] = weight
+            adjacency[i, j] = weight
 
 
     data_df_a = pd.DataFrame(
@@ -96,10 +96,10 @@ def get_large_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
                     b = get_list_of_casts(df_np[j, 5])
                 )
                 weight = weight_dir + weight_casts
-        else:
-            weight = 0.
+            else:
+                weight = 0.
             
-        adjacency[i, j] = weight
+            adjacency[i, j] = weight
 
 
     data_df_a = pd.DataFrame(
