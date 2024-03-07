@@ -133,7 +133,7 @@ def get_movies_df_lar(json_data):
 if __name__ == "__main__":
 
     collected_json_data = load_collected_json(
-        path="../data/rotten_tomatoes_movies_data_with_score_panels.json"
+        path="./data/rotten_tomatoes_movies_data_with_score_panels.json"
         )
     print(
         f" size of collected data: {len(collected_json_data)}"
