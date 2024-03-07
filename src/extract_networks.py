@@ -22,7 +22,7 @@ def get_edge_weight(a, b):
 
 def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
     df_np = df.values
-    adjacency = np.zeros(shape=(len(df_np, len(df_np))))
+    adjacency = np.zeros(shape=(len(df_np), len(df_np)))
 
     for i in range(len(df_np)):
         for j in range(len(df_np)):
@@ -74,8 +74,8 @@ if __name__ == "__main__":
 
     medium_df = pd.read_csv('./data/medium_movies_data.csv')
     print(
-        f"Medium data size: {medium_df.shape}", 
-        f"Medium data head: {medium_df.head()}"
+        f"Medium-size data head: {medium_df.head()} \n"
+        f"Medium-size data shape: {medium_df.shape} \n", 
         )
 
     data_df_a, data_a = get_medium_adjacency_matrix(df=medium_df)
