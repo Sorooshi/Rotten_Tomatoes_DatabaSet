@@ -1,8 +1,7 @@
 import json
 import numpy as np
 import pandas as pd
-
-EXTRACT_LARGE = True
+import argparse 
 
 FEATURES_1 = [
     'Title', 'Synopsis', 'Original Language', 'Runtime', 
@@ -129,6 +128,13 @@ def get_large_movies_df(json_data):
     
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser()
+    
+    parser.add_argument(
+        "--extract_large", default=0, type=int,
+        help="To extract large-size data, when set to 1 and medium-size else."
+        )
+    
     collected_json_data = load_collected_json(
         path="./data/rotten_tomatoes_movies_data_with_score_panels.json"
         )
