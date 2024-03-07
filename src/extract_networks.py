@@ -89,23 +89,13 @@ def get_large_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
                 weight_dir = get_edge_weight(
                 a = get_list_of_others(df_np[i, 4]), 
                 b = get_list_of_others(df_np[j, 4])
-            )
-                # Producers
-                weight_pro = get_edge_weight(
-                    a = get_list_of_others(df_np[i, 5]), 
-                    b = get_list_of_others(df_np[j, 5])
-                )
-                # Writers
-                weight_wri = get_edge_weight(
-                    a = get_list_of_others(df_np[i, 6]), 
-                    b = get_list_of_others(df_np[j, 6])
                 )
                 # Top casts
                 weight_casts = get_edge_weight(
-                    a = get_list_of_casts(df_np[i, 7]), 
-                    b = get_list_of_casts(df_np[j, 7])
+                    a = get_list_of_casts(df_np[i, 5]), 
+                    b = get_list_of_casts(df_np[j, 5])
                 )
-                weight = weight_dir + weight_pro + weight_wri + weight_casts
+                weight = weight_dir + weight_casts
         else:
             weight = 0.
             
@@ -123,8 +113,8 @@ def get_large_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         columns=None,
         )
     
-    data_df_a.to_csv("./data/medium_data_df_a.csv", index=True)
-    data_a.to_csv("./data/medium_data_a.csv", header=False, index=False)
+    data_df_a.to_csv("./data/large_data_df_a.csv", index=True)
+    data_a.to_csv("./data/large_data_a.csv", header=False, index=False)
 
     return data_df_a, data_a
 
@@ -145,5 +135,11 @@ if __name__ == "__main__":
         data_df_a, data_a = get_medium_adjacency_matrix(df=medium_df)
         
     elif extract_large == 1:
-        print("....")
+        large_df = pd.read_csv('./data/large_movies_data.csv')
+        print(
+            f"Medium-size data head: {large_df.head()} \n"
+            f"Medium-size data shape: {large_df.shape} \n", 
+            )
+
+        data_df_a, data_a = get_medium_adjacency_matrix(df=large_df)
 
