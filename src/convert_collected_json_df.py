@@ -149,7 +149,7 @@ if __name__ == "__main__":
         )
     
     if EXTRACT_LARGE:
-        movies_data_lar = get_movies_df_med(
+        movies_data_lar = get_movies_df_lar(
             json_data=collected_json_data
             )
         
