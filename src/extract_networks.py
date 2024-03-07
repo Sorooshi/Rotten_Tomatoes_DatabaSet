@@ -67,6 +67,8 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         index=df.Title.values,
         )
     
+    data_df_a.set_index([df.Title.values], inplace=True)
+    
     data_a = pd.DataFrame(
         data=adjacency, 
         columns=None,
