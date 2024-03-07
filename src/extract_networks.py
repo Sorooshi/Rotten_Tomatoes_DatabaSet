@@ -1,6 +1,12 @@
 import numpy as np
 import pandas as pd
 
+parser = argparse.ArgumentParser(description="Convert JSON to DF")
+
+parser.add_argument(
+        "-s", "--size", default=0, type=int,
+        help="To extract large-size data when it is set to 1, and medium-size else."
+        )
 
 def get_list_of_casts(x):
     x = x.split(", ")
@@ -73,12 +79,18 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
 
 if __name__ == "__main__":
 
-    medium_df = pd.read_csv('./data/medium_movies_data.csv')
-    print(
-        f"Medium-size data head: {medium_df.head()} \n"
-        f"Medium-size data shape: {medium_df.shape} \n", 
-        )
+    args = parser.parse_args()
+    extract_large = args.size
 
-    data_df_a, data_a = get_medium_adjacency_matrix(df=medium_df)
-    
-    
+    if extract_large != 0:
+        medium_df = pd.read_csv('./data/medium_movies_data.csv')
+        print(
+            f"Medium-size data head: {medium_df.head()} \n"
+            f"Medium-size data shape: {medium_df.shape} \n", 
+            )
+
+        data_df_a, data_a = get_medium_adjacency_matrix(df=medium_df)
+        
+    elif extract_large == 1:
+        print("....")
+        
