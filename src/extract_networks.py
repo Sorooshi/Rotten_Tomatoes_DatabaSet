@@ -67,7 +67,56 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         index=df.Title.values,
         )
     
-    # data_df_a.set_index(df.Title.values, inplace=True)
+    data_a = pd.DataFrame(
+        data=adjacency, 
+        columns=None,
+        )
+    
+    data_df_a.to_csv("./data/medium_data_df_a.csv", index=True)
+    data_a.to_csv("./data/medium_data_a.csv", header=False, index=False)
+
+    return data_df_a, data_a
+
+
+def get_large_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
+    df_np = df.values
+    adjacency = np.zeros(shape=(len(df_np), len(df_np)))
+
+    for i in range(len(df_np)):
+        for j in range(len(df_np)):
+            if i != j:
+                # Directors
+                weight_dir = get_edge_weight(
+                a = get_list_of_others(df_np[i, 4]), 
+                b = get_list_of_others(df_np[j, 4])
+            )
+                # Producers
+                weight_pro = get_edge_weight(
+                    a = get_list_of_others(df_np[i, 5]), 
+                    b = get_list_of_others(df_np[j, 5])
+                )
+                # Writers
+                weight_wri = get_edge_weight(
+                    a = get_list_of_others(df_np[i, 6]), 
+                    b = get_list_of_others(df_np[j, 6])
+                )
+                # Top casts
+                weight_casts = get_edge_weight(
+                    a = get_list_of_casts(df_np[i, 7]), 
+                    b = get_list_of_casts(df_np[j, 7])
+                )
+                weight = weight_dir + weight_pro + weight_wri + weight_casts
+        else:
+            weight = 0.
+            
+        adjacency[i, j] = weight
+
+
+    data_df_a = pd.DataFrame(
+        data=adjacency, 
+        columns=df.Title.values,
+        index=df.Title.values,
+        )
     
     data_a = pd.DataFrame(
         data=adjacency, 
@@ -78,6 +127,7 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
     data_a.to_csv("./data/medium_data_a.csv", header=False, index=False)
 
     return data_df_a, data_a
+
 
 
 if __name__ == "__main__":
