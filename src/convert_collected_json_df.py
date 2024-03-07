@@ -92,8 +92,6 @@ def get_movies_df_lar(json_data):
 
     movies_data_lar = pd.DataFrame(columns=FEATURES_2)
 
-
-
     for k, v in json_data.items():
         try:
             run_time =  int(v['Info']['Runtime'].split()[0].split("h")[0]) * 60 + int(v['Info']['Runtime'].split()[1].split("m")[0])
