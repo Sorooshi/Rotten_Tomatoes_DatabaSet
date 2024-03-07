@@ -29,10 +29,10 @@ def load_collected_json(path):
     return data
 
 
-def get_movies_df_med(json_data):
+def get_medium_movies_df(json_data):
     links_with_issue = []
     errors = []
-    movies_data_med = pd.DataFrame(columns=FEATURES_1)
+    medium_movies_data = pd.DataFrame(columns=FEATURES_1)
 
     for k, v in json_data.items():
         try:
@@ -67,7 +67,7 @@ def get_movies_df_med(json_data):
                 'Release Date (Streaming)': v['Info']['Release Date (Streaming)'].strip(), 
                 'Link': k.strip()
             })
-            movies_data_med = append_row(df=movies_data_med, row=a_row)
+            medium_movies_data = append_row(df=medium_movies_data, row=a_row)
 
         except Exception as error:
             print(
@@ -78,23 +78,24 @@ def get_movies_df_med(json_data):
             links_with_issue.append(k)
             errors.append(error)
 
-    languages = list(movies_data_med["Original Language"].unique())
+    languages = list(medium_movies_data["Original Language"].unique())
     for language in languages:
-        movies_data_med['Original Language'].replace(language, language[:3], inplace=True)
+        medium_movies_data['Original Language'].replace(language, language[:3], inplace=True)
 
-    movies_data_med.to_csv("./data/movies_data_med.csv", index=False)
+    medium_movies_data.to_csv("./data/medium_movies_data.csv", index=False)
 
-    return movies_data_med
+    return medium_movies_data
 
-def get_movies_df_lar(json_data):
+def get_large_movies_df(json_data):
     links_with_issue = []
     errors = []
 
-    movies_data_lar = pd.DataFrame(columns=FEATURES_2)
+    large_movies_data = pd.DataFrame(columns=FEATURES_2)
 
     for k, v in json_data.items():
         try:
-            run_time =  int(v['Info']['Runtime'].split()[0].split("h")[0]) * 60 + int(v['Info']['Runtime'].split()[1].split("m")[0])
+            run_time =  int(v['Info']['Runtime'].split()[0].split("h")[0]) * 60 + \
+                  int(v['Info']['Runtime'].split()[1].split("m")[0])
             a_row = pd.Series({
                 'Title': v['Title'].strip(),
                 'Synopsis': v['Synopsis'].strip(), 
@@ -109,7 +110,7 @@ def get_movies_df_lar(json_data):
                 'Genre': v['Info']['Genre'].strip().split(", ")[0],
                 'Link': k.strip()
             })
-            movies_data_lar = append_row(df=movies_data_lar, row=a_row)
+            large_movies_data = append_row(df=large_movies_data, row=a_row)
         except Exception as error:
             print(
                 f"In {k} \n"
@@ -119,13 +120,13 @@ def get_movies_df_lar(json_data):
             links_with_issue.append(k)
             errors.append(error)
 
-        languages = list(movies_data_lar["Original Language"].unique())
+        languages = list(large_movies_data["Original Language"].unique())
         for language in languages:
-            movies_data_lar['Original Language'].replace(language, language[:3], inplace=True)
+            large_movies_data['Original Language'].replace(language, language[:3], inplace=True)
 
-        movies_data_lar.to_csv("./data/movies_data_lar.csv", index=False)
+        large_movies_data.to_csv("./data/large_movies_data.csv", index=False)
 
-        return movies_data_lar
+        return large_movies_data
                 
     
 if __name__ == "__main__":
