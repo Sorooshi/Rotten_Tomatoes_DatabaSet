@@ -8,7 +8,7 @@ tfkl = tf.keras.layers
 
 
 class LstmAe(tfk.Model):
-    def __init__(self, latent_dim, embedding_dim, vocab_size):
+    def __init__(self, latent_dim, vocab_size):
         super().__init__()
 
         # self.latent_dim = latent_dim
@@ -66,8 +66,20 @@ class LstmAe(tfk.Model):
         return x
     
 
+class TrainTestLstmAe:
+    def __init__(self, data: pd.DataFrame=None, n_epochs: int= 1):
+        super().__init__()
+        self.data = data
+        self.n_epochs = n_epochs
 
-class 
+    def train_val_test(self,):
+        x_train = None
+        x_val = None
+        x_test = None
+
+        for k in range(5):
+            print("....")
+
 
 
 
