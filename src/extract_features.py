@@ -66,7 +66,7 @@ class TrainTestLstmAe:
     @staticmethod
     def get_preprocess_data(
         data_path: str="../data/medium_movies_data.csv", 
-        vocab_size: int = 12500 # 124079 precise
+        vocab_size: int = 125000 # 124079 precise
         ) -> tuple:
 
         data = pd.read_csv(data_path)
@@ -78,7 +78,7 @@ class TrainTestLstmAe:
             f"labels head: \n {labels[:3]} \n"
             f"labels shape: {labels.shape} \n"
         )
-        if vocab_size is None:
+        if vocab_size is None:  # a bit slower
             vocabulary = []
             for synopsis in text_data:
                 parsed_synopsis = np.unique(synopsis.lower().strip().split(" ")).tolist()
