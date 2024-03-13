@@ -78,8 +78,8 @@ class TrainTestLstmAe:
             f"labels shape: {labels.shape} \n"
         )
         AUTOTUNE = tf.data.AUTOTUNE
-        text_data = tf.data.Dataset.from_tensor_slices(text_data)
-        label_data = tf.data.Dataset.from_tensor_slices(labels)
+        # text_data = tf.data.Dataset.from_tensor_slices(text_data)
+        # label_data = tf.data.Dataset.from_tensor_slices(labels)
 
         txt_vec = tfkl.TextVectorization(
             max_tokens=vocab_size, 
@@ -88,16 +88,18 @@ class TrainTestLstmAe:
             standardize="lower_and_strip_punctuation",
         )
         text_data = txt_vec.adapt(
-            text_data.map(lambda x: txt_vec(x)), batch_size=8, steps=None
+            data=text_data, batch_size=8, steps=None
         )
-        text_data.cache().prefetch(buffer_size=AUTOTUNE)
+        # text_data.cache().prefetch(buffer_size=AUTOTUNE)
 
-        labels_int = tfkl.StringLookup(vocabulary=label_size)
+        labels_int = tfkl.StringLookup(
+            vocabulary=label_size,
+            output_mode="int", 
+        )
         label_data = labels_int.adopt(
-            label_data.map(lambda y: labels_int(y)), batch_size=8, steps=None
+            data=label_data, batch_size=8, steps=None
         )
-        label_data.cache().prefetch(buffer_size=AUTOTUNE)
-
+        
         return text_data, label_data   
 
     def train_val_test(self,):
