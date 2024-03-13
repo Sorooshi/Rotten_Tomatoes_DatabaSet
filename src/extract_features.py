@@ -92,8 +92,13 @@ class TrainTestLstmAe:
         )
         text_data.cache().prefetch(buffer_size=AUTOTUNE)
 
-        lab_int = tfkl.StringLookup(vocabulary=)
-        return text_data,        
+        labels_int = tfkl.StringLookup(vocabulary=label_size)
+        label_data = labels_int.adopt(
+            label_data.map(lambda y: labels_int(y)), batch_size=8, steps=None
+        )
+        label_data.cache().prefetch(buffer_size=AUTOTUNE)
+
+        return text_data, label_data   
 
     def train_val_test(self,):
         x_train = None
