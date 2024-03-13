@@ -84,11 +84,11 @@ class TrainTestLstmAe:
             output_mode="int", ragged=True,
             standardize="lower_and_strip_punctuation",
         )
-        text_data = txt_vec.adapt(
+        txt_vec.adapt(
             data=text_data, batch_size=8, steps=None
         )
         
-        return text_data, labels   
+        return txt_vec, labels   
 
     def train_val_test(self,):
         x_train = None
