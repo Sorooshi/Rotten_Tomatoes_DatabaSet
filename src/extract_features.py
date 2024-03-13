@@ -67,11 +67,10 @@ class TrainTestLstmAe:
     def load_preprocess_data(
         vocab_size: int=1000, 
         data_path: str="../data/medium_movies_data.csv", 
-        labels: list= ['Action', 'Adventure', 'Biography',
-                        'Comedy', 'Crime', 'Documentary', 'Drama', 
-                        'Fantasy', 'History', 'Holiday', 'Horror',
-                        'Kids & family', 'Musical', 'Mystery & thriller',
-                        'Romance', 'Sci-fi', 'War', 'Western']
+        labels: list= ['action', 'adventure', 'biography', 'comedy', 'crime', 
+                       'documentary', 'drama', 'fantasy', 'history', 'holiday',
+                       'horror', 'kids & family', 'musical', 'mystery & thriller', 
+                       'romance', 'sci-fi', 'war','western']
        ):
 
         data = pd.read_csv(data_path)
