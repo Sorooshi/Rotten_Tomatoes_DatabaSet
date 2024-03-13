@@ -66,7 +66,7 @@ class TrainTestLstmAe:
     @staticmethod
     def get_preprocess_data(
         data_path: str="../data/medium_movies_data.csv", 
-        vocab_size: int = 125000 # 124079 precise
+        vocab_size: int = 124100 # 124,079 precise
         ) -> tuple:
 
         data = pd.read_csv(data_path)
