@@ -57,8 +57,8 @@ class LstmAe(tfk.Model):
         )
 
     def call(self, inputs):
-        x = self.input(inputs)
-        x = self.txt_vec().adapt(data=x, batch_size=8, steps=None)
+        # x = self.input(inputs)
+        x = self.txt_vec().adapt(data=inputs, batch_size=8, steps=None)
         x = self.emb(x)
         x = self.enc(x)
         x = self.dec1(x)
