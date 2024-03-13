@@ -65,8 +65,14 @@ class TrainTestLstmAe:
     
     @staticmethod
     def load_preprocess_data(
+        vocab_size: int=1000, 
         data_path: str="../data/medium_movies_data.csv", 
-        vocab_size: int=1000, label_size: int=10):
+        labels: list= ['Action', 'Adventure', 'Biography',
+                        'Comedy', 'Crime', 'Documentary', 'Drama', 
+                        'Fantasy', 'History', 'Holiday', 'Horror',
+                        'Kids & family', 'Musical', 'Mystery & thriller',
+                        'Romance', 'Sci-fi', 'War', 'Western']
+       ):
 
         data = pd.read_csv(data_path)
         text_data = data.Synopsis.values
@@ -79,7 +85,7 @@ class TrainTestLstmAe:
         )
         AUTOTUNE = tf.data.AUTOTUNE
         # train_dataset = train_dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
-        text_data = text_data.shuffle(100).batch(8).prefetch(tf.data.AUTOTUNE)
+        
         # text_data = tf.data.Dataset.from_tensor_slices(text_data)
         # label_data = tf.data.Dataset.from_tensor_slices(labels)
 
