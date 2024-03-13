@@ -70,8 +70,6 @@ class TrainTestLstmAe:
         text_data = data.Synopsis.values
         labels = data.Genre.values
         print(
-            f"data head: \n {data.head()} \n" 
-            f"data shape: {data.shape} \n"
             f"text data head: \n {text_data[:5]} \n" 
             f"text data shape: {text_data.shape} \n"
             f"labels head: \n {labels[:5]} \n"
