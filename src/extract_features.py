@@ -64,24 +64,33 @@ class TrainTestLstmAe:
         self.n_epochs = n_epochs
     
     @staticmethod
-    def load_preprocess_data(
-        vocab_size: int=1000, 
-        data_path: str="../data/medium_movies_data.csv", ):
+    def get_preprocess_data(
+        data_path: str="../data/medium_movies_data.csv", ) -> tuple:
 
         data = pd.read_csv(data_path)
         text_data = data.Synopsis.values
         labels = data.Genre.values
         print(
-            f"text data head: \n {text_data[:5]} \n" 
+            f"text data head: \n {text_data[:3]} \n" 
             f"text data shape: {text_data.shape} \n"
-            f"labels head: \n {labels[:5]} \n"
+            f"labels head: \n {labels[:3]} \n"
             f"labels shape: {labels.shape} \n"
         )
 
+        vocabulary = []
+        for synopsis in text_data:
+            parsed_synopsis = np.unique(synopsis.lower().strip().split(" ")).tolist()
+            for word in parsed_synopsis:
+                if word not in vocabulary:
+                    vocabulary.append(vocabulary)
+
+        print(f"vocabulary size {len(vocabulary)}")
+
         txt_vec = tfkl.TextVectorization(
-            max_tokens=vocab_size, 
+            max_tokens=len(vocabulary), 
             split="whitespace", ngrams=1, 
             output_mode="int", ragged=True,
+            # vocabulary=vocabulary,
             standardize="lower_and_strip_punctuation",
         )
         txt_vec.adapt(
@@ -91,10 +100,10 @@ class TrainTestLstmAe:
         return txt_vec, labels   
 
     def train_val_test(self,):
-        x_train = None
-        x_val = None
-        x_test = None
-
+        vectorized_text, labels = self.get_preprocess_data(
+            data_path="../data/medium_movies_data.scv",
+        )
+        
         for k in range(5):
             print("....")
 
