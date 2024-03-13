@@ -66,12 +66,7 @@ class TrainTestLstmAe:
     @staticmethod
     def load_preprocess_data(
         vocab_size: int=1000, 
-        data_path: str="../data/medium_movies_data.csv", 
-        labels: list= ['action', 'adventure', 'biography', 'comedy', 'crime', 
-                       'documentary', 'drama', 'fantasy', 'history', 'holiday',
-                       'horror', 'kids & family', 'musical', 'mystery & thriller', 
-                       'romance', 'sci-fi', 'war','western']
-       ):
+        data_path: str="../data/medium_movies_data.csv", ):
 
         data = pd.read_csv(data_path)
         text_data = data.Synopsis.values
@@ -82,11 +77,6 @@ class TrainTestLstmAe:
             f"labels head: \n {labels[:5]} \n"
             f"labels shape: {labels.shape} \n"
         )
-        AUTOTUNE = tf.data.AUTOTUNE
-        # train_dataset = train_dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
-        
-        # text_data = tf.data.Dataset.from_tensor_slices(text_data)
-        # label_data = tf.data.Dataset.from_tensor_slices(labels)
 
         txt_vec = tfkl.TextVectorization(
             max_tokens=vocab_size, 
@@ -97,17 +87,8 @@ class TrainTestLstmAe:
         text_data = txt_vec.adapt(
             data=text_data, batch_size=8, steps=None
         )
-        # text_data.cache().prefetch(buffer_size=AUTOTUNE)
-
-        labels_int = tfkl.StringLookup(
-            vocabulary=labels,
-            output_mode="int", 
-        )
-        label_data = labels_int.adopt(
-            data=label_data, batch_size=8, steps=None
-        )
         
-        return text_data, label_data   
+        return text_data, labels   
 
     def train_val_test(self,):
         x_train = None
