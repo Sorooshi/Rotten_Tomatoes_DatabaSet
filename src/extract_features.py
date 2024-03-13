@@ -65,7 +65,9 @@ class TrainTestLstmAe:
     
     @staticmethod
     def get_preprocess_data(
-        data_path: str="../data/medium_movies_data.csv", ) -> tuple:
+        data_path: str="../data/medium_movies_data.csv", 
+        vocab_size: int = 12500 # 124079 precise
+        ) -> tuple:
 
         data = pd.read_csv(data_path)
         text_data = data.Synopsis.values
@@ -76,21 +78,21 @@ class TrainTestLstmAe:
             f"labels head: \n {labels[:3]} \n"
             f"labels shape: {labels.shape} \n"
         )
+        if vocab_size is None:
+            vocabulary = []
+            for synopsis in text_data:
+                parsed_synopsis = np.unique(synopsis.lower().strip().split(" ")).tolist()
+                for word in parsed_synopsis:
+                    if word not in vocabulary:
+                        vocabulary.append(vocabulary)
 
-        vocabulary = []
-        for synopsis in text_data:
-            parsed_synopsis = np.unique(synopsis.lower().strip().split(" ")).tolist()
-            for word in parsed_synopsis:
-                if word not in vocabulary:
-                    vocabulary.append(vocabulary)
-
-        print(f"vocabulary size {len(vocabulary)}")
+            print(f"vocabulary size {len(vocabulary)}")
+            vocab_size = len(vocabulary)
 
         txt_vec = tfkl.TextVectorization(
-            max_tokens=len(vocabulary), 
+            max_tokens=vocab_size, 
             split="whitespace", ngrams=1, 
             output_mode="int", ragged=True,
-            # vocabulary=vocabulary,
             standardize="lower_and_strip_punctuation",
         )
         txt_vec.adapt(
