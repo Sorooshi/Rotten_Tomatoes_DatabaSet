@@ -64,7 +64,9 @@ class TrainTestLstmAe:
         self.n_epochs = n_epochs
     
     @staticmethod
-    def load_preprocess_data(data_path, vocab_size, ):
+    def load_preprocess_data(
+        data_path: str="../data/medium_movies_data.csv", 
+        vocab_size: int=1000, label_size: int=10):
 
         data = pd.read_csv(data_path)
         text_data = data.Synopsis.values
@@ -89,7 +91,9 @@ class TrainTestLstmAe:
             text_data.map(lambda x: txt_vec(x)), batch_size=8, steps=None
         )
         text_data.cache().prefetch(buffer_size=AUTOTUNE)
-        return text_data        
+
+        lab_int = tfkl.StringLookup(vocabulary=)
+        return text_data,        
 
     def train_val_test(self,):
         x_train = None
