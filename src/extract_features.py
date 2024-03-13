@@ -8,27 +8,20 @@ tfkl = tf.keras.layers
 
 
 class LstmAe(tfk.Model):
-    def __init__(self, latent_dim, vocab_size):
+    def __init__(self, latent_dim, txt_vec):
         super().__init__()
 
         # self.latent_dim = latent_dim
         # self.embedding_dim = embedding_dim
         # self.vocab_size = vocab_size
 
-        self.inputs = tfkl.Input(
-            shape=(1, ), dtype=tf.string
-            )
-
-        self.txt_vec = tfkl.TextVectorization(
-            max_tokens=vocab_size, 
-            split="whitespace", ngrams=1, 
-            output_mode="int", ragged=True,
-            standardize="lower_and_strip_punctuation",
-            )
+        # self.inputs = tfkl.Input(
+        #     shape=(1, ), dtype=tf.string
+        # )
         self.emb = tfkl.Embedding(
-            input_dim=len(self.txt_vec.get_vocabulary()),
+            input_dim=len(txt_vec.get_vocabulary()),
             output_dim=latent_dim,
-            )
+        )
         self.enc = tfkl.Bidirectional(
             tfkl.LSTM(
                 units=latent_dim,  # hp.Int('units', min_value=2, max_value=100, step=5), 
@@ -37,7 +30,6 @@ class LstmAe(tfk.Model):
                 name="encoder 1"
             )
         )
-
         self.dec1 = tfkl.Bidirectional(
             tfkl.LSTM(
                 units=10,  # hp.Int('units', min_value=2, max_value=100, step=5), 
@@ -46,7 +38,6 @@ class LstmAe(tfk.Model):
                 name="decoder 1"
             )
         )
-
         self.dec2 = tfkl.Bidirectional(
             tfkl.LSTM(
                 units=20,  # hp.Int('units', min_value=2, max_value=100, step=5), 
@@ -71,6 +62,34 @@ class TrainTestLstmAe:
         super().__init__()
         self.data = data
         self.n_epochs = n_epochs
+    
+    @staticmethod
+    def load_preprocess_data(data_path, vocab_size, ):
+
+        data = pd.read_csv(data_path)
+        text_data = data.Synopsis.values
+        labels = data.Genre.values
+        print(
+            f"data head: {data.head()} \n" 
+            f"data shape: {data.shape} \n"
+            f"text data head: {text_data[:5]} \n" 
+            f"text data shape: {text_data.shape} \n"
+            f"labels head: {labels[:5]} \n"
+            f"labels shape: {labels.shape} \n"
+        )
+        AUTOTUNE = tf.data.AUTOTUNE
+        text_data = tf.data.Dataset.from_tensor_slices(text_data)
+        txt_vec = tfkl.TextVectorization(
+            max_tokens=vocab_size, 
+            split="whitespace", ngrams=1, 
+            output_mode="int", ragged=True,
+            standardize="lower_and_strip_punctuation",
+        )
+        text_data = text_data.adapt(
+            map(lambda x, y: txt_vec(x)), batch_size=8, steps=None
+        )
+        text_data.cache().prefetch(buffer_size=AUTOTUNE)
+        return text_data        
 
     def train_val_test(self,):
         x_train = None
