@@ -70,11 +70,11 @@ class TrainTestLstmAe:
         text_data = data.Synopsis.values
         labels = data.Genre.values
         print(
-            f"data head: {data.head()} \n" 
+            f"data head: \n {data.head()} \n" 
             f"data shape: {data.shape} \n"
-            f"text data head: {text_data[:5]} \n" 
+            f"text data head: \n {text_data[:5]} \n" 
             f"text data shape: {text_data.shape} \n"
-            f"labels head: {labels[:5]} \n"
+            f"labels head: \n {labels[:5]} \n"
             f"labels shape: {labels.shape} \n"
         )
         AUTOTUNE = tf.data.AUTOTUNE
@@ -85,8 +85,8 @@ class TrainTestLstmAe:
             output_mode="int", ragged=True,
             standardize="lower_and_strip_punctuation",
         )
-        text_data = text_data.adapt(
-            map(lambda x, y: txt_vec(x)), batch_size=8, steps=None
+        text_data = txt_vec.adapt(
+            map(lambda x, y: txt_vec(text_data)), batch_size=8, steps=None
         )
         text_data.cache().prefetch(buffer_size=AUTOTUNE)
         return text_data        
