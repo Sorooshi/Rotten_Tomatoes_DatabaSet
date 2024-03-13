@@ -101,7 +101,7 @@ class TrainTestLstmAe:
         # text_data.cache().prefetch(buffer_size=AUTOTUNE)
 
         labels_int = tfkl.StringLookup(
-            vocabulary=label_size,
+            vocabulary=labels,
             output_mode="int", 
         )
         label_data = labels_int.adopt(
