@@ -78,6 +78,8 @@ class TrainTestLstmAe:
             f"labels shape: {labels.shape} \n"
         )
         AUTOTUNE = tf.data.AUTOTUNE
+        # train_dataset = train_dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
+        text_data = text_data.shuffle(100).batch(8).prefetch(tf.data.AUTOTUNE)
         # text_data = tf.data.Dataset.from_tensor_slices(text_data)
         # label_data = tf.data.Dataset.from_tensor_slices(labels)
 
