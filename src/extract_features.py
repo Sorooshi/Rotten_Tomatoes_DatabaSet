@@ -90,7 +90,7 @@ class TrainTestLstmAe:
             standardize="lower_and_strip_punctuation",
         )
         text_data = txt_vec.adapt(
-            data=text_data, batch_size=8, steps=None
+            data=text_data.map(lambda x: txt_vec(x)), batch_size=8, steps=None
         )
         # text_data.cache().prefetch(buffer_size=AUTOTUNE)
 
