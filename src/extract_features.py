@@ -21,15 +21,15 @@ class LstmAe(tfk.Model):
         self.emb = tfkl.Embedding(
             input_dim=len(txt_vec.get_vocabulary()),
             output_dim=latent_dim,
-        )
+            )
         self.enc = tfkl.Bidirectional(
             tfkl.LSTM(
                 units=latent_dim,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
                 name="encoder 1"
+                )
             )
-        )
         self.dec1 = tfkl.Bidirectional(
             tfkl.LSTM(
                 units=10,  # hp.Int('units', min_value=2, max_value=100, step=5), 
@@ -49,8 +49,8 @@ class LstmAe(tfk.Model):
 
     def call(self, inputs):
         # x = self.input(inputs)
-        x = self.txt_vec.adapt(data=inputs, batch_size=8, steps=None)
-        x = self.emb(x)
+        # x = self.txt_vec.adapt(data=inputs, batch_size=8, steps=None)
+        x = self.emb(inputs)
         x = self.enc(x)
         x = self.dec1(x)
         x = self.dec2(x)
@@ -84,10 +84,13 @@ class TrainTestLstmAe:
                 parsed_synopsis = np.unique(synopsis.lower().strip().split(" ")).tolist()
                 for word in parsed_synopsis:
                     if word not in vocabulary:
-                        vocabulary.append(vocabulary)
-
-            print(f"vocabulary size {len(vocabulary)}")
+                        vocabulary.append(vocabulary)            
             vocab_size = len(vocabulary)
+            n_classes = [i.lower() for i in np.unique(labels)]
+            print(
+                f"vocabulary size {len(vocabulary)}"
+                f"Number of classes: {n_classes}"
+                )
 
         txt_vec = tfkl.TextVectorization(
             max_tokens=vocab_size, 
