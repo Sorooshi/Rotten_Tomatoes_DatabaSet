@@ -110,7 +110,21 @@ class TrainTestLstmAe:
             data=text_data, batch_size=8, steps=None
         )
         
-        return txt_vec, labels   
+        return txt_vec, labels  
+
+    def get_text_data(
+        data_path: str="../data/medium_movies_data.csv", 
+        ) -> tuple:
+
+        data = pd.read_csv(data_path)
+        text_data = data.Synopsis.values
+        labels = data.Genre.values
+        print(
+            f"text data head: \n {text_data[:3]} \n" 
+            f"text data shape: {text_data.shape} \n"
+            f"labels head: \n {labels[:3]} \n"
+            f"labels shape: {labels.shape} \n"
+        ) 
 
     def train_val_test(self,):
         vectorized_text, labels = self.get_preprocess_data(
