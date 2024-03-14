@@ -67,7 +67,7 @@ class LstmAe(tfk.Model):
         x = self.txt_vec(x)
         print(f"txt_vec: {x.shape}")
         self.y = tf.get_static_value(self.txt_vec(x))
-        print(f"y: {self.y.shape}")
+        print(f"y: ")
         x = self.emb(x)
         print(f"emb: {x.shape}")
         x = self.enc(x)
