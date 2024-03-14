@@ -41,6 +41,7 @@ class LstmAe(tfk.Model):
                 units=10,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
+                return_sequences=True,
                 name="decoder1"
             )
         )
@@ -49,6 +50,7 @@ class LstmAe(tfk.Model):
                 units=20,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="tanh",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
+                return_sequences=True,
                 name="decoder2"
             )
         )
