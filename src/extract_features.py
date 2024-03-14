@@ -8,18 +8,26 @@ tfkl = tf.keras.layers
 
 
 class LstmAe(tfk.Model):
-    def __init__(self, latent_dim, txt_vec):
+    def __init__(self, latent_dim):
         super().__init__()
 
         # self.latent_dim = latent_dim
         # self.embedding_dim = embedding_dim
         # self.vocab_size = vocab_size
 
-        # self.inputs = tfkl.Input(
-        #     shape=(1, ), dtype=tf.string
-        # )
+        self.inputs = tfkl.Input(
+            shape=(None, ), dtype=tf.string
+        )
+
+        self.txt_vec = tfkl.TextVectorization(
+            max_tokens=None, 
+            split="whitespace", ngrams=1, 
+            output_mode="int", ragged=True,
+            standardize="lower_and_strip_punctuation",
+        )
+
         self.emb = tfkl.Embedding(
-            input_dim=len(txt_vec.get_vocabulary()),
+            input_dim=self.txt_vec.vocabulary_size(),
             output_dim=latent_dim,
             )
         self.enc = tfkl.Bidirectional(
@@ -48,8 +56,8 @@ class LstmAe(tfk.Model):
         )
 
     def call(self, inputs):
-        # x = self.input(inputs)
-        # x = self.txt_vec.adapt(data=inputs, batch_size=8, steps=None)
+        x = self.inputs(inputs)
+        x = self.txt_vec.adapt(data=x, batch_size=8, steps=None)
         x = self.emb(inputs)
         x = self.enc(x)
         x = self.dec1(x)
