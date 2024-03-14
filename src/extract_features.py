@@ -64,7 +64,7 @@ class LstmAe(tfk.Model):
         print(f"inputs:, {inputs.shape}")
         print(f"examples: {tf.get_static_value(inputs[5:9])}")
         x = self.inputs(inputs)
-        print(f"inputs: {inputs.numpy()[5:9]}")
+        print(f"inputs: {tf.get_static_value(inputs[5:9])}")
         print(f"examples: {x[5:9]}")
         x = self.txt_vec(x)
         print(f"txt_vec: {x.shape}")
