@@ -26,7 +26,7 @@ class LstmAe(tfk.Model):
             standardize="lower_and_strip_punctuation",
         )
 
-        self.txt_vec.adapt()
+        self.txt_vec.adapt(data=self.inputs, batch_size=8, steps=None)
         
         self.emb = tfkl.Embedding(
             input_dim=self.txt_vec.vocabulary_size(),
