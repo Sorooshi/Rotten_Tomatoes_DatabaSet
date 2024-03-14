@@ -24,8 +24,8 @@ class LstmAe(tfk.Model):
             split="whitespace", ngrams=1, 
             output_mode="int", ragged=True,
             standardize="lower_and_strip_punctuation",
-        )
-
+        ).txt_vec.adapt()
+        
         self.emb = tfkl.Embedding(
             input_dim=self.txt_vec.vocabulary_size(),
             output_dim=latent_dim,
@@ -57,7 +57,7 @@ class LstmAe(tfk.Model):
 
     def call(self, x):
         x = self.inputs(x)
-        x = self.txt_vec.adapt(data=x, batch_size=8, steps=None)
+        x = self.txt_vec(x)
         x = self.emb(x)
         x = self.enc(x)
         x = self.dec1(x)
