@@ -84,7 +84,8 @@ class LstmAe(tfk.Model):
         return x
     
     def train_step(self, data):
-        x, y = data
+        x = data
+        y = data
 
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
