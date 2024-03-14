@@ -62,10 +62,10 @@ class LstmAe(tfk.Model):
 
     def call(self, inputs):
         print(f"inputs:, {inputs.shape}")
-        print(f"examples: {x[100:105]}")
+        print(f"examples: {inputs[5:9]}")
         x = self.inputs(inputs)
         print(f"inputs: {x.shape}")
-        print(f"examples: {x[100:105]}")
+        print(f"examples: {x[5:9]}")
         x = self.txt_vec(x)
         print(f"txt_vec: {x.shape}")
         print(f"examples: {self.vocab[100:105]}")
