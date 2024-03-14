@@ -115,7 +115,7 @@ class TrainTestLstmAe:
             data=text_data, batch_size=8, steps=None
         )
         
-        return txt_vec, labels, 
+        return txt_vec, labels, max_length
 
     def get_text_data(
         data_path: str="../data/medium_movies_data.csv", 
