@@ -126,6 +126,8 @@ class TrainTestLstmAe:
             f"labels shape: {labels.shape} \n"
         ) 
 
+        return text_data, labels
+
     def train_val_test(self,):
         vectorized_text, labels = self.get_preprocess_data(
             data_path="../data/medium_movies_data.scv",
