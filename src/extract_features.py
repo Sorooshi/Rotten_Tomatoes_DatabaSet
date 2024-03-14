@@ -103,7 +103,8 @@ class TrainTestLstmAe:
                 f"vocabulary size {len(vocabulary)}"
                 f"Number of classes: {n_classes}"
                 )
-
+        else:
+            max_length = 171
         txt_vec = tfkl.TextVectorization(
             max_tokens=vocab_size, 
             split="whitespace", ngrams=1, 
@@ -114,7 +115,7 @@ class TrainTestLstmAe:
             data=text_data, batch_size=8, steps=None
         )
         
-        return txt_vec, labels, max_length
+        return txt_vec, labels, 
 
     def get_text_data(
         data_path: str="../data/medium_movies_data.csv", 
