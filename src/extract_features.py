@@ -36,7 +36,7 @@ class LstmAe(tfk.Model):
                 units=latent_dim,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
-                name="encoder 1"
+                name="encoder1"
                 )
             )
         self.dec1 = tfkl.Bidirectional(
@@ -44,7 +44,7 @@ class LstmAe(tfk.Model):
                 units=10,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
-                name="decoder 1"
+                name="decoder1"
             )
         )
         self.dec2 = tfkl.Bidirectional(
@@ -52,7 +52,7 @@ class LstmAe(tfk.Model):
                 units=20,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="tanh",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
-                name="decoder 2"
+                name="decoder2"
             )
         )
 
