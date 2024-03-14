@@ -88,7 +88,7 @@ class LstmAe(tfk.Model):
 
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
-            loss = self.compute_loss(y=y, y_pred=y_pred)
+            loss = tfk.losses.mean_squared_error(y, y_pred)
         
         trainable_vars = self.trainable_variables
         gradients = tape.gradient(loss, trainable_vars)
