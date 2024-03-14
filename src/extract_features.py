@@ -23,6 +23,8 @@ class LstmAe(tfk.Model):
             )
         self.txt_vec.adapt(data=text_data, batch_size=8, steps=None)
         
+        self.vocab = np.array(self.txt_vec.get_vocabulary())
+
         self.emb = tfkl.Embedding(
             input_dim=self.txt_vec.vocabulary_size(),
             output_dim=latent_dim,
@@ -57,10 +59,13 @@ class LstmAe(tfk.Model):
 
     def call(self, inputs):
         print(f"inputs:, {inputs.shape}")
+        print(f"examples: {self.vocab[:2]}")
         x = self.inputs(inputs)
         print(f"inputs: {x.shape}")
+        print(f"examples: {self.vocab[:2]}")
         x = self.txt_vec(x)
         print(f"txt_vec: {x.shape}")
+        print(f"examples: {self.vocab[:2]}")
         x = self.emb(x)
         print(f"emb: {x.shape}")
         x = self.enc(x)
