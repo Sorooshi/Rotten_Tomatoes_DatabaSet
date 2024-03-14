@@ -10,6 +10,7 @@ tfkl = tf.keras.layers
 class LstmAe(tfk.Model):
     def __init__(self, latent_dim, text_data, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.max_seq_len = 100
 
         self.inputs = tfkl.InputLayer(
             input_shape=(1,), dtype=tf.string,
@@ -18,7 +19,8 @@ class LstmAe(tfk.Model):
         self.txt_vec = tfkl.TextVectorization(
             max_tokens=None, 
             split="whitespace", ngrams=1, 
-            output_mode="int", ragged=True,
+            output_mode="int", ragged=False,
+            output_sequence_length=self.max_seq_len,
             standardize="lower_and_strip_punctuation",
             )
         self.txt_vec.adapt(data=text_data, batch_size=8, steps=None)
@@ -57,7 +59,7 @@ class LstmAe(tfk.Model):
             )
         )
         self.outputs = tfkl.Dense(
-            units=self.txt_vec.vocabulary_size(), activation="softmax"
+            units=self.max_seq_len, activation="tanh"
             )
 
     def call(self, inputs, ):
