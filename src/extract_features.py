@@ -73,6 +73,7 @@ class LstmAe(tfk.Model):
         print(f"y: {self.y.shape}")
         x = self.enc(x)
         print(f"enc: {x.shape}")
+        print(f"y: {self.y.shape}")
         x = self.dec1(x)
         print(f"dec1: {x.shape}")
         x = self.dec2(x)
