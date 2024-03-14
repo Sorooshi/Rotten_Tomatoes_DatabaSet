@@ -11,16 +11,12 @@ class LstmAe(tfk.Model):
     def __init__(self, latent_dim, text_data):
         super().__init__()
 
-        # self.latent_dim = latent_dim
-        # self.embedding_dim = embedding_dim
-        # self.vocab_size = vocab_size
-
         self.inputs = tfkl.InputLayer(
             input_shape=(1,), dtype=tf.string, ragged=True,
         )
 
         self.txt_vec = tfkl.TextVectorization(
-            max_tokens=123, 
+            max_tokens=None, 
             split="whitespace", ngrams=1, 
             output_mode="int", ragged=True,
             standardize="lower_and_strip_punctuation",
