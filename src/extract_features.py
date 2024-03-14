@@ -20,7 +20,7 @@ class LstmAe(tfk.Model):
         )
 
         self.txt_vec = tfkl.TextVectorization(
-            max_tokens=None, 
+            max_tokens=123, 
             split="whitespace", ngrams=1, 
             output_mode="int", ragged=True,
             standardize="lower_and_strip_punctuation",
