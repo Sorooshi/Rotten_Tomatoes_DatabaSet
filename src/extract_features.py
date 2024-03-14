@@ -68,7 +68,9 @@ class LstmAe(tfk.Model):
         print(f"examples: {x[5:9]}")
         x = self.txt_vec(x)
         print(f"txt_vec: {x.shape}")
-        print(f"examples: {self.vocab[100:105]}")
+        print(f"examples: {self.vocab[5:9]}")
+        print(f"inputs: {tf.get_static_value(x[5:9])}")
+
         x = self.emb(x)
         print(f"emb: {x.shape}")
         x = self.enc(x)
