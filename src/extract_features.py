@@ -66,6 +66,8 @@ class LstmAe(tfk.Model):
         print(f"inputs shape: {x.shape}")
         x = self.txt_vec(x)
         print(f"txt_vec: {x.shape}")
+        self.y = self.txt_vec(x)
+        print(f"y: {y.shape}")
         x = self.emb(x)
         print(f"emb: {x.shape}")
         x = self.enc(x)
@@ -80,11 +82,10 @@ class LstmAe(tfk.Model):
     
     def train_step(self, data):
         x = data
-        y = self.txt_vec(x)
 
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
-            loss = tfk.losses.mean_squared_error(y, y_pred)
+            loss = tfk.losses.mean_squared_error(self.y, y_pred)
         
         trainable_vars = self.trainable_variables
         gradients = tape.gradient(loss, trainable_vars)
