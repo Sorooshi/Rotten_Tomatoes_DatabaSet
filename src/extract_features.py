@@ -89,11 +89,11 @@ class TrainTestLstmAe:
         )
         if vocab_size is None:  # a bit slower
             vocabulary = []
-            max_length = 0
+            max_seq_len = 0
             for synopsis in text_data:
                 parsed_synopsis = np.unique(synopsis.lower().strip().split(" ")).tolist()
-                if len(parsed_synopsis) > max_length:
-                    max_length = len(parsed_synopsis)
+                if len(parsed_synopsis) > max_seq_len:
+                    max_seq_len = len(parsed_synopsis)
                 for word in parsed_synopsis:
                     if word not in vocabulary:
                         vocabulary.append(vocabulary)            
@@ -104,7 +104,7 @@ class TrainTestLstmAe:
                 f"Number of classes: {n_classes}"
                 )
         else:
-            max_length = 171
+            max_seq_len = 171
         txt_vec = tfkl.TextVectorization(
             max_tokens=vocab_size, 
             split="whitespace", ngrams=1, 
@@ -115,7 +115,7 @@ class TrainTestLstmAe:
             data=text_data, batch_size=8, steps=None
         )
         
-        return txt_vec, labels, max_length
+        return txt_vec, labels, max_seq_len
 
     def get_text_data(
         data_path: str="../data/medium_movies_data.csv", 
