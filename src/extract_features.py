@@ -16,7 +16,7 @@ class LstmAe(tfk.Model):
         # self.vocab_size = vocab_size
 
         self.inputs = tfk.Input(
-            shape=(None, ), dtype=tf.string
+            shape=(1, ), dtype=tf.string
         )
 
         self.txt_vec = tfkl.TextVectorization(
@@ -55,8 +55,8 @@ class LstmAe(tfk.Model):
             )
         )
 
-    def call(self, inputs):
-        x = self.inputs(inputs)
+    def call(self, x):
+        x = self.inputs(x)
         x = self.txt_vec().adapt(data=x, batch_size=8, steps=None)
         x = self.emb(x)
         x = self.enc(x)
