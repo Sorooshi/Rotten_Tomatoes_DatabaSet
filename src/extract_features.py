@@ -57,17 +57,19 @@ class LstmAe(tfk.Model):
         )
 
     def call(self, inputs):
-        print("inputs: {inputs} \n , inputs.shape")
+        print(f"inputs: {inputs} \n , inputs.shape")
         x = self.inputs(inputs)
-        print("x1: {x} \n , x.shape")
+        print(f"inputs: {x} \n , x.shape")
         x = self.txt_vec(x)
-        print("x2: {x} \n , x.shape")
+        print(f"txt_vec: {x} \n , x.shape")
         x = self.emb(x)
-        print("x3: {x} \n , x.shape")
+        print(f"emb: {x} \n , x.shape")
         x = self.enc(x)
-        print("x4: {x} \n , x.shape")
+        print(f"enc: {x} \n , x.shape")
         x = self.dec1(x)
+        print(f"dec1: {x} \n , x.shape")
         x = self.dec2(x)
+        print(f"dec2: {x} \n , x.shape")
         return x
     
 
