@@ -47,7 +47,7 @@ class LstmAe(tfk.Model):
         )
         self.dec2 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=20,  # hp.Int('units', min_value=2, max_value=100, step=5), 
+                units=self.txt_vec.vocabulary_size(),  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="tanh",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
                 return_sequences=False,
