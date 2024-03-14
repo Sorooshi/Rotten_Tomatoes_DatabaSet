@@ -16,7 +16,7 @@ class LstmAe(tfk.Model):
         # self.vocab_size = vocab_size
 
         self.inputs = tfkl.Input(
-            input_shape=(1, ), dtype=tf.string
+            shape=(None, 140), dtype=tf.string
         )
 
         self.txt_vec = tfkl.TextVectorization(
@@ -89,8 +89,11 @@ class TrainTestLstmAe:
         )
         if vocab_size is None:  # a bit slower
             vocabulary = []
+            max_length = 0
             for synopsis in text_data:
                 parsed_synopsis = np.unique(synopsis.lower().strip().split(" ")).tolist()
+                if len(parsed_synopsis) > max_length:
+                    max_length = len(parsed_synopsis)
                 for word in parsed_synopsis:
                     if word not in vocabulary:
                         vocabulary.append(vocabulary)            
@@ -111,7 +114,7 @@ class TrainTestLstmAe:
             data=text_data, batch_size=8, steps=None
         )
         
-        return txt_vec, labels  
+        return txt_vec, labels, max_length
 
     def get_text_data(
         data_path: str="../data/medium_movies_data.csv", 
