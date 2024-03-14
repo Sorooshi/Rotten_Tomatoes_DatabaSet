@@ -12,7 +12,7 @@ class LstmAe(tfk.Model):
         super().__init__()
 
         self.inputs = tfkl.InputLayer(
-            input_shape=(171,), dtype=tf.string,
+            input_shape=(1,), dtype=tf.string,
         )
 
         self.txt_vec = tfkl.TextVectorization(
@@ -82,6 +82,25 @@ class LstmAe(tfk.Model):
         x = self.outputs(x)
         print(f"outputs: {x.shape}")
         return x
+    
+    def train_step(self, data):
+        x, y = data
+
+        with tf.GradientTape() as tape:
+            y_pred = self(x, training=True)
+            loss = self.compute_loss(y=y, y_pred=y_pred)
+        
+        trainable_vars = self.trainable_variables
+        gradients = tape.gradient(loss, trainable_vars)
+        self.optimizer.apply_gradients(zip(gradients, trainable_vars))
+        for metric in self.metrics:
+            if metric.name == "loss":
+                metric.update_state(loss)
+            else:
+                metric.update_state(y, y_pred)
+
+        return {m.name: m.result() for m in self.metrics}
+    
     
 
 class TrainTestLstmAe:
