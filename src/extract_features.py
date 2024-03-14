@@ -8,7 +8,7 @@ tfkl = tf.keras.layers
 
 
 class LstmAe(tfk.Model):
-    def __init__(self, latent_dim):
+    def __init__(self, latent_dim, text_data):
         super().__init__()
 
         # self.latent_dim = latent_dim
@@ -25,7 +25,7 @@ class LstmAe(tfk.Model):
             output_mode="int", ragged=True,
             standardize="lower_and_strip_punctuation",
             )
-        self.txt_vec.adapt(data=None, batch_size=8, steps=None)
+        self.txt_vec.adapt(data=text_data, batch_size=8, steps=None)
         
         self.emb = tfkl.Embedding(
             input_dim=self.txt_vec.vocabulary_size(),
