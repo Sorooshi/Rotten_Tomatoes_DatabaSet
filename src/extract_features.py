@@ -29,7 +29,8 @@ class LstmAe(tfk.Model):
         
         self.emb = tfkl.Embedding(
             input_dim=self.txt_vec.vocabulary_size(),
-            output_dim=(latent_dim, 1),
+            output_dim=latent_dim,
+            mask_zero=True,
             )
         self.enc = tfkl.Bidirectional(
             tfkl.LSTM(
