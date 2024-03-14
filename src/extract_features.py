@@ -66,10 +66,11 @@ class LstmAe(tfk.Model):
         print(f"inputs shape: {x.shape}")
         x = self.txt_vec(x)
         print(f"txt_vec: {x.shape}")
-        self.y = tf.get_static_value(self.txt_vec(x))
-        print(f"y: ")
+        self.y = x
+        print(f"y: {self.y.shape}")
         x = self.emb(x)
         print(f"emb: {x.shape}")
+        print(f"y: {self.y.shape}")
         x = self.enc(x)
         print(f"enc: {x.shape}")
         x = self.dec1(x)
