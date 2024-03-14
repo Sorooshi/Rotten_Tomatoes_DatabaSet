@@ -66,8 +66,8 @@ class LstmAe(tfk.Model):
         print(f"inputs shape: {x.shape}")
         x = self.txt_vec(x)
         print(f"txt_vec: {x.shape}")
-        self.y = self.txt_vec(x)
-        print(f"y: {y.shape}")
+        self.y = tf.get_static_value(self.txt_vec(x))
+        print(f"y: {self.y.shape}")
         x = self.emb(x)
         print(f"emb: {x.shape}")
         x = self.enc(x)
@@ -94,7 +94,7 @@ class LstmAe(tfk.Model):
             if metric.name == "loss":
                 metric.update_state(loss)
             else:
-                metric.update_state(y, y_pred)
+                metric.update_state(self.y, y_pred)
 
         return {m.name: m.result() for m in self.metrics}
     
