@@ -24,7 +24,7 @@ class LstmAe(tfk.Model):
             split="whitespace", ngrams=1, 
             output_mode="int", ragged=True,
             standardize="lower_and_strip_punctuation",
-        ).txt_vec.adapt()
+        ).adapt()
         
         self.emb = tfkl.Embedding(
             input_dim=self.txt_vec.vocabulary_size(),
