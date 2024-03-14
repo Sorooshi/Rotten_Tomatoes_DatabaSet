@@ -15,8 +15,8 @@ class LstmAe(tfk.Model):
         # self.embedding_dim = embedding_dim
         # self.vocab_size = vocab_size
 
-        self.inputs = tfk.Input(
-            shape=[None, ], dtype=tf.string
+        self.inputs = tfk.InputLayer(
+            input_shape=(None, ), dtype=tf.string
         )
 
         self.txt_vec = tfkl.TextVectorization(
