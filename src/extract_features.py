@@ -26,13 +26,13 @@ class LstmAe(tfk.Model):
         self.emb = tfkl.Embedding(
             input_dim=self.txt_vec.vocabulary_size(),
             output_dim=latent_dim,
-            # mask_zero=True,
             )
         self.enc = tfkl.Bidirectional(
             tfkl.LSTM(
                 units=latent_dim,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
+                return_sequences=True,
                 name="encoder1"
                 )
             )
