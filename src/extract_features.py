@@ -49,13 +49,16 @@ class LstmAe(tfk.Model):
         )
         self.dec2 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=self.txt_vec.vocabulary_size(),  # hp.Int('units', min_value=2, max_value=100, step=5), 
+                units=25,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="tanh",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
                 return_sequences=False,
                 name="decoder2"
             )
         )
+        self.outputs = tfkl.Dense(
+            units=self.txt_vec.vocabulary_size(), activation="softmax"
+            )
 
     def call(self, inputs):
         print(f"inputs:, {inputs.shape}")
@@ -74,6 +77,8 @@ class LstmAe(tfk.Model):
         print(f"dec1: {x.shape}")
         x = self.dec2(x)
         print(f"dec2: {x.shape}")
+        x = self.outputs(x)
+        print(f"outputs: {x.shape}")
         return x
     
 
