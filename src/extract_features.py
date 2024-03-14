@@ -8,8 +8,8 @@ tfkl = tf.keras.layers
 
 
 class LstmAe(tfk.Model):
-    def __init__(self, latent_dim, text_data):
-        super().__init__()
+    def __init__(self, latent_dim, text_data, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.inputs = tfkl.InputLayer(
             input_shape=(1,), dtype=tf.string,
@@ -60,7 +60,7 @@ class LstmAe(tfk.Model):
             units=self.txt_vec.vocabulary_size(), activation="softmax"
             )
 
-    def call(self, inputs):
+    def call(self, inputs, ):
         print(f"inputs:, {inputs.shape}")
         print(f"examples: {tf.get_static_value(inputs[5:9])}")
         x = self.inputs(inputs)
