@@ -62,7 +62,7 @@ class LstmAe(tfk.Model):
 
     def call(self, inputs):
         print(f"inputs:, {inputs.shape}")
-        print(f"examples: {inputs[5:9]}")
+        print(f"examples: {tf.get_static_value(inputs, partial=False [5:9])}")
         x = self.inputs(inputs)
         print(f"inputs: {inputs.numpy()[5:9]}")
         print(f"examples: {x[5:9]}")
