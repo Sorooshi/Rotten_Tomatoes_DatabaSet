@@ -29,7 +29,7 @@ class LstmAe(tfk.Model):
         
         self.emb = tfkl.Embedding(
             input_dim=self.txt_vec.vocabulary_size(),
-            output_dim=latent_dim,
+            output_dim=(latent_dim,
             )
         self.enc = tfkl.Bidirectional(
             tfkl.LSTM(
@@ -57,19 +57,19 @@ class LstmAe(tfk.Model):
         )
 
     def call(self, inputs):
-        print(f"inputs: {inputs} \n , inputs.shape")
+        print(f"inputs:, {inputs.shape}")
         x = self.inputs(inputs)
-        print(f"inputs: {x} \n , x.shape")
+        print(f"inputs: {x.shape}")
         x = self.txt_vec(x)
-        print(f"txt_vec: {x} \n , x.shape")
+        print(f"txt_vec: {x.shape}")
         x = self.emb(x)
-        print(f"emb: {x} \n , x.shape")
+        print(f"emb: {x.shape}")
         x = self.enc(x)
-        print(f"enc: {x} \n , x.shape")
+        print(f"enc: {x.shape}")
         x = self.dec1(x)
-        print(f"dec1: {x} \n , x.shape")
+        print(f"dec1: {x.shape}")
         x = self.dec2(x)
-        print(f"dec2: {x} \n , x.shape")
+        print(f"dec2: {x.shape}")
         return x
     
 
