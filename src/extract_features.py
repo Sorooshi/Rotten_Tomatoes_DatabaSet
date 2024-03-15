@@ -115,9 +115,9 @@ class LstmAe(tfk.Model):
 
     #     return {m.name: m.result() for m in self.metrics}
 
-    @property
-    def metrics(self):
-        return [self.train_metric, self.val_metric]  # self.loss_tracker,
+    # @property
+    # def metrics(self):
+    #     return [self.train_metric, self.val_metric]  # self.loss_tracker,
 
 class TrainTestLstmAe:
     def __init__(self, data: pd.DataFrame=None, n_epochs: int= 1):
