@@ -68,24 +68,13 @@ class LstmAe(tfk.Model):
 
     def call(self, inputs, ):
         x = self.inputs(inputs)
-        print(f"inputs: {tf.get_static_value(inputs[5:9])}")
-        print(f"inputs shape: {x.shape}")
         x = self.txt_vec(x)
-        print(f"txt_vec: {x.shape}")
         self.y = deepcopy(x)
-        print(f"y: {self.y.shape}")
         x = self.emb(x)
-        print(f"emb: {x.shape}")
-        print(f"y: {self.y.shape}")
         x = self.enc(x)
-        print(f"enc: {x.shape}")
-        print(f"y: {self.y.shape}")
         x = self.dec1(x)
-        print(f"dec1: {x.shape}")
         x = self.dec2(x)
-        print(f"dec2: {x.shape}")
         x = self.outputs(x)
-        print(f"outputs: {x.shape}")
         return x
     
     def train_step(self, data):
