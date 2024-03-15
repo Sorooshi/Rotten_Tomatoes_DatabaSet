@@ -66,7 +66,7 @@ class LstmAe(tfk.Model):
             units=self.max_seq_len, activation="softmax"
             )
 
-    def call(self, inputs, ):
+    def call(self, inputs, training=None):
         x = self.inputs(inputs)
         x = self.txt_vec(x)
         x = self.emb(x)
