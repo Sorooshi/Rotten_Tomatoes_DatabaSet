@@ -14,10 +14,10 @@ class LstmAe(tfk.Model):
         super().__init__(*args, **kwargs)
         self.y = None
         self.max_seq_len = 100
-        self.loss_tracker = tfk.metrics.Mean(name="loss")
-        self.mae_metric = tfk.metrics.MeanAbsoluteError(name="mae")
-        self.mse_metric = tfk.metrics.MeanSquaredError(name="mse")
-        self.loss_fn = tfk.losses.MeanSquaredError(name="mse")
+        # self.loss_tracker = tfk.metrics.Mean(name="loss")
+        # self.mae_metric = tfk.metrics.MeanAbsoluteError(name="mae")
+        # self.mse_metric = tfk.metrics.MeanSquaredError(name="mse")
+        # self.loss_fn = tfk.losses.MeanSquaredError(name="mse")
 
         self.inputs = tfkl.InputLayer(
             input_shape=(1,), dtype=tf.string,
@@ -80,22 +80,33 @@ class LstmAe(tfk.Model):
     
     def train_step(self, data):
         x = data
+
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
-            loss = self.loss_fn(self.y, y_pred) # tfk.losses.mean_squared_error(self.y, y_pred)
+            loss = self.loss_fn(self.y, y_pred) 
         
         trainable_vars = self.trainable_variables
         gradients = tape.gradient(loss, trainable_vars)
         self.optimizer.apply_gradients(zip(gradients, trainable_vars))
+
+        # Update the metrics.
+        for metric in self.metrics:
+            if metric.name == "loss":
+                metric.update_state(loss)
+            else:
+                metric.update_state(self.y, y_pred,)
+                
+        return {m.name: m.result() for m in self.metrics}
+
         
-        self.loss_tracker.update_state(loss)
-        self.mae_metric.update_state(self.y, y_pred)
-        self.mse_metric.update_state(self.y, y_pred)
-        return {
-            "loss": self.loss_tracker.result(), 
-            "mae": self.mae_metric.result(), 
-            "mse": self.mse_metric.result(),
-            }
+        # self.loss_tracker.update_state(loss)
+        # self.mae_metric.update_state(self.y, y_pred)
+        # self.mse_metric.update_state(self.y, y_pred)
+        # return {
+        #     "loss": self.loss_tracker.result(), 
+        #     "mae": self.mae_metric.result(), 
+        #     "mse": self.mse_metric.result(),
+        #     }
     
     @property
     def metrics(self):
