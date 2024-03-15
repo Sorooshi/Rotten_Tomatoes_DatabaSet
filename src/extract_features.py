@@ -64,7 +64,7 @@ class LstmAe(tfk.Model):
                 )
             )
         self.outputs = tfkl.Dense(
-            units=self.max_seq_len, activation="tanh"
+            units=self.max_seq_len, activation="softmax"
             )
 
     def call(self, inputs, ):
