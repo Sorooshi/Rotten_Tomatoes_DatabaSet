@@ -10,8 +10,8 @@ tfkl = tf.keras.layers
 
 
 class LstmAe(tfk.Model):
-    def __init__(self, latent_dim, text_data, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, latent_dim, vocabulary, *args, **kwargs):
+        super(LstmAe).__init__(*args, **kwargs)
         self.y = None
         self.max_seq_len = 100
         self.loss_tracker = tfk.metrics.Mean(name="loss")
@@ -25,13 +25,12 @@ class LstmAe(tfk.Model):
             )
         self.txt_vec = tfkl.TextVectorization(
             max_tokens=None, 
+            vocabulary = vocabulary,
             split="whitespace", ngrams=1, 
             output_mode="int", ragged=False,
             output_sequence_length=self.max_seq_len,
             standardize="lower_and_strip_punctuation",
             )
-        self.txt_vec.adapt(data=text_data, batch_size=8, steps=None)
-        self.vocab = np.array(self.txt_vec.get_vocabulary())
 
         self.emb = tfkl.Embedding(
             input_dim=self.txt_vec.vocabulary_size(),
@@ -71,7 +70,6 @@ class LstmAe(tfk.Model):
     def call(self, inputs, ):
         x = self.inputs(inputs)
         x = self.txt_vec(x)
-        self.y = x
         x = self.emb(x)
         x = self.enc(x)
         x = self.dec1(x)
@@ -117,7 +115,7 @@ class LstmAe(tfk.Model):
 
     @property
     def metrics(self):
-        return [self.loss_tracker, self.mae_metric, self.mse_metric]
+        return [self.train_metric, self.val_metric]  # self.loss_tracker,
 
 class TrainTestLstmAe:
     def __init__(self, data: pd.DataFrame=None, n_epochs: int= 1):
@@ -126,7 +124,7 @@ class TrainTestLstmAe:
         self.n_epochs = n_epochs
     
     @staticmethod
-    def get_preprocess_text_data(
+    def get_vocabulary_max_len(
         data_path: str="../data/medium_movies_data.csv", 
         vocab_size: int = 124100 # 124,079 precise
         ) -> tuple:
@@ -168,7 +166,9 @@ class TrainTestLstmAe:
             data=text_data, batch_size=8, steps=None
         )
 
-        return txt_vec, labels, max_seq_len
+        vocabulary = txt_vec.get_vocabulary()
+
+        return vocabulary, max_seq_len
 
     def get_train_test_data(
         data_path: str="../data/medium_movies_data.csv", 
