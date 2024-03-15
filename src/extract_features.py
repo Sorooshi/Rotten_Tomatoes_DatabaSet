@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import keras_tuner as kt 
-from copy import deepcopy
+from sklearn.model_selection import train_test_split
 
 
 tfk = tf.keras 
@@ -91,12 +91,9 @@ class LstmAe(tfk.Model):
 
         # Update the metrics.
         for metric in self.metrics:
-            print(self.metrics)
             if metric.name == "loss":
-                print(f"loss: {metric}")
                 metric.update_state(loss)
             else:
-                print(f"else: {metric}")
                 metric.update_state(self.y, y_pred,)
 
         return {m.name: m.result() for m in self.metrics}
@@ -122,7 +119,7 @@ class TrainTestLstmAe:
         self.n_epochs = n_epochs
     
     @staticmethod
-    def get_preprocess_data(
+    def get_preprocess_train_test_data(
         data_path: str="../data/medium_movies_data.csv", 
         vocab_size: int = 124100 # 124,079 precise
         ) -> tuple:
@@ -163,8 +160,17 @@ class TrainTestLstmAe:
         txt_vec.adapt(
             data=text_data, batch_size=8, steps=None
         )
-        
-        return txt_vec, labels, max_seq_len
+
+        x_train, x_test, y_train, y_test = train_test_split(
+            txt_vec, labels, test_size=0.05
+            )
+
+        train_data = tf.data.Dataset.from_tensor_slices(x_train, y_train)
+        train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=8)
+        test_data = tf.data.Dataset.from_tensor_slices(x_test, y_test)
+        test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=8)
+       
+        return train_data, test_data, max_seq_len
 
     def get_text_data(
         data_path: str="../data/medium_movies_data.csv", 
@@ -183,7 +189,7 @@ class TrainTestLstmAe:
         return text_data, labels
 
     def train_val_test(self,):
-        vectorized_text, labels = self.get_preprocess_data(
+        vectorized_text, labels = self.get_preprocess_train_test_data(
             data_path="../data/medium_movies_data.scv",
         )
         
