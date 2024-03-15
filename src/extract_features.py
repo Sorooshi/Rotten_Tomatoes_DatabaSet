@@ -83,6 +83,8 @@ class LstmAe(tfk.Model):
 
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
+            print(y_pred)
+            print(y_pred.shape)
             loss = tfk.losses.mean_absolute_error(self.y, y_pred) 
 
             # Update the metrics.
@@ -95,7 +97,6 @@ class LstmAe(tfk.Model):
         trainable_vars = self.trainable_variables
         gradients = tape.gradient(loss, trainable_vars)
         self.optimizer.apply_gradients(zip(gradients, trainable_vars))
-
 
         return {m.name: m.result() for m in self.metrics}
 
