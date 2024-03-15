@@ -15,8 +15,9 @@ class LstmAe(tfk.Model):
         self.y = None
         self.max_seq_len = 100
         self.loss_tracker = tfk.metrics.Mean(name="loss")
-        self.mse_metric = tfk.metrics.MeanSquaredError(name="mse")
         self.mae_metric = tfk.metrics.MeanAbsoluteError(name="mae")
+        self.mse_metric = tfk.metrics.MeanSquaredError(name="mse")
+        self.loss_fn - tfk.losses.MeanSquaredError(name="mse")
 
         self.inputs = tfkl.InputLayer(
             input_shape=(1,), dtype=tf.string,
@@ -81,7 +82,7 @@ class LstmAe(tfk.Model):
         x = data
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
-            loss = tfk.losses.mean_squared_error(self.y, y_pred)
+            loss = self.loss_fn(self.y, y_pred) # tfk.losses.mean_squared_error(self.y, y_pred)
         
         trainable_vars = self.trainable_variables
         gradients = tape.gradient(loss, trainable_vars)
