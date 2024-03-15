@@ -93,8 +93,8 @@ class LstmAe(tfk.Model):
         for metric in self.metrics:
             print(self.metrics)
             if metric.name == "loss":
-                metric.update_state(loss)
                 print(f"loss: {metric}")
+                metric.update_state(loss)
             else:
                 print(f"else: {metric}")
                 metric.update_state(self.y, y_pred,)
