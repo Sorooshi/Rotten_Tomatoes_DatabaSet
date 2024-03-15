@@ -78,6 +78,10 @@ class LstmAe(tfk.Model):
         x = self.outputs(x)
         return x 
     
+    @tf.function
+    def train_step(self, data):
+        
+        return loss_value
     def train_step(self, data):
         x = data
 
@@ -98,16 +102,6 @@ class LstmAe(tfk.Model):
 
         return {m.name: m.result() for m in self.metrics}
 
-        
-        # self.loss_tracker.update_state(loss)
-        # self.mae_metric.update_state(self.y, y_pred)
-        # self.mse_metric.update_state(self.y, y_pred)
-        # return {
-        #     "loss": self.loss_tracker.result(), 
-        #     "mae": self.mae_metric.result(), 
-        #     "mse": self.mse_metric.result(),
-        #     }
-    
     @property
     def metrics(self):
         return [self.loss_tracker, self.mae_metric, self.mse_metric]
@@ -177,13 +171,13 @@ class TrainTestLstmAe:
             f"labels shape: {labels.shape} \n"
         ) 
 
-        x_train, x_test, y_train, y_test = train_test_split(
+        x_train, x_test, _, _ = train_test_split(
             text_data, labels, test_size=0.05
             )
 
-        train_data = tf.data.Dataset.from_tensor_slices(x_train, y_train)
+        train_data = tf.data.Dataset.from_tensor_slices((x_train, x_train))
         train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=8)
-        test_data = tf.data.Dataset.from_tensor_slices(x_test, y_test)
+        test_data = tf.data.Dataset.from_tensor_slices((x_test, x_test))
         test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=8)
        
 
