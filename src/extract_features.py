@@ -67,7 +67,8 @@ class LstmAe(tfk.Model):
             )
 
     def call(self, inputs, training=None):
-        x = self.inputs(inputs)
+        x, y = inputs
+        x = self.inputs(x)
         x = self.txt_vec(x)
         x = self.emb(x)
         x = self.enc(x)
