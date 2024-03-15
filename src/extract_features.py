@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import keras_tuner as kt 
+from copy import deepcopy
+
 
 tfk = tf.keras 
 tfkl = tf.keras.layers
@@ -10,12 +12,15 @@ tfkl = tf.keras.layers
 class LstmAe(tfk.Model):
     def __init__(self, latent_dim, text_data, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.y = None
         self.max_seq_len = 100
+        self.loss_tracker = tfk.metrics.Mean(name="loss")
+        self.mse_metric = tfk.metrics.MeanSquaredError(name="mse")
+        self.mae_metric = tfk.metrics.MeanAbsoluteError(name="mae")
 
         self.inputs = tfkl.InputLayer(
             input_shape=(1,), dtype=tf.string,
-        )
-
+            )
         self.txt_vec = tfkl.TextVectorization(
             max_tokens=None, 
             split="whitespace", ngrams=1, 
@@ -24,7 +29,6 @@ class LstmAe(tfk.Model):
             standardize="lower_and_strip_punctuation",
             )
         self.txt_vec.adapt(data=text_data, batch_size=8, steps=None)
-        
         self.vocab = np.array(self.txt_vec.get_vocabulary())
 
         self.emb = tfkl.Embedding(
@@ -56,8 +60,8 @@ class LstmAe(tfk.Model):
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
                 return_sequences=False,
                 name="decoder2"
+                )
             )
-        )
         self.outputs = tfkl.Dense(
             units=self.max_seq_len, activation="tanh"
             )
@@ -68,7 +72,7 @@ class LstmAe(tfk.Model):
         print(f"inputs shape: {x.shape}")
         x = self.txt_vec(x)
         print(f"txt_vec: {x.shape}")
-        self.y = x
+        self.y = deepcopy(x)
         print(f"y: {self.y.shape}")
         x = self.emb(x)
         print(f"emb: {x.shape}")
@@ -86,7 +90,6 @@ class LstmAe(tfk.Model):
     
     def train_step(self, data):
         x = data
-
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
             loss = tfk.losses.mean_squared_error(self.y, y_pred)
@@ -94,15 +97,19 @@ class LstmAe(tfk.Model):
         trainable_vars = self.trainable_variables
         gradients = tape.gradient(loss, trainable_vars)
         self.optimizer.apply_gradients(zip(gradients, trainable_vars))
-        for metric in self.metrics:
-            if metric.name == "loss":
-                metric.update_state(loss)
-            else:
-                metric.update_state(self.y, y_pred)
-
-        return {m.name: m.result() for m in self.metrics}
+        
+        self.loss_tracker.update_state(loss)
+        self.mae_metric.update_state(self.y, y_pred)
+        self.mse_metric.update_state(self.y, y_pred)
+        return {
+            "loss": self.loss_tracker.result(), 
+            "mae": self.mae_metric.result(), 
+            "mse": self.mse_metric.result(),
+            }
     
-    
+    @property
+    def metrics(self):
+        return [self.loss_tracker, self.mae_metric, self.mse_metric]
 
 class TrainTestLstmAe:
     def __init__(self, data: pd.DataFrame=None, n_epochs: int= 1):
