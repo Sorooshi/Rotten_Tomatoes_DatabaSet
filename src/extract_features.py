@@ -69,11 +69,14 @@ class LstmAe(tfk.Model):
     def call(self, inputs, training=None):
         x = self.inputs(inputs)
         x = self.txt_vec(x)
+        print("called txt vec")
         x = self.emb(x)
+        print("called emd")
         x = self.enc(x)
         x = self.dec1(x)
         x = self.dec2(x)
         x = self.outputs(x)
+        
         return x 
     
     @tf.function
@@ -177,7 +180,7 @@ class TrainTestLstmAe:
             )
 
         train_data = tf.data.Dataset.from_tensor_slices((x_train, x_train))
-        train_data = train_data.batch(batch_size=8)  # shuffle(buffer_size=1024)
+        train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=8)
         test_data = tf.data.Dataset.from_tensor_slices((x_test, x_test))
         test_data = test_data.batch(batch_size=8)
 
