@@ -15,7 +15,7 @@ class LstmAe(tfk.Model):
         self.y = None
         self.max_seq_len = 100
         self.loss_tracker = tfk.metrics.Mean(name="loss")
-        self.mae_metric = tfk.metrics.MeanAbsoluteError(name="mae")
+        self.mae_metric = tfk.metrics.mean_absolute_error # (name="mae")
         self.loss_fn = tfk.losses.mean_squared_error
 
         self.inputs = tfkl.InputLayer(
