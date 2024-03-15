@@ -15,8 +15,9 @@ class LstmAe(tfk.Model):
         self.y = None
         self.max_seq_len = 100
         self.loss_tracker = tfk.metrics.Mean(name="loss")
-        self.mae_metric = tfk.metrics.MeanAbsoluteError(name="mae")
-        self.mse_metric = tfk.metrics.MeanSquaredError(name="mse")
+        self.train_metric = tfk.metrics.MeanAbsoluteError(name="mae")
+        self.val_metric = tfk.metrics.MeanAbsoluteError(name="mae")
+        self.loss_fn = tfk.losses.mean_absolute_error
 
 
         self.inputs = tfkl.InputLayer(
@@ -79,28 +80,40 @@ class LstmAe(tfk.Model):
         return x 
     
     @tf.function
-    def train_step(self, data):
-        
-        return loss_value
-    def train_step(self, data):
-        x = data
-
+    def train_step(self, x, y):
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
-            loss = tfk.losses.mean_absolute_error(self.y, y_pred) 
+            loss_value = self.loss_fn(y, y_pred)
+        grads = tape.gradient(loss_value, self.trainable_weights)
+        self.optimizer.apply(zip(grads, self.trainable_weights))
+        self.train_metric.update_state(y, y_pred)
 
-        trainable_vars = self.trainable_variables
-        gradients = tape.gradient(loss, trainable_vars)
-        self.optimizer.apply_gradients(zip(gradients, trainable_vars))
+        return loss_value
+    
+    @tf.function
+    def test_step(self, x, y):
+        y_pred = self(x, training=False)
+        self.val_metric(y, y_pred)
 
-        # Update the metrics.
-        for metric in self.metrics:
-            if metric.name == "loss":
-                metric.update_state(loss)
-            else:
-                metric.update_state(self.y, y_pred,)
+    # def train_step(self, data):
+    #     x = data
 
-        return {m.name: m.result() for m in self.metrics}
+    #     with tf.GradientTape() as tape:
+    #         y_pred = self(x, training=True)
+    #         loss = tfk.losses.mean_absolute_error(self.y, y_pred) 
+
+    #     trainable_vars = self.trainable_variables
+    #     gradients = tape.gradient(loss, trainable_vars)
+    #     self.optimizer.apply_gradients(zip(gradients, trainable_vars))
+
+    #     # Update the metrics.
+    #     for metric in self.metrics:
+    #         if metric.name == "loss":
+    #             metric.update_state(loss)
+    #         else:
+    #             metric.update_state(self.y, y_pred,)
+
+    #     return {m.name: m.result() for m in self.metrics}
 
     @property
     def metrics(self):
@@ -179,7 +192,6 @@ class TrainTestLstmAe:
         train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=8)
         test_data = tf.data.Dataset.from_tensor_slices((x_test, x_test))
         test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=8)
-       
 
         return train_data, test_data
 
