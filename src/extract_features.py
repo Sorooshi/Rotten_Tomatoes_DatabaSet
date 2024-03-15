@@ -13,7 +13,7 @@ class LstmAe(tfk.Model):
     def __init__(self, latent_dim, text_data, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.y = None
-        self.max_seq_len = 1000
+        self.max_seq_len = 100
         self.loss_tracker = tfk.metrics.Mean(name="loss")
         self.mae_metric = tfk.metrics.MeanAbsoluteError(name="mae")
         self.mse_metric = tfk.metrics.MeanSquaredError(name="mse")
