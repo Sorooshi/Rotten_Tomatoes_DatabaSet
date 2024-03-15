@@ -37,7 +37,7 @@ class LstmAe(tfk.Model):
             )
         self.enc = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=latent_dim,  # hp.Int('units', min_value=2, max_value=100, step=5), 
+                units=123,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
                 return_sequences=True,
@@ -75,10 +75,16 @@ class LstmAe(tfk.Model):
         x = self.dec1(x)
         x = self.dec2(x)
         x = self.outputs(x)
-        return x
+        return x 
     
     def train_step(self, data):
         x = data
+        # idx = np.range(0, x.shape[0])
+        # idx_train = np.random.choice(a=idx, size=int(0.95*len(x)), replace=False)
+        # idx_val = list(set(idx).difference(set(idx_train)))
+        # x_train, y_train = x[idx_train, :], self.y[idx_train]
+        # x_test, y_val = x[idx_val, :], self.y[idx_val]
+
 
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
