@@ -70,7 +70,7 @@ class LstmAe(tfk.Model):
     def call(self, inputs, ):
         x = self.inputs(inputs)
         x = self.txt_vec(x)
-        self.y = deepcopy(x)
+        self.y = x
         x = self.emb(x)
         x = self.enc(x)
         x = self.dec1(x)
