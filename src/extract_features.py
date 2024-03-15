@@ -95,6 +95,8 @@ class LstmAe(tfk.Model):
                 metric.update_state(loss)
             else:
                 metric.update_state(self.y, y_pred,)
+        
+        self.compiled_metrics.update_state(self.y, y_pred)
 
         return {m.name: m.result() for m in self.metrics}
 
