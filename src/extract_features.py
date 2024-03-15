@@ -11,7 +11,7 @@ tfkl = tf.keras.layers
 
 class LstmAe(tfk.Model):
     def __init__(self, latent_dim, vocabulary, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(LstmAe).__init__(*args, **kwargs)
         self.max_seq_len = 100
         # self.loss_tracker = tfk.metrics.Mean(name="loss")
         self.train_metric = tfk.metrics.MeanAbsoluteError(name="mae")
