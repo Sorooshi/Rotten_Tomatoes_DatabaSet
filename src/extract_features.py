@@ -95,29 +95,17 @@ class LstmAe(tfk.Model):
         y_pred = self(x, training=False)
         self.val_metric(y, y_pred)
 
-    # def train_step(self, data):
-    #     x = data
+    def fit(self, train_data, test_data, n_epochs):
 
-    #     with tf.GradientTape() as tape:
-    #         y_pred = self(x, training=True)
-    #         loss = tfk.losses.mean_absolute_error(self.y, y_pred) 
-
-    #     trainable_vars = self.trainable_variables
-    #     gradients = tape.gradient(loss, trainable_vars)
-    #     self.optimizer.apply_gradients(zip(gradients, trainable_vars))
-
-    #     # Update the metrics.
-    #     for metric in self.metrics:
-    #         if metric.name == "loss":
-    #             metric.update_state(loss)
-    #         else:
-    #             metric.update_state(self.y, y_pred,)
-
-    #     return {m.name: m.result() for m in self.metrics}
-
-    # @property
-    # def metrics(self):
-    #     return [self.train_metric, self.val_metric]  # self.loss_tracker,
+        for epoch in range(n_epochs):
+            print(f"epoch: {epoch+1}")
+            for step, train_ds in enumerate(train_data):
+                loss_value = self.train_step(train_data)
+                if step % 200 == 0:
+                    print(
+                        "Training loss (for one batch) at step %d: %.4f"
+                        % (step, float(loss_value))
+                    )
 
 class TrainTestLstmAe:
     def __init__(self, data: pd.DataFrame=None, n_epochs: int= 1):
