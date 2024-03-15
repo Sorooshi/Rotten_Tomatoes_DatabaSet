@@ -119,7 +119,7 @@ class TrainTestLstmAe:
         self.n_epochs = n_epochs
     
     @staticmethod
-    def get_preprocess_train_test_data(
+    def get_preprocess_text_data(
         data_path: str="../data/medium_movies_data.csv", 
         vocab_size: int = 124100 # 124,079 precise
         ) -> tuple:
@@ -161,18 +161,9 @@ class TrainTestLstmAe:
             data=text_data, batch_size=8, steps=None
         )
 
-        x_train, x_test, y_train, y_test = train_test_split(
-            txt_vec, labels, test_size=0.05
-            )
+        return txt_vec, labels, max_seq_len
 
-        train_data = tf.data.Dataset.from_tensor_slices(x_train, y_train)
-        train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=8)
-        test_data = tf.data.Dataset.from_tensor_slices(x_test, y_test)
-        test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=8)
-       
-        return train_data, test_data, max_seq_len
-
-    def get_text_data(
+    def get_train_test_data(
         data_path: str="../data/medium_movies_data.csv", 
         ) -> tuple:
 
@@ -186,10 +177,20 @@ class TrainTestLstmAe:
             f"labels shape: {labels.shape} \n"
         ) 
 
-        return text_data, labels
+        x_train, x_test, y_train, y_test = train_test_split(
+            text_data, labels, test_size=0.05
+            )
+
+        train_data = tf.data.Dataset.from_tensor_slices(x_train, y_train)
+        train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=8)
+        test_data = tf.data.Dataset.from_tensor_slices(x_test, y_test)
+        test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=8)
+       
+
+        return train_data, test_data
 
     def train_val_test(self,):
-        vectorized_text, labels = self.get_preprocess_train_test_data(
+        vectorized_text, labels, max_len = self.get_preprocess_data(
             data_path="../data/medium_movies_data.scv",
         )
         
