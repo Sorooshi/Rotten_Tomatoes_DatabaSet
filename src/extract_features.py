@@ -14,10 +14,10 @@ class LstmAe(tfk.Model):
         super().__init__(*args, **kwargs)
         self.y = None
         self.max_seq_len = 1000
-        self.loss_tracker = tfk.metrics.Mean(name="loss")
-        self.mse_metric = tfk.metrics.MeanSquaredError(name="mse")
-        self.mae_metric = tfk.metrics.MeanAbsoluteError(name="mse")
-        self.loss_fn = tfk.losses.mean_absolute_error
+        # self.loss_tracker = tfk.metrics.Mean(name="loss")
+        # self.mse_metric = tfk.metrics.MeanSquaredError(name="mse")
+        # self.mae_metric = tfk.metrics.MeanAbsoluteError(name="mse")
+        # self.loss_fn = tfk.losses.mean_absolute_error
 
         self.inputs = tfkl.InputLayer(
             input_shape=(1,), dtype=tf.string,
@@ -80,16 +80,10 @@ class LstmAe(tfk.Model):
     
     def train_step(self, data):
         x = data
-        # idx = np.range(0, x.shape[0])
-        # idx_train = np.random.choice(a=idx, size=int(0.95*len(x)), replace=False)
-        # idx_val = list(set(idx).difference(set(idx_train)))
-        # x_train, y_train = x[idx_train, :], self.y[idx_train]
-        # x_test, y_val = x[idx_val, :], self.y[idx_val]
-
 
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
-            loss = self.loss_fn(self.y, y_pred) 
+            loss = self.compute_loss(self.y, y_pred) 
         
         trainable_vars = self.trainable_variables
         gradients = tape.gradient(loss, trainable_vars)
