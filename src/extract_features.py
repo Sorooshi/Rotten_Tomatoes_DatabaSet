@@ -77,8 +77,7 @@ class LstmAe(tfk.Model):
         return x 
     
     @tf.function
-    def train_step(self, data):
-        x, y = data
+    def train_step(self, x, y):
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
             loss_value = self.loss_fn(y, y_pred)
@@ -90,8 +89,7 @@ class LstmAe(tfk.Model):
         return loss_value
     
     @tf.function
-    def test_step(self, data):
-        x, y = data
+    def test_step(self, x, y):
         y_pred = self(x, training=False)
         self.val_metric(y, y_pred)
 
