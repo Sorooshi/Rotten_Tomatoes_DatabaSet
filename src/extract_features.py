@@ -117,7 +117,7 @@ class LstmAe(tfk.Model):
                 if step % 10 == 0:
                     print(
                         "Training loss (for one batch) at step %d: %.4f"
-                        % (step, float(loss_value))
+                        % (step, loss_value)
                     )
 
 class TrainTestLstmAe:
