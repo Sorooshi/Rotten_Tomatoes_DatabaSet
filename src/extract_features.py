@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 
 tfk = tf.keras 
 tfkl = tf.keras.layers
-
+BATCH_SIZE = 64
 
 class LstmAe(tfk.Model):
     def __init__(self, latent_dim, vocabulary, *args, **kwargs):
@@ -37,7 +37,7 @@ class LstmAe(tfk.Model):
             )
         self.enc1 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=456,  # hp.Int('units', min_value=2, max_value=100, step=5), 
+                units=20,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
                 return_sequences=True,
@@ -47,7 +47,7 @@ class LstmAe(tfk.Model):
         
         self.enc2 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=123,  # hp.Int('units', min_value=2, max_value=100, step=5), 
+                units=10,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
                 return_sequences=True,
@@ -79,9 +79,7 @@ class LstmAe(tfk.Model):
     def call(self, inputs, training=None):
         x = self.inputs(inputs)
         x = self.txt_vec(x)
-        print("called txt vec")
         x = self.emb(x)
-        print("called emd")
         x = self.enc1(x)
         x = self.enc2(x)
         x = self.dec1(x)
@@ -97,9 +95,8 @@ class LstmAe(tfk.Model):
             loss_value = self.loss_fn(y_true, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
-        print("optimized")
         self.train_metric.update_state(y_true, y_pred)
-
+        print("optimized!")
         return loss_value
     
     @tf.function
@@ -107,14 +104,15 @@ class LstmAe(tfk.Model):
         y_pred = self(x, training=False)
         y_true = self.inputs(self.txt_vec(y))
         self.val_metric(y_true, y_pred)
+        print("evaluated!")
 
     def fit(self, train_data, test_data, n_epochs):
 
         for epoch in range(n_epochs):
             print(f"epoch: {epoch+1}")
-            for step, train_ds in enumerate(train_data):
-                loss_value = self.train_step(train_ds)
-                if step % 10 == 0:
+            for step, (x_tr_batch, y_tr_batch) in enumerate(train_data):
+                loss_value = self.train_step(x_tr_batch, y_tr_batch)
+                if step % 50 == 0:
                     print(
                         "Training loss (for one batch) at step %d: %.4f"
                         % (step, loss_value)
@@ -127,7 +125,7 @@ class TrainTestLstmAe:
         self.n_epochs = n_epochs
     
     @staticmethod
-    def get_vocabulary_max_len(
+    def get_vocabulary_and_max_len(
         data_path: str="../data/medium_movies_data.csv", 
         vocab_size: int = 124100 # 124,079 precise
         ) -> tuple:
@@ -192,9 +190,9 @@ class TrainTestLstmAe:
             )
 
         train_data = tf.data.Dataset.from_tensor_slices((x_train, x_train))
-        train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=8)
+        train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=BATCH_SIZE)
         test_data = tf.data.Dataset.from_tensor_slices((x_test, x_test))
-        test_data = test_data.batch(batch_size=8)
+        test_data = test_data.batch(batch_size=BATCH_SIZE)
 
         return train_data, test_data
 
