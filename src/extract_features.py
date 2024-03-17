@@ -35,7 +35,17 @@ class LstmAe(tfk.Model):
             input_dim=self.txt_vec.vocabulary_size(),
             output_dim=latent_dim,
             )
-        self.enc = tfkl.Bidirectional(
+        self.enc1 = tfkl.Bidirectional(
+            tfkl.LSTM(
+                units=456,  # hp.Int('units', min_value=2, max_value=100, step=5), 
+                activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
+                # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
+                return_sequences=True,
+                name="encoder1"
+                )
+            )
+        
+        self.enc2 = tfkl.Bidirectional(
             tfkl.LSTM(
                 units=123,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
@@ -72,29 +82,31 @@ class LstmAe(tfk.Model):
         print("called txt vec")
         x = self.emb(x)
         print("called emd")
-        x = self.enc(x)
+        x = self.enc1(x)
+        x = self.enc2(x)
         x = self.dec1(x)
         x = self.dec2(x)
         x = self.outputs(x)
-        
         return x 
     
     @tf.function
     def train_step(self, x, y):
         with tf.GradientTape() as tape:
-            y_pred = self.call(x, training=True)
-            loss_value = self.loss_fn(y, y_pred)
+            y_pred = self(x, training=True)
+            y_true = self.inputs(self.txt_vec(y))
+            loss_value = self.loss_fn(y_true, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
         print("optimized")
-        self.train_metric.update_state(y, y_pred)
+        self.train_metric.update_state(y_true, y_pred)
 
         return loss_value
     
     @tf.function
     def test_step(self, x, y):
-        y_pred = self.call(x, training=False)
-        self.val_metric(y, y_pred)
+        y_pred = self(x, training=False)
+        y_true = self.inputs(self.txt_vec(y))
+        self.val_metric(y_true, y_pred)
 
     def fit(self, train_data, test_data, n_epochs):
 
