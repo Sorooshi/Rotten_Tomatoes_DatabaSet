@@ -113,8 +113,8 @@ class LstmAe(tfk.Model):
         for epoch in range(n_epochs):
             print(f"epoch: {epoch+1}")
             for step, train_ds in enumerate(train_data):
-                loss_value = self.train_step(train_data)
-                if step % 200 == 0:
+                loss_value = self.train_step(train_ds)
+                if step % 10 == 0:
                     print(
                         "Training loss (for one batch) at step %d: %.4f"
                         % (step, float(loss_value))
