@@ -111,6 +111,7 @@ class LstmAe(tfk.Model):
         return self.val_metric(y_true, y_pred)
 
     def fit(self, train_data, test_data, n_epochs):
+        history = {}
         train_total_loss, val_total_loss = [], []
         for epoch in range(n_epochs):
             print(f"epoch: {epoch+1}")
@@ -122,17 +123,18 @@ class LstmAe(tfk.Model):
                         % (step, loss_value)
                     )
             
-            train_total_loss.append(self.train_metric.results())
+            train_total_loss.append(self.train_metric.result())
         
         for step, (x_val_batch, y_val_batch) in enumerate(test_data):
             val_loss = self.test_step(x_val_batch, y_val_batch)
-            val_total_loss.append(val_loss)
+            val_total_loss.append(val_loss.result())
             if step % 25 == 0:
                     print(
                         "Validation loss (for one batch) at step %d: %.4f"
                         % (step, val_loss)
                     )
-            
+        
+        history["metrics"] = {}
         return train_total_loss, val_total_loss
 
 class TrainTestLstmAe:
