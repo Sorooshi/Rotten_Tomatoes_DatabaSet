@@ -232,12 +232,12 @@ class FineTuneLstmAe(TrainTestLstmAe):
         if self.classification:
             self.pred_activation = "softmax"
             self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="loss_fn")
-            self.metrics = ["accuracy"]
+            self.metric = ["accuracy"]
             self.name = "LSTM_AE-Cls"
         else:
             self.pred_activation = "tanh"
             self.loss_fn = tfk.losses.Huber(name="loss_fn")
-            self.metrics = ["logcosh"]
+            self.metric = ["logcosh"]
             self.name = "LSTM_AE-Reg"
 
     def model_builder(self, hp):
@@ -314,7 +314,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
         model.compile(
             loss=self.loss_fn,
             optimizer=tfk.optimizers.SGD(learning_rate=hp_learning_rate),
-            metrics=self.metrics,
+            metrics=self.metric,
         )
 
         return model
