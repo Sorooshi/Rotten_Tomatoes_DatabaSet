@@ -184,6 +184,8 @@ class TrainTestLstmAe(LstmAe):
 
         self.vocabulary = txt_vec.get_vocabulary()
         self.max_seq_len = max_seq_len
+
+        return self.vocabulary, self.max_seq_len
     
 
     def get_train_test_data(self, batch_size=8, return_tensors=True) -> tuple:
@@ -223,13 +225,11 @@ class TrainTestLstmAe(LstmAe):
 class FineTuneLstmAe(TrainTestLstmAe):
     def __init__(self,  
                  classification: bool = True, 
-                 max_seq_len: int = 100, *args, **kwargs):
-        super(FineTuneLstmAe, self).__init__(*args, **kwargs)
-
-        
-        self.vocabulary = TrainTestLstmAe.get_vocabulary_and_max_len().vocabulary
-        self.max_seq_len = max_seq_len
+                 *args, **kwargs):
+        super(FineTuneLstmAe, self).__init__(*args, **kwargs)        
         self.classification = classification
+        self.vocabulary, self.max_seq_len  = TrainTestLstmAe.get_vocabulary_and_max_len()
+
         # self.latent_dim = latent_dim
 
         if self.classification:
@@ -258,7 +258,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
         model.add(
             tfkl.TextVectorization(
             max_tokens=None, 
-            vocabulary = LstmAe.vocabulary,
+            vocabulary = self.vocabulary,
             split="whitespace", ngrams=2, 
             output_mode="int", ragged=False,
             output_sequence_length=self.max_seq_len,
