@@ -192,7 +192,7 @@ class TrainTestLstmAe:
         train_data = tf.data.Dataset.from_tensor_slices((x_train, x_train))
         train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=BATCH_SIZE)
         test_data = tf.data.Dataset.from_tensor_slices((x_test, x_test))
-        test_data = test_data.batch(batch_size=BATCH_SIZE)
+        test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=BATCH_SIZE)
 
         return train_data, test_data
 
