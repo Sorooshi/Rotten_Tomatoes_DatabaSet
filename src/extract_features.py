@@ -37,7 +37,7 @@ class LstmAe(tfk.Model):
             )
         self.enc1 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=20,  # hp.Int('units', min_value=2, max_value=100, step=5), 
+                units=100,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
                 return_sequences=True,
@@ -47,7 +47,7 @@ class LstmAe(tfk.Model):
         
         self.enc2 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=10,  # hp.Int('units', min_value=2, max_value=100, step=5), 
+                units=50,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
                 return_sequences=True,
@@ -56,7 +56,7 @@ class LstmAe(tfk.Model):
             )
         self.dec1 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=10,  # hp.Int('units', min_value=2, max_value=100, step=5), 
+                units=50,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
                 return_sequences=True,
@@ -65,7 +65,7 @@ class LstmAe(tfk.Model):
         )
         self.dec2 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=25,  # hp.Int('units', min_value=2, max_value=100, step=5), 
+                units=100,  # hp.Int('units', min_value=2, max_value=100, step=5), 
                 activation="tanh",  # hp.Choice("activation", ["relu", "tanh"]), 
                 # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
                 return_sequences=False,
@@ -77,7 +77,7 @@ class LstmAe(tfk.Model):
             )
 
     def call(self, inputs, training=None):
-        x = self.inputs(inputs)
+        x = self.inputs(inputs, training)
         x = self.txt_vec(x)
         x = self.emb(x)
         x = self.enc1(x)
@@ -91,25 +91,27 @@ class LstmAe(tfk.Model):
     def train_step(self, x, y):
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
-            print(f"y_pred {y_pred.shape} \n, {y_pred}")
-            y_true = self.inputs(self.txt_vec(y))
-            print(f"y_true {y_true.shape} \n, {y_true}")
+            if y is None:
+                y_true = self.inputs(self.txt_vec(x))
+            else:
+                y_true = self.inputs(self.txt_vec(y))
             loss_value = self.loss_fn(y_true, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
         self.train_metric.update_state(y_true, y_pred)
-        print("optimized!")
         return loss_value
     
     @tf.function
     def test_step(self, x, y):
         y_pred = self(x, training=False)
-        y_true = self.inputs(self.txt_vec(y))
-        self.val_metric(y_true, y_pred)
-        print("evaluated!")
+        if y is None:
+            y_true = self.inputs(self.txt_vec(x))
+        else:
+            y_true = self.inputs(self.txt_vec(y))
+        return self.val_metric(y_true, y_pred)
 
     def fit(self, train_data, test_data, n_epochs):
-
+        train_total_loss, val_total_loss = [], []
         for epoch in range(n_epochs):
             print(f"epoch: {epoch+1}")
             for step, (x_tr_batch, y_tr_batch) in enumerate(train_data):
@@ -119,6 +121,19 @@ class LstmAe(tfk.Model):
                         "Training loss (for one batch) at step %d: %.4f"
                         % (step, loss_value)
                     )
+            
+            train_total_loss.append(self.train_metric.results())
+        
+        for step, (x_val_batch, y_val_batch) in enumerate(test_data):
+            val_loss = self.test_step(x_val_batch, y_val_batch)
+            val_total_loss.append(val_loss)
+            if step % 25 == 0:
+                    print(
+                        "Validation loss (for one batch) at step %d: %.4f"
+                        % (step, val_loss)
+                    )
+            
+        return train_total_loss, val_total_loss
 
 class TrainTestLstmAe:
     def __init__(self, data: pd.DataFrame=None, n_epochs: int= 1):
