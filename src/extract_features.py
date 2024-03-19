@@ -111,7 +111,6 @@ class LstmAe(tfk.Model):
         return self.val_metric(y_true, y_pred)
 
     def fit(self, train_data, test_data, n_epochs):
-        history = {}
         train_total_loss, val_total_loss = [], []
         for epoch in range(n_epochs):
             print(f"epoch: {epoch+1}")
@@ -122,7 +121,7 @@ class LstmAe(tfk.Model):
                         "Training loss (for one batch) at step %d: %.4f"
                         % (step, loss_value)
                     )
-            train_total_loss.append(self.train_metric.result())
+            train_total_loss.append(self.train_metric)
         
             for step, (x_val_batch, y_val_batch) in enumerate(test_data):
                 val_loss = self.test_step(x_val_batch, y_val_batch)
