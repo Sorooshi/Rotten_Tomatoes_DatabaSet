@@ -21,9 +21,9 @@ class LstmAe(tfk.Model):
             self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="loss_fn")
             pred_activation = "softmax"
         else:
-            self.train_metric = tfk.metrics.CosineSimilarity()
-            self.val_metric = tfk.metrics.CosineSimilarity()
-            self.loss_fn = tfk.losses.CosineSimilarity(name="loss_fn")
+            self.train_metric = tfk.metrics.Huber()
+            self.val_metric = tfk.metrics.Huber()
+            self.loss_fn = tfk.losses.Huber(name="loss_fn")
             pred_activation = "tanh"
 
         self.inputs = tfkl.InputLayer(
