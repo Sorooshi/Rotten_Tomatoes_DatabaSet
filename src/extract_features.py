@@ -126,8 +126,9 @@ class LstmAe(tfk.Model):
         return train_total_loss, val_total_loss
 
 class TrainTestLstmAe(LstmAe):
-    def __init__(self, n_epochs: int= 1):
-        super().__init__()
+    def __init__(self, n_epochs: int= 1, *args, **kwargs):
+        super(TrainTestLstmAe, self).__init__(*args, **kwargs)
+        self.data = None
         self.labels = None 
         self.text_data = None
         self.n_epochs = n_epochs
@@ -135,9 +136,9 @@ class TrainTestLstmAe(LstmAe):
     def get_text_and_labels(
             self, data_path: str="../data/medium_movies_data.csv", ):
 
-        data = pd.read_csv(data_path)
-        self.labels = data.Genre.values
-        self.text_data = data.Synopsis.values
+        self.data = pd.read_csv(data_path)
+        self.labels = self.data.Genre.values
+        self.text_data = self.data.Synopsis.values
 
         print(
             f"text data head: \n {self.text_data[:3]} \n" 
@@ -183,24 +184,9 @@ class TrainTestLstmAe(LstmAe):
         self.max_seq_len = max_seq_len
     
 
-    # def get_train_test_data(self, batch_size=8,) -> tuple:
+    def get_train_test_data(self, batch_size=8, return_tensors=True) -> tuple:
 
-    #     self.get_text_and_labels
-
-    #     x_train, x_test, _, _ = train_test_split(
-    #         self.text_data, self.labels, test_size=0.05
-    #         )
-
-    #     train_data = tf.data.Dataset.from_tensor_slices((x_train, x_train))
-    #     train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
-    #     test_data = tf.data.Dataset.from_tensor_slices((x_test, x_test))
-    #     test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
-
-    #     return train_data, test_data
-
-    def get_train_test_tenors(self, batch_size=8,) -> tuple:
-
-        self.get_text_and_labels
+        self.get_text_and_labels()
 
         x_train, x_test, _, _ = train_test_split(
             self.text_data, self.labels, test_size=0.05
@@ -212,12 +198,15 @@ class TrainTestLstmAe(LstmAe):
         y_test = LstmAe.inputs(x_test)
         y_test = LstmAe.txt_vec(y_test)
 
-        train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-        train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
-        test_data = tf.data.Dataset.from_tensor_slices((x_test, y_test))
-        test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
-
-        return train_data, test_data
+        if return_tensors:
+            train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+            train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
+            test_data = tf.data.Dataset.from_tensor_slices((x_test, y_test))
+            test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
+            return train_data, test_data, 
+        else:
+            return x_train, y_train, x_test, y_test
+            
 
 
     def train_test_tuned_model(self,):
@@ -229,16 +218,18 @@ class TrainTestLstmAe(LstmAe):
             print(" to be completed ....")
 
 
-class FineTuneLstmAe:
+class FineTuneLstmAe(TrainTestLstmAe):
     def __init__(self, latent_dim: int = 50, 
                  vocabulary: list = [],
                  classification: bool = True, 
                  max_seq_len: int = 100, *args, **kwargs):
-        super(FineTuneLstmAe).__init__(*args, **kwargs)
+        super(FineTuneLstmAe, self).__init__(*args, **kwargs)
+
         self.vocabulary = vocabulary
         self.max_seq_len = max_seq_len
         self.classification = classification
         self.latent_dim = latent_dim
+
         if self.classification:
             self.pred_activation = "softmax"
             self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="loss_fn")
@@ -330,7 +321,7 @@ class FineTuneLstmAe:
         return model
 
 
-    def fine_tune_the_model(self, build_model, x_train, y_train, x_val, y_val):
+    def fine_tune_the_model(self, build_model,):
 
         tuner = kt.BayesianOptimization(
             hypermodel=build_model, 
@@ -343,7 +334,9 @@ class FineTuneLstmAe:
 
         print(tuner.search_space_summary())
 
-        tuner.search(x_train, y_train, epochs=5, validation_data=(x_val, y_val))
+        train_data, val_data = TrainTestLstmAe.get_train_test_data(batch_size=8, return_tensors=True)
+
+        tuner.search(train_data, epochs=5, validation_data=val_data)
 
         # models = tuner.get_best_models(num_models=1)
         best_hps = tuner.get_best_hyperparameters(2)
