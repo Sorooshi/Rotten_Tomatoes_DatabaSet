@@ -18,12 +18,12 @@ class LstmAe(tfk.Model):
         if classification:
             self.train_metric = tfk.metrics.Accuracy(name="acc")
             self.val_metric = tfk.metrics.Accuracy(name="acc_val")
-            self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="scc")
+            self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="loss_fn")
             pred_activation = "softmax"
         else:
-            self.train_metric = tfk.metrics.MeanRelativeError(name="mre")
-            self.val_metric = tfk.metrics.MeanRelativeError(name="mre_val")
-            self.loss_fn = tfk.losses.MeanRelativeError(name="loss_fn")
+            self.train_metric = tfk.metrics.CosineSimilarity()
+            self.val_metric = tfk.metrics.CosineSimilarity()
+            self.loss_fn = tfk.losses.CosineSimilarity(name="loss_fn")
             pred_activation = "tanh"
 
         self.inputs = tfkl.InputLayer(
