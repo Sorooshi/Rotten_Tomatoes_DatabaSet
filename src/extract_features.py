@@ -233,12 +233,12 @@ class FineTuneLstmAe(TrainTestLstmAe):
             self.pred_activation = "softmax"
             self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="loss_fn")
             self.metric = ["accuracy"]
-            self.name = "LSTM_AE-Cls"
+            self.proj_name = "LSTM_AE-Cls"
         else:
             self.pred_activation = "tanh"
             self.loss_fn = tfk.losses.Huber(name="loss_fn")
             self.metric = ["logcosh"]
-            self.name = "LSTM_AE-Reg"
+            self.proj_name = "LSTM_AE-Reg"
 
     def model_builder(self, hp):
         hp_units = hp.Int('units', min_value=10, max_value=512, step=10)
@@ -328,7 +328,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
             max_trials=10, 
             executions_per_trial=5,
             overwrite=True,
-            directory=self.name,
+            directory=self.proj_name,
             )
 
         print(tuner.search_space_summary())
@@ -344,7 +344,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
         # models = tuner.get_best_models(num_models=1)
         best_hps = tuner.get_best_hyperparameters(2)
         
-        with open(os.path.join("./best_hps" + self.name), 'r') as fp:
+        with open(os.path.join("./best_hps" + self.proj_name), 'r') as fp:
             fp.pickle(best_hps)
 
         return best_hps
