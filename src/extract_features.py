@@ -201,7 +201,7 @@ class TrainTestLstmAe(LstmAe):
                          classification=False, max_seq_len=123)
         
         
-        y_train = lstm_ae.call.inputs(x_train)
+        y_train = lstm_ae.call().inputs(x_train)
         y_train = lstm_ae.txt_vec(x_train)
 
         y_test = lstm_ae.txt_vec(lstm_ae.inputs(x_test))
