@@ -244,7 +244,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
             self.proj_name = "LSTM_AE-Reg"
 
     def build_model(self, hp):
-        hp_units = hp.Int('units', min_value=10, max_value=512, step=10)
+        hp_units = hp.Int('units', min_value=32, max_value=256, step=32)
         hp_latent_dim = hp.Int('units', min_value=10, max_value=50, step=5)
         hp_activation = hp.Choice('activation', values = ["relu", "tanh", ] )
         hp_learning_rate = hp.Choice('learning_rate', values=[1e-3, 1e-4, 1e-5, 1e-6])
@@ -324,9 +324,8 @@ class FineTuneLstmAe(TrainTestLstmAe):
 
 
     def fine_tune_the_model(self, ):
-
-        build_model = self.build_model(kt.HyperParameters())
-
+        hp = kt.HyperParameters()
+        build_model = self.build_model(hp=hp)
         tuner = kt.BayesianOptimization(
             hypermodel=build_model, 
             objective="val_accuracy", 
