@@ -87,24 +87,16 @@ class LstmAe(tfk.Model):
     def train_step(self, x, y):
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
-            if y is None:
-                y_true = self.inputs(self.txt_vec(x))
-            else:
-                y_true = self.inputs(self.txt_vec(y))
-            loss_value = self.loss_fn(y_true, y_pred)
+            loss_value = self.loss_fn(y, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
-        self.train_metric.update_state(y_true, y_pred)
+        self.train_metric.update_state(y, y_pred)
         return loss_value
     
     @tf.function
     def test_step(self, x, y):
         y_pred = self(x, training=False)
-        if y is None:
-            y_true = self.inputs(self.txt_vec(x))
-        else:
-            y_true = self.inputs(self.txt_vec(y))
-        self.val_metric(y_true, y_pred)
+        self.val_metric(y, y_pred)
 
     def fit(self, train_data, test_data, n_epochs):
         train_total_loss, val_total_loss = [], []
@@ -133,31 +125,36 @@ class LstmAe(tfk.Model):
 
         return train_total_loss, val_total_loss
 
-class TrainTestLstmAe:
-    def __init__(self, data: pd.DataFrame=None, n_epochs: int= 1):
+class TrainTestLstmAe(LstmAe):
+    def __init__(self, n_epochs: int= 1):
         super().__init__()
-        self.data = data
+        self.labels = None 
+        self.text_data = None
         self.n_epochs = n_epochs
     
-    @staticmethod
-    def get_vocabulary_and_max_len(
-        data_path: str="../data/medium_movies_data.csv", 
-        vocab_size: int = 124100 # 124,079 precise
-        ) -> tuple:
+    def get_text_and_labels(
+            self, data_path: str="../data/medium_movies_data.csv", ):
 
         data = pd.read_csv(data_path)
-        text_data = data.Synopsis.values
-        labels = data.Genre.values
+        self.labels = data.Genre.values
+        self.text_data = data.Synopsis.values
+
         print(
-            f"text data head: \n {text_data[:3]} \n" 
-            f"text data shape: {text_data.shape} \n"
-            f"labels head: \n {labels[:3]} \n"
-            f"labels shape: {labels.shape} \n"
-        )
+            f"text data head: \n {self.text_data[:3]} \n" 
+            f"text data shape: {self.text_data.shape} \n"
+            f"labels head: \n {self.labels[:3]} \n"
+            f"labels shape: {self.labels.shape} \n"
+        ) 
+
+    
+    def get_vocabulary_and_max_len(self, vocab_size: int = 124100) -> tuple:
+
+        self.get_text_and_labels()
+
         if vocab_size is None:  # a bit slower
             vocabulary = []
             max_seq_len = 0
-            for synopsis in text_data:
+            for synopsis in self.text_data:
                 parsed_synopsis = np.unique(synopsis.lower().strip().split(" ")).tolist()
                 if len(parsed_synopsis) > max_seq_len:
                     max_seq_len = len(parsed_synopsis)
@@ -165,13 +162,13 @@ class TrainTestLstmAe:
                     if word not in vocabulary:
                         vocabulary.append(vocabulary)            
             vocab_size = len(vocabulary)
-            n_classes = [i.lower() for i in np.unique(labels)]
+            n_classes = [i.lower() for i in np.unique(self.labels)]
             print(
                 f"vocabulary size {len(vocabulary)}"
                 f"Number of classes: {n_classes}"
                 )
         else:
-            max_seq_len = 171
+            max_seq_len = 171  # value for medium size network
         txt_vec = tfkl.TextVectorization(
             max_tokens=vocab_size, 
             split="whitespace", ngrams=1, 
@@ -179,40 +176,51 @@ class TrainTestLstmAe:
             standardize="lower_and_strip_punctuation",
         )
         txt_vec.adapt(
-            data=text_data, batch_size=8, steps=None
+            data=self.text_data, batch_size=8, steps=None
         )
 
-        vocabulary = txt_vec.get_vocabulary()
+        self.vocabulary = txt_vec.get_vocabulary()
+        self.max_seq_len = max_seq_len
+    
 
-        return vocabulary, max_seq_len
+    # def get_train_test_data(self, batch_size=8,) -> tuple:
 
-    def get_train_test_data(
-        data_path: str="../data/medium_movies_data.csv", 
-        batch_size=8,
-        ) -> tuple:
+    #     self.get_text_and_labels
 
-        data = pd.read_csv(data_path)
-        text_data = data.Synopsis.values
-        labels = data.Genre.values
-        print(
-            f"text data head: \n {text_data[:3]} \n" 
-            f"text data shape: {text_data.shape} \n"
-            f"labels head: \n {labels[:3]} \n"
-            f"labels shape: {labels.shape} \n"
-        ) 
+    #     x_train, x_test, _, _ = train_test_split(
+    #         self.text_data, self.labels, test_size=0.05
+    #         )
+
+    #     train_data = tf.data.Dataset.from_tensor_slices((x_train, x_train))
+    #     train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
+    #     test_data = tf.data.Dataset.from_tensor_slices((x_test, x_test))
+    #     test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
+
+    #     return train_data, test_data
+
+    def get_train_test_tenors(self, batch_size=8,) -> tuple:
+
+        self.get_text_and_labels
 
         x_train, x_test, _, _ = train_test_split(
-            text_data, labels, test_size=0.05
+            self.text_data, self.labels, test_size=0.05
             )
+        
+        y_train = LstmAe.inputs(x_train)
+        y_train = LstmAe.txt_vec(y_train)
 
-        train_data = tf.data.Dataset.from_tensor_slices((x_train, x_train))
+        y_test = LstmAe.inputs(x_test)
+        y_test = LstmAe.txt_vec(y_test)
+
+        train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
         train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
-        test_data = tf.data.Dataset.from_tensor_slices((x_test, x_test))
+        test_data = tf.data.Dataset.from_tensor_slices((x_test, y_test))
         test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
 
         return train_data, test_data
 
-    def train_val_test(self,):
+
+    def train_test_tuned_model(self,):
         vectorized_text, labels, max_len = self.get_preprocess_data(
             data_path="../data/medium_movies_data.scv",
         )
@@ -346,5 +354,5 @@ class FineTuneLstmAe:
         return best_hps
 
 
-
+    
 
