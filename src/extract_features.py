@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -21,9 +22,9 @@ class LstmAe(tfk.Model):
             self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="loss_fn")
             pred_activation = "softmax"
         else:
-            self.train_metric = tfk.metrics.MeanAbsoluteError()
-            self.val_metric = tfk.metrics.MeanAbsoluteError()
-            self.loss_fn = tfk.losses.Huber(name="loss_fn")
+            self.train_metric = tfk.metrics.LogCoshError()
+            self.val_metric = tfk.metrics.LogCoshError()
+            self.loss_fn = tfk.losses.Huber(name="loss_fn")  
             pred_activation = "tanh"
 
         self.inputs = tfkl.InputLayer(
@@ -230,12 +231,23 @@ class FineTuneLstmAe:
         self.max_seq_len = max_seq_len
         self.classification = classification
         self.latent_dim = latent_dim
+        if self.classification:
+            self.pred_activation = "softmax"
+            self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="loss_fn")
+            self.metrics = ["accuracy"]
+            self.name = "LSTM_AE-Cls"
+        else:
+            self.pred_activation = "tanh"
+            self.loss_fn = tfk.losses.Huber(name="loss_fn")
+            self.metrics = ["logcosh"]
+            self.name = "LSTM_AE-Reg"
 
     def model_builder(self, hp):
         hp_units = hp.Int('units', min_value=10, max_value=512, step=10)
         hp_latent_dim = hp.Int('units', min_value=10, max_value=50, step=5)
-        hp_activation = hp.Categorical('activation', )
-        hp_learning_rate = hp.Choice('learning_rate', values=[1e-2, 1e-3, 1e-4, 1e-5, 1e-6])
+        hp_activation = hp.Choice('activation', values = ["relu", "tanh", ] )
+        hp_learning_rate = hp.Choice('learning_rate', values=[1e-3, 1e-4, 1e-5, 1e-6])
+        hp_dropout = hp.Choice('dropout', values=[0.0, 0.1, 0.4])
 
 
         model = tfk.Sequential()
@@ -251,32 +263,87 @@ class FineTuneLstmAe:
             output_sequence_length=self.max_seq_len,
             standardize="lower_and_strip_punctuation",
             )
-        )
-        
+        ) 
         model.add(
             tfkl.Embedding(
             input_dim=self.txt_vec.vocabulary_size(),
             output_dim=hp_latent_dim,
             )
         )
-
-        model.add(
+        model.add( 
             tfkl.Bidirectional(
                 tfkl.LSTM(
                 units=hp_units,  
-                activation="relu",  
-                dropout=0.1,
+                activation=hp_activation,  
+                dropout=hp_dropout,
                 return_sequences=True,
                 name="encoder1"
-                ))
+                )
+            )
         )
-
         model.add(
-
+            tfkl.Bidirectional(
+            tfkl.LSTM(
+                units=hp_units,  
+                activation=hp_activation, 
+                dropout=hp_dropout,
+                return_sequences=True,
+                name="decoder1")
+                )
         )
-    
+        model.add(
+            tfkl.Bidirectional(
+            tfkl.LSTM(
+                units=hp_units,  
+                activation=hp_activation, 
+                dropout=hp_dropout,
+                return_sequences=True,
+                name="decoder2")
+                )
+        )
+        model.add(
+            tfkl.Dense(
+            units=hp_units, 
+            activation=hp_activation,
+            )
+        )
+        model.add(
+            tfkl.Dense(
+            units=self.max_seq_len, activation=self.pred_activation,
+            )
+        )
+
+        model.compile(
+            loss=self.loss_fn,
+            optimizer=tfk.optimizers.SGD(learning_rate=hp_learning_rate),
+            metrics=self.metrics,
+        )
+
+        return model
 
 
+    def fine_tune_the_model(self, build_model, x_train, y_train, x_val, y_val):
+
+        tuner = kt.BayesianOptimization(
+            hypermodel=build_model, 
+            objective="val_accuracy", 
+            max_trials=10, 
+            executions_per_trial=5,
+            overwrite=True,
+            directory=self.name,
+            )
+
+        print(tuner.search_space_summary())
+
+        tuner.search(x_train, y_train, epochs=5, validation_data=(x_val, y_val))
+
+        # models = tuner.get_best_models(num_models=1)
+        best_hps = tuner.get_best_hyperparameters(2)
+        
+        with open(os.path.join("./best_hps" + self.name), 'r') as fp:
+            fp.pickle(best_hps)
+
+        return best_hps
 
 
 
