@@ -132,7 +132,7 @@ class LstmAe(tfk.Model):
 
             val_metric = self.val_metric.result()
             val_total_loss.append(val_metric)
-            self.val_metric.result().reset_states()
+            self.val_metric.reset_states()
             print("Validation metric: %.4f" % (float(val_metric),))
 
         return train_total_loss, val_total_loss
