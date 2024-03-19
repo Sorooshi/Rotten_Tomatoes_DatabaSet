@@ -108,29 +108,33 @@ class LstmAe(tfk.Model):
             y_true = self.inputs(self.txt_vec(x))
         else:
             y_true = self.inputs(self.txt_vec(y))
-        return self.val_metric(y_true, y_pred)
+        self.val_metric(y_true, y_pred)
 
     def fit(self, train_data, test_data, n_epochs):
         train_total_loss, val_total_loss = [], []
         for epoch in range(n_epochs):
             print(f"epoch: {epoch+1}")
-            for step, (x_tr_batch, y_tr_batch) in enumerate(train_data):
-                loss_value = self.train_step(x_tr_batch, y_tr_batch)
+            for step, (x_batch_train, y_batch_train) in enumerate(train_data):
+                loss_value = self.train_step(x_batch_train, y_batch_train)
                 if step % 50 == 0:
                     print(
                         "Training loss (for one batch) at step %d: %.4f"
                         % (step, loss_value)
                     )
-            train_total_loss.append(self.train_metric)
-        
-            for step, (x_val_batch, y_val_batch) in enumerate(test_data):
-                val_loss = self.test_step(x_val_batch, y_val_batch)
-                val_total_loss.append(val_loss)
-                if step % 25 == 0:
-                        print(
-                            "Validation loss (for one batch) at step %d: %.4f"
-                            % (step, val_loss)
-                        )
+            train_metric = self.train_metric.result()
+            train_total_loss.append(train_metric)
+            print("Training metric over epoch: %.4f" % (float(train_metric),))
+            self.train_metric.reset_states()
+
+            # Run a validation loop at the end of each epoch.
+            for x_batch_val, y_batch_val in test_data:
+                self.test_step(x_batch_val, y_batch_val)
+
+            val_metric = self.val_metric.result()
+            val_total_loss.append(val_metric)
+            self.val_metric.result().reset_states()
+            print("Validation metric: %.4f" % (float(val_metric),))
+
         return train_total_loss, val_total_loss
 
 class TrainTestLstmAe:
