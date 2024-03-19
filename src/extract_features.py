@@ -243,7 +243,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
             self.metric = ["logcosh"]
             self.proj_name = "LSTM_AE-Reg"
 
-    def model_builder(self, hp):
+    def build_model(self, hp):
         hp_units = hp.Int('units', min_value=10, max_value=512, step=10)
         hp_latent_dim = hp.Int('units', min_value=10, max_value=50, step=5)
         hp_activation = hp.Choice('activation', values = ["relu", "tanh", ] )
@@ -253,7 +253,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
 
         model = tfk.Sequential()
         model.add(
-            tfkl.Input(shape=(1,), dtype=tf.string,)
+            tfkl.InputLayer(input_shape=(1,), dtype=tf.string,)
         )
         model.add(
             tfkl.TextVectorization(
@@ -325,7 +325,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
 
     def fine_tune_the_model(self, ):
 
-        build_model = self.model_builder(kt.HyperParameters())
+        build_model = self.build_model(kt.HyperParameters())
 
         tuner = kt.BayesianOptimization(
             hypermodel=build_model, 
