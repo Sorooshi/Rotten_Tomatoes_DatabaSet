@@ -21,9 +21,9 @@ class LstmAe(tfk.Model):
             self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="scc")
             pred_activation = "softmax"
         else:
-            self.train_metric = tfk.metrics.MeanAbsoluteError(name="mae")
-            self.val_metric = tfk.metrics.MeanAbsoluteError(name="mae_val")
-            self.loss_fn = tfk.losses.MeanSquaredError(name="mse_loss")
+            self.train_metric = tfk.metrics.MeanRelativeError(name="mre")
+            self.val_metric = tfk.metrics.MeanRelativeError(name="mre_val")
+            self.loss_fn = tfk.losses.MeanRelativeError(name="loss_fn")
             pred_activation = "tanh"
 
         self.inputs = tfkl.InputLayer(
@@ -217,7 +217,66 @@ class TrainTestLstmAe:
         )
         
         for k in range(5):
-            print("....")
+            print(" to be completed ....")
+
+
+class FineTuneLstmAe:
+    def __init__(self, latent_dim: int = 50, 
+                 vocabulary: list = [],
+                 classification: bool = True, 
+                 max_seq_len: int = 100, *args, **kwargs):
+        super(FineTuneLstmAe).__init__(*args, **kwargs)
+        self.vocabulary = vocabulary
+        self.max_seq_len = max_seq_len
+        self.classification = classification
+        self.latent_dim = latent_dim
+
+    def model_builder(self, hp):
+        hp_units = hp.Int('units', min_value=10, max_value=512, step=10)
+        hp_latent_dim = hp.Int('units', min_value=10, max_value=50, step=5)
+        hp_activation = hp.Categorical('activation', )
+        hp_learning_rate = hp.Choice('learning_rate', values=[1e-2, 1e-3, 1e-4, 1e-5, 1e-6])
+
+
+        model = tfk.Sequential()
+        model.add(
+            tfkl.InputLayer(input_shape=(1,), dtype=tf.string,)
+        )
+        model.add(
+            tfkl.TextVectorization(
+            max_tokens=None, 
+            vocabulary = self.vocabulary,
+            split="whitespace", ngrams=2, 
+            output_mode="int", ragged=False,
+            output_sequence_length=self.max_seq_len,
+            standardize="lower_and_strip_punctuation",
+            )
+        )
+        
+        model.add(
+            tfkl.Embedding(
+            input_dim=self.txt_vec.vocabulary_size(),
+            output_dim=hp_latent_dim,
+            )
+        )
+
+        model.add(
+            tfkl.Bidirectional(
+                tfkl.LSTM(
+                units=hp_units,  
+                activation="relu",  
+                dropout=0.1,
+                return_sequences=True,
+                name="encoder1"
+                ))
+        )
+
+        model.add(
+
+        )
+    
+
+
 
 
 
