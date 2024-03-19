@@ -325,7 +325,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
 
     def fine_tune_the_model(self, ):
         hps = kt.HyperParameters()
-        train_data, val_data = TrainTestLstmAe.get_train_test_data(
+        train_data, val_data = TrainTestLstmAe().get_train_test_data(
             batch_size=8, return_tensors=True
             )
 
