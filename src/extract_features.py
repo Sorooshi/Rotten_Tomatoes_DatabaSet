@@ -321,8 +321,8 @@ class FineTuneLstmAe(TrainTestLstmAe):
 
 
     def fine_tune_the_model(self, ):
-        
-        build_model = self.model_builder()
+
+        build_model = self.model_builder(kt.HyperParameters())
 
         tuner = kt.BayesianOptimization(
             hypermodel=build_model, 
