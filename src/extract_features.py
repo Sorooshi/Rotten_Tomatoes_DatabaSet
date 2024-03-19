@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 
 tfk = tf.keras 
 tfkl = tf.keras.layers
-BATCH_SIZE = 64
+BATCH_SIZE = 8
 
 class LstmAe(tfk.Model):
     def __init__(self, latent_dim, vocabulary, *args, **kwargs):
