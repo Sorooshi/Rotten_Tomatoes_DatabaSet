@@ -197,7 +197,9 @@ class TrainTestLstmAe(LstmAe):
             self.text_data, self.labels, test_size=0.05
             )
         
-        lstm_ae = LstmAe()
+        lstm_ae = LstmAe(latent_dim=40, vocabulary=None, 
+                         classification=False, max_seq_len=None)
+        
         y_train = lstm_ae.txt_vec(lstm_ae.inputs(x_train))
 
         y_test = lstm_ae.txt_vec(lstm_ae.inputs(x_test))
