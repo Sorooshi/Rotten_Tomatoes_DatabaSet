@@ -11,7 +11,7 @@ tfkl = tf.keras.layers
 
 class LstmAe(tfk.Model):
     def __init__(self, latent_dim: int = 50, 
-                 vocabulary: list = [],
+                 vocabulary: list = None,
                  classification: bool = True, 
                  max_seq_len: int = 100, *args, **kwargs):
         super(LstmAe, self).__init__(*args, **kwargs)
