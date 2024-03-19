@@ -127,14 +127,12 @@ class LstmAe(tfk.Model):
         
         for step, (x_val_batch, y_val_batch) in enumerate(test_data):
             val_loss = self.test_step(x_val_batch, y_val_batch)
-            val_total_loss.append(val_loss.result())
+            val_total_loss.append(val_loss)
             if step % 25 == 0:
                     print(
                         "Validation loss (for one batch) at step %d: %.4f"
                         % (step, val_loss)
                     )
-        
-        history["metrics"] = {}
         return train_total_loss, val_total_loss
 
 class TrainTestLstmAe:
