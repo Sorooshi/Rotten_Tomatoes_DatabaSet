@@ -197,11 +197,11 @@ class TrainTestLstmAe(LstmAe):
             )
         
         lstm_ae = LstmAe()
-        y_train = lstm_ae().inputs(x_train)
-        y_train = lstm_ae().txt_vec(y_train)
+        y_train = lstm_ae.inputs(x_train)
+        y_train = lstm_ae.txt_vec(y_train)
 
-        y_test = lstm_ae().inputs(x_test)
-        y_test = lstm_ae().txt_vec(y_test)
+        y_test = lstm_ae.inputs(x_test)
+        y_test = lstm_ae.txt_vec(y_test)
 
         if return_tensors:
             train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
