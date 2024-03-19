@@ -37,6 +37,10 @@ class LstmAe(tfk.Model):
             output_sequence_length=self.max_seq_len,
             standardize="lower_and_strip_punctuation",
             )
+        self.emb = tfkl.Embedding(
+            input_dim=self.txt_vec.vocabulary_size(),
+            output_dim=latent_dim,
+            )
         self.enc1 = tfkl.Bidirectional(
             tfkl.LSTM(
                 units=150,  
@@ -46,10 +50,6 @@ class LstmAe(tfk.Model):
                 name="encoder1"
                 )
             )       
-        self.emb = tfkl.Embedding(
-            input_dim=self.txt_vec.vocabulary_size(),
-            output_dim=latent_dim,
-            )
         self.dec1 = tfkl.Bidirectional(
             tfkl.LSTM(
                 units=50,  
@@ -75,8 +75,8 @@ class LstmAe(tfk.Model):
     def call(self, inputs, training=None):
         x = self.inputs(inputs, training)
         x = self.txt_vec(x)
-        x = self.enc1(x)
         x = self.emb(x)
+        x = self.enc1(x)
         x = self.dec1(x)
         x = self.dec2(x)
         x = self.outputs(x)
