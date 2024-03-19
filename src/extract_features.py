@@ -226,8 +226,8 @@ class FineTuneLstmAe(TrainTestLstmAe):
                  max_seq_len: int = 100, *args, **kwargs):
         super(FineTuneLstmAe, self).__init__(*args, **kwargs)
 
-
-        self.vocabulary = TrainTestLstmAe.vocabulary
+        
+        self.vocabulary = TrainTestLstmAe.get_vocabulary_and_max_len().vocabulary
         self.max_seq_len = max_seq_len
         self.classification = classification
         # self.latent_dim = latent_dim
