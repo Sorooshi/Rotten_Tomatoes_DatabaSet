@@ -7,17 +7,24 @@ from sklearn.model_selection import train_test_split
 
 tfk = tf.keras 
 tfkl = tf.keras.layers
-BATCH_SIZE = 8
 
 class LstmAe(tfk.Model):
-    def __init__(self, latent_dim, vocabulary, *args, **kwargs):
+    def __init__(self, latent_dim: int = 50, 
+                 vocabulary: list = [],
+                 classification: bool = True, 
+                 max_seq_len: int = 100, *args, **kwargs):
         super(LstmAe, self).__init__(*args, **kwargs)
-        self.max_seq_len = 100
-        # self.loss_tracker = tfk.metrics.Mean(name="loss")
-        self.train_metric = tfk.metrics.MeanAbsoluteError(name="mae")
-        self.val_metric = tfk.metrics.MeanAbsoluteError(name="mae")
-        self.loss_fn = tfk.losses.MeanSquaredError(name="mse_loss")
-
+        self.max_seq_len = max_seq_len
+        if classification:
+            self.train_metric = tfk.metrics.Accuracy(name="acc")
+            self.val_metric = tfk.metrics.Accuracy(name="acc_val")
+            self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="scc")
+            pred_activation = "softmax"
+        else:
+            self.train_metric = tfk.metrics.MeanAbsoluteError(name="mae")
+            self.val_metric = tfk.metrics.MeanAbsoluteError(name="mae_val")
+            self.loss_fn = tfk.losses.MeanSquaredError(name="mse_loss")
+            pred_activation = "tanh"
 
         self.inputs = tfkl.InputLayer(
             input_shape=(1,), dtype=tf.string,
@@ -25,55 +32,44 @@ class LstmAe(tfk.Model):
         self.txt_vec = tfkl.TextVectorization(
             max_tokens=None, 
             vocabulary = vocabulary,
-            split="whitespace", ngrams=1, 
+            split="whitespace", ngrams=2, 
             output_mode="int", ragged=False,
             output_sequence_length=self.max_seq_len,
             standardize="lower_and_strip_punctuation",
             )
-
+        self.enc1 = tfkl.Bidirectional(
+            tfkl.LSTM(
+                units=150,  
+                activation="relu",  
+                dropout=0.1,
+                return_sequences=True,
+                name="encoder1"
+                )
+            )       
         self.emb = tfkl.Embedding(
             input_dim=self.txt_vec.vocabulary_size(),
             output_dim=latent_dim,
             )
-        self.enc1 = tfkl.Bidirectional(
-            tfkl.LSTM(
-                units=100,  # hp.Int('units', min_value=2, max_value=100, step=5), 
-                activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
-                # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
-                return_sequences=True,
-                name="encoder1"
-                )
-            )
-        
-        self.enc2 = tfkl.Bidirectional(
-            tfkl.LSTM(
-                units=50,  # hp.Int('units', min_value=2, max_value=100, step=5), 
-                activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
-                # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
-                return_sequences=True,
-                name="encoder1"
-                )
-            )
         self.dec1 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=50,  # hp.Int('units', min_value=2, max_value=100, step=5), 
-                activation="relu",  # hp.Choice("activation", ["relu", "tanh"]), 
-                # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
+                units=50,  
+                activation="relu", 
+                dropout=0.1,
                 return_sequences=True,
                 name="decoder1"
             )
         )
         self.dec2 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=100,  # hp.Int('units', min_value=2, max_value=100, step=5), 
-                activation="tanh",  # hp.Choice("activation", ["relu", "tanh"]), 
-                # dropout=hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1),
+                units=100,  
+                activation="tanh", 
+                dropout=0.1,
                 return_sequences=False,
                 name="decoder2"
                 )
             )
         self.outputs = tfkl.Dense(
-            units=self.max_seq_len, activation="softmax"
+            units=self.max_seq_len, activation=pred_activation,
             )
 
     def call(self, inputs, training=None):
@@ -123,7 +119,7 @@ class LstmAe(tfk.Model):
                     )
             train_metric = self.train_metric.result()
             train_total_loss.append(train_metric)
-            print("Training metric over epoch: %.4f" % (float(train_metric),))
+            print("Training metric over epoch: %.3f" % (float(train_metric),))
             self.train_metric.reset_states()
 
             # Run a validation loop at the end of each epoch.
@@ -133,7 +129,7 @@ class LstmAe(tfk.Model):
             val_metric = self.val_metric.result()
             val_total_loss.append(val_metric)
             self.val_metric.reset_states()
-            print("Validation metric: %.4f" % (float(val_metric),))
+            print("Validation metric: %.3f" % (float(val_metric),))
 
         return train_total_loss, val_total_loss
 
@@ -192,6 +188,7 @@ class TrainTestLstmAe:
 
     def get_train_test_data(
         data_path: str="../data/medium_movies_data.csv", 
+        batch_size=8,
         ) -> tuple:
 
         data = pd.read_csv(data_path)
@@ -209,9 +206,9 @@ class TrainTestLstmAe:
             )
 
         train_data = tf.data.Dataset.from_tensor_slices((x_train, x_train))
-        train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=BATCH_SIZE)
+        train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
         test_data = tf.data.Dataset.from_tensor_slices((x_test, x_test))
-        test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=BATCH_SIZE)
+        test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
 
         return train_data, test_data
 
