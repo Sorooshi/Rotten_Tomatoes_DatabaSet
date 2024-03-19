@@ -219,16 +219,15 @@ class TrainTestLstmAe(LstmAe):
 
 
 class FineTuneLstmAe(TrainTestLstmAe):
-    def __init__(self, latent_dim: int = 50, 
-                 vocabulary: list = [],
+    def __init__(self,  
                  classification: bool = True, 
                  max_seq_len: int = 100, *args, **kwargs):
         super(FineTuneLstmAe, self).__init__(*args, **kwargs)
 
-        self.vocabulary = vocabulary
+        # self.vocabulary = vocabulary
         self.max_seq_len = max_seq_len
         self.classification = classification
-        self.latent_dim = latent_dim
+        # self.latent_dim = latent_dim
 
         if self.classification:
             self.pred_activation = "softmax"
@@ -334,9 +333,13 @@ class FineTuneLstmAe(TrainTestLstmAe):
 
         print(tuner.search_space_summary())
 
-        train_data, val_data = TrainTestLstmAe.get_train_test_data(batch_size=8, return_tensors=True)
+        train_data, val_data = TrainTestLstmAe.get_train_test_data(
+            batch_size=8, return_tensors=True
+            )
 
-        tuner.search(train_data, epochs=5, validation_data=val_data)
+        tuner.search(
+            train_data, epochs=5, validation_data=val_data
+            )
 
         # models = tuner.get_best_models(num_models=1)
         best_hps = tuner.get_best_hyperparameters(2)
