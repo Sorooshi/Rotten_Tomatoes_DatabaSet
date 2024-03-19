@@ -324,8 +324,12 @@ class FineTuneLstmAe(TrainTestLstmAe):
 
 
     def fine_tune_the_model(self, ):
-        hp = kt.HyperParameters()
-        build_model = self.build_model(hp=hp)
+        hps = kt.HyperParameters()
+        train_data, val_data = TrainTestLstmAe.get_train_test_data(
+            batch_size=8, return_tensors=True
+            )
+
+        build_model = self.build_model(hp=hps)
         tuner = kt.BayesianOptimization(
             hypermodel=build_model, 
             objective="val_accuracy", 
@@ -337,12 +341,8 @@ class FineTuneLstmAe(TrainTestLstmAe):
 
         print(tuner.search_space_summary())
 
-        train_data, val_data = TrainTestLstmAe.get_train_test_data(
-            batch_size=8, return_tensors=True
-            )
-
         tuner.search(
-            train_data, epochs=5, validation_data=val_data
+            train_data, epochs=10, validation_data=val_data
             )
 
         # models = tuner.get_best_models(num_models=1)
