@@ -132,6 +132,8 @@ class TrainTestLstmAe(LstmAe):
         self.labels = None 
         self.text_data = None
         self.n_epochs = n_epochs
+        self.vocabulary = None
+        self.max_seq_len = None
     
     def get_text_and_labels(
             self, data_path: str="../data/medium_movies_data.csv", ):
@@ -224,7 +226,8 @@ class FineTuneLstmAe(TrainTestLstmAe):
                  max_seq_len: int = 100, *args, **kwargs):
         super(FineTuneLstmAe, self).__init__(*args, **kwargs)
 
-        # self.vocabulary = vocabulary
+
+        self.vocabulary = TrainTestLstmAe.vocabulary
         self.max_seq_len = max_seq_len
         self.classification = classification
         # self.latent_dim = latent_dim
@@ -255,7 +258,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
         model.add(
             tfkl.TextVectorization(
             max_tokens=None, 
-            vocabulary = self.vocabulary,
+            vocabulary = LstmAe.vocabulary,
             split="whitespace", ngrams=2, 
             output_mode="int", ragged=False,
             output_sequence_length=self.max_seq_len,
