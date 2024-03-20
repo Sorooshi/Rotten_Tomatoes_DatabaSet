@@ -400,15 +400,103 @@ class FineTuneLstmAe(TrainTestLstmAe):
             self.metric = ["logcosh"]
             self.proj_name = "LSTM_AE-Reg"
             self.dir_path = "./"
+
+    def build(self, hp):
+        hp_units = hp.Int(
+            'units', min_value=32, max_value=256, step=32
+            )
+        hp_latent_dim = hp.Int(
+            'units', min_value=10, max_value=50, step=5
+            )
+        hp_activation = hp.Choice(
+            'activation', values = ["relu", "tanh", ] 
+            )
+        hp_learning_rate = hp.Choice(
+            'learning_rate', values=[1e-3, 1e-4, 1e-5, 1e-6]
+            )
+        hp_dropout = hp.Choice(
+            'dropout', values=[0.0, 0.1, 0.4]
+            )
+
+        model = tfk.Sequential()
+        model.add(
+            tfkl.InputLayer(input_shape=(1,),
+                            dtype=tf.string,)
+        )
+        model.add(
+            tfkl.TextVectorization(
+            max_tokens=None, 
+            vocabulary = self.vocabulary,
+            split="whitespace", ngrams=self.ngrams, 
+            output_mode="int", ragged=False,
+            output_sequence_length=self.max_seq_len,
+            standardize="lower_and_strip_punctuation",
+            )
+        ) 
+        model.add(
+            tfkl.Embedding(
+            input_dim=self.txt_vec.vocabulary_size(),
+            output_dim=hp_latent_dim,
+            )
+        )
+        model.add( 
+            tfkl.Bidirectional(
+                tfkl.LSTM(
+                units=hp_units,  
+                activation=hp_activation,  
+                dropout=hp_dropout,
+                return_sequences=True,
+                name="encoder1"
+                )
+            )
+        )
+        model.add(
+            tfkl.Bidirectional(
+            tfkl.LSTM(
+                units=hp_units,  
+                activation=hp_activation, 
+                dropout=hp_dropout,
+                return_sequences=True,
+                name="decoder1")
+                )
+        )
+        model.add(
+            tfkl.Bidirectional(
+            tfkl.LSTM(
+                units=hp_units,  
+                activation=hp_activation, 
+                dropout=hp_dropout,
+                return_sequences=True,
+                name="decoder2")
+                )
+        )
+        model.add(
+            tfkl.Dense(
+            units=hp_units, 
+            activation=hp_activation,
+            )
+        )
+        model.add(
+            tfkl.Dense(
+            units=self.max_seq_len, activation=self.pred_activation,
+            )
+        )
+
+        model.compile(
+            loss=self.loss_fn,
+            optimizer=tfk.optimizers.SGD(learning_rate=hp_learning_rate),
+            metrics=self.metric,
+        )
+
+        return model
+
     
     def fine_tune_the_model(self, return_tensors=False):
 
-        hypermodel = MyHyperModel()
-        hp = kt.HyperParameters()
-        model = hypermodel.build(hp)
         
-        hypermodel.fit(hp=hp, model=model, )
-
+        hp = kt.HyperParameters()
+        model = self.build(hp)
+        
         tuner = kt.BayesianOptimization(
             hypermodel=model, 
             objective="val_accuracy", 
