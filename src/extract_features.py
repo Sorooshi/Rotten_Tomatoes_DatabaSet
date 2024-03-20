@@ -254,6 +254,10 @@ class TrainTestLstmAe(LstmAe):
         lstm_ae.txt_vec(self.text_data)
         y_train = lstm_ae.predict(x_train)
         y_test = lstm_ae.predict(x_test)
+        print(
+            f"x_train and y_train shapes: {x_train.shape, y_train.shape}"
+            f"x_test and y_test shapes: {x_test.shape, y_test.shape}"
+            )
 
         if return_tensors:
             train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
