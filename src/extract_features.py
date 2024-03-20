@@ -270,7 +270,7 @@ class TrainTestLstmAe(LstmAe):
         lstm_ae.compile()
         lstm_ae.inputs(x_train)
         lstm_ae.txt_vec(x_train)
-        y_train = lstm_ae.predict()
+        y_train = lstm_ae.predict(x_train)
 
         print("y_train", y_train)
         y_test = lstm_ae.txt_vec(lstm_ae.call(inputs=x_test))
