@@ -232,6 +232,7 @@ class TrainTestLstmAe(LstmAe):
         # # txt_vec.adapt(
         #     data=self.text_data, batch_size=8, steps=None
         # )
+        return self.vocabulary, self.vocab_size, self.max_seq_len, self.ngrams
     
 
     def get_train_test_data(self, batch_size=8, return_tensors=True) -> tuple:
