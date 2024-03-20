@@ -312,7 +312,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
 
         model = tfk.Sequential()
         model.add(
-            tfkl.Input(shape=(self.max_seq_len,), dtype=tf.string,)
+            tfkl.Input(shape=(1,), dtype=tf.string,)
         )
         model.add(
             tfkl.TextVectorization(
