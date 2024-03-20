@@ -29,7 +29,7 @@ class LstmAe(tfk.Model):
             pred_activation = "tanh"
 
         self.inputs = tfkl.InputLayer(
-            input_shape=(1,), #dtype=tf.string,
+            input_shape=(1,), dtype=tf.string,
             )
         self.txt_vec = tfkl.TextVectorization(
             max_tokens=None, 
@@ -268,7 +268,7 @@ class TrainTestLstmAe(LstmAe):
             ngrams=ngrams
             )
         lstm_ae.compile()
-        y_train = lstm_ae.txt_vec(lstm_ae.call(inputs=x_train))
+        y_train = lstm_ae.txt_vec(lstm_ae(inputs=x_train))
         print("y_train", y_train)
         y_test = lstm_ae.txt_vec(lstm_ae.call(inputs=x_test))
         # y_train = y_train.txt_vec(x_train)
