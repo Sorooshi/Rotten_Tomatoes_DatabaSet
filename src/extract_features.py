@@ -217,10 +217,10 @@ class TrainTestLstmAe(LstmAe):
             data_npz = np.load(
                 os.path.join(vocab_path, np_name)
                 )
-            self.max_seq_len = data_npz["max_seq_len"]
             self.vocabulary = data_npz["vocabulary"]
-            self.vocab_size = data_npz["vocab_size"]
-            self.ngrams = data_npz["ngrams"]
+            self.max_seq_len = int(data_npz["max_seq_len"])
+            self.vocab_size = int(data_npz["vocab_size"])
+            self.ngrams = int(data_npz["ngrams"])
             
         # txt_vec = tfkl.TextVectorization(
         #     max_tokens=vocab_size, 
@@ -237,8 +237,8 @@ class TrainTestLstmAe(LstmAe):
 
     def get_train_test_data(self, batch_size=8, return_tensors=True) -> tuple:
 
-        self.get_text_and_labels()
-        self.get_vocabulary()
+        # self.get_text_and_labels()
+        vocab, vocab_size, max_seq_len, ngrams = self.get_vocabulary()
 
         x_train, x_test, _, _ = train_test_split(
             self.text_data, self.labels, test_size=0.05
@@ -262,10 +262,10 @@ class TrainTestLstmAe(LstmAe):
         # )
 
         lstm_ae = LstmAe(
-            vocabulary=self.vocabulary, 
+            vocabulary=vocab, 
             classification=False, 
-            max_seq_len=self.max_seq_len, 
-            ngrams=self.ngrams
+            max_seq_len=max_seq_len, 
+            ngrams=ngrams
             )
         y_train = lstm_ae().txt_vec(lstm_ae.call(inputs=x_train))
         print("y_train", y_train)
