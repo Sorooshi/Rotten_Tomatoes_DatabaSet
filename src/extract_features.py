@@ -294,11 +294,13 @@ class FineTuneLstmAe(TrainTestLstmAe):
             self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="loss_fn")
             self.metric = ["accuracy"]
             self.proj_name = "LSTM_AE-Cls"
+            self.dir_path = "./"
         else:
             self.pred_activation = "tanh"
             self.loss_fn = tfk.losses.Huber(name="loss_fn")
             self.metric = ["logcosh"]
             self.proj_name = "LSTM_AE-Reg"
+            self.dir_path = "./"
 
     def build_model(self, hp):
         hp_units = hp.Int('units', min_value=32, max_value=256, step=32)
@@ -380,11 +382,8 @@ class FineTuneLstmAe(TrainTestLstmAe):
         return model
 
 
-    def fine_tune_the_model(self, ):
+    def fine_tune_the_model(self, return_tensors=False):
         hps = kt.HyperParameters()
-        train_data, val_data = TrainTestLstmAe().get_train_test_data(
-            batch_size=8, return_tensors=True
-            )
 
         build_model = self.build_model(hp=hps)
         tuner = kt.BayesianOptimization(
@@ -393,15 +392,27 @@ class FineTuneLstmAe(TrainTestLstmAe):
             max_trials=10, 
             executions_per_trial=5,
             overwrite=True,
-            directory=self.proj_name,
+            directory=self.dir_path,
+            project_name=self.proj_name,
             )
 
         print(tuner.search_space_summary())
 
-        tuner.search(
+        if return_tensors:
+            train_data, val_data = TrainTestLstmAe().get_train_test_data(
+                batch_size=8, return_tensors=True
+                )
+            tuner.search(
             train_data, epochs=10, validation_data=val_data
             )
-
+        else:
+            x_train, y_train, x_test, \
+                y_test = TrainTestLstmAe().get_train_test_data(return_tensors=False)
+            
+            tuner.search(
+            x_train, y_train, epochs=10, validation_data=(x_test, y_test)
+            )
+        
         # models = tuner.get_best_models(num_models=1)
         best_hps = tuner.get_best_hyperparameters(2)
         
