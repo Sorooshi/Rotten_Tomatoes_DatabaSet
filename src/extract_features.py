@@ -155,7 +155,7 @@ class TrainTestLstmAe(LstmAe):
     def get_vocabulary(
             self, vocab_path = "../data/", 
             max_seq_len: int = 200,
-            np_name = "medium.npy", 
+            np_name = "medium.npz", 
             ngrams : int = 2, 
             ) -> tuple:
         """ returns, as attributes, the vocabulary (np.arr), its size (int),
