@@ -11,6 +11,7 @@ tfkl = tf.keras.layers
 
 class LstmAe(tfk.Model):
     def __init__(self, latent_dim: int = 50, 
+                 ngrams : int = 2,
                  vocabulary: list = None,
                  classification: bool = True, 
                  max_seq_len: int = 100, *args, **kwargs):
@@ -33,7 +34,7 @@ class LstmAe(tfk.Model):
         self.txt_vec = tfkl.TextVectorization(
             max_tokens=None, 
             vocabulary = vocabulary,
-            split="whitespace", ngrams=2, 
+            split="whitespace", ngrams=ngrams, 
             output_mode="int", ragged=False,
             output_sequence_length=self.max_seq_len,
             standardize="lower_and_strip_punctuation",
@@ -132,12 +133,13 @@ class TrainTestLstmAe(LstmAe):
         self.data = None
         self.labels = None 
         self.text_data = None
-        self.n_epochs = n_epochs
         self.vocabulary = None
         self.max_seq_len = None
+        self.n_epochs = n_epochs
     
     def get_text_and_labels(
-            self, data_path: str="../data/medium_movies_data.csv", ):
+            self, data_path: 
+            str="../data/medium_movies_data.csv", ):
 
         self.data = pd.read_csv(data_path)
         self.labels = self.data.Genre.values
@@ -149,62 +151,129 @@ class TrainTestLstmAe(LstmAe):
             f"labels head: \n {self.labels[:3]} \n"
             f"labels shape: {self.labels.shape} \n"
         ) 
-
-    
-    def get_vocabulary_and_max_len(self, vocab_size: int = 124100) -> tuple:
+ 
+    def get_vocabulary(
+            self, vocab_path = "../data/", 
+            max_seq_len: int = 200,
+            np_name = "medium.npy", 
+            ngrams : int = 2, 
+            ) -> tuple:
+        """ returns, as attributes, the vocabulary (np.arr), its size (int),
+        the maximum sequence length (int) and applied ngrams (int). """
 
         self.get_text_and_labels()
 
-        if vocab_size is None:  # a bit slower
-            vocabulary = []
-            max_seq_len = 0
-            for synopsis in self.text_data:
-                parsed_synopsis = np.unique(synopsis.lower().strip().split(" ")).tolist()
-                if len(parsed_synopsis) > max_seq_len:
-                    max_seq_len = len(parsed_synopsis)
-                for word in parsed_synopsis:
-                    if word not in vocabulary:
-                        vocabulary.append(vocabulary)            
-            vocab_size = len(vocabulary)
-            n_classes = [i.lower() for i in np.unique(self.labels)]
-            print(
-                f"vocabulary size {len(vocabulary)}"
-                f"Number of classes: {n_classes}"
+        if not os.path.isfile(os.path.join(vocab_path, np_name)): 
+            txt_vec = tfkl.TextVectorization(
+                max_tokens=None, 
+                vocabulary = None,
+                output_sequence_length=None,  # max_seq_len
+                split="whitespace", ngrams=ngrams, 
+                output_mode="int", ragged=False,
+                standardize="lower_and_strip_punctuation",
                 )
+            txt_vec.adapt(
+                data=self.text_data, batch_size=8, steps=None
+                )
+            self.vocabulary = txt_vec.get_vocabulary()
+            self.vocab_size = txt_vec.vocabulary_size()
+            self.max_seq_len = max_seq_len
+            self.ngrams = ngrams
+            
+            np.savez(os.path.join(
+                vocab_path, np_name), 
+                max_seq_len = self.max_seq_len,
+                vocabulary=self.vocabulary, 
+                vocab_size=self.vocab_size,
+                ngrams = self.ngrams,
+                )
+            
+            # vocabulary = []
+            # max_seq_len = 0
+            # for synopsis in self.text_data:
+            #     parsed_synopsis = np.unique(
+            #         synopsis.lower().strip().split(" ")
+            #         ).tolist()
+            #     if len(parsed_synopsis) > max_seq_len:
+            #         max_seq_len = len(parsed_synopsis)
+            #     for word in parsed_synopsis:
+            #         if word not in vocabulary:
+            #             vocabulary.append(vocabulary)            
+            # vocab_size = len(vocabulary)
+            # n_classes = [i.lower() for i in np.unique(self.labels)]
+            # print(
+            #     f"vocabulary size {len(vocabulary)}"
+            #     f"Number of classes: {n_classes}"
+            #     )
+            
+            # np.savez(os.path.join(
+            #     vocab_path, np_name), 
+            #     vocabulary=self.vocabulary, 
+            #     vocab_size=vocab_size,
+            #     max_len_seq=max_seq_len,
+            #     n_classes=n_classes,
+            #     )
         else:
-            max_seq_len = 171  # value for medium size network
-        txt_vec = tfkl.TextVectorization(
-            max_tokens=vocab_size, 
-            split="whitespace", ngrams=1, 
-            output_mode="int", ragged=True,
-            standardize="lower_and_strip_punctuation",
-        )
-        txt_vec.adapt(
-            data=self.text_data, batch_size=8, steps=None
-        )
-
-        self.vocabulary = txt_vec.get_vocabulary()
-        self.max_seq_len = max_seq_len
-
-        return self.vocabulary, self.max_seq_len
+            data_npz = np.load(
+                os.path.join(vocab_path, np_name)
+                )
+            self.max_seq_len = data_npz["max_seq_len"]
+            self.vocabulary = data_npz["vocabulary"]
+            self.vocab_size = data_npz["vocab_size"]
+            self.ngrams = data_npz["ngrams"]
+            
+        # txt_vec = tfkl.TextVectorization(
+        #     max_tokens=vocab_size, 
+        #     vocabulary=vocabulary,
+        #     split="whitespace", ngrams=ngrams, 
+        #     output_mode="int", ragged=True,
+        #     standardize="lower_and_strip_punctuation",
+        # )
+        # # txt_vec.adapt(
+        #     data=self.text_data, batch_size=8, steps=None
+        # )
     
 
     def get_train_test_data(self, batch_size=8, return_tensors=True) -> tuple:
 
         self.get_text_and_labels()
+        self.get_vocabulary()
 
         x_train, x_test, _, _ = train_test_split(
             self.text_data, self.labels, test_size=0.05
             )
         
-        lstm_ae = LstmAe(latent_dim=40, vocabulary=None, 
-                         classification=False, max_seq_len=123)
-        
-        
-        y_train = lstm_ae.call(inputs=x_train)
-        y_train = y_train.txt_vec(x_train)
+        # text_vectorizer = tfk.Sequential()
+        # text_vectorizer.add(
+        #     tfkl.InputLayer(
+        #         input_shape=(1,), dtype=tf.string,
+        #         )
+        #     )
+        # text_vectorizer.add(
+        #     tfkl.TextVectorization(
+        #     max_tokens=None, 
+        #     vocabulary=self.vocabulary,
+        #     split="whitespace", ngrams=2, 
+        #     output_mode="int", ragged=False,
+        #     output_sequence_length=self.max_seq_len,
+        #     standardize="lower_and_strip_punctuation",
+        #     )
+        # )
 
-        y_test = lstm_ae.txt_vec(lstm_ae.inputs(x_test))
+        lstm_ae = LstmAe(
+            vocabulary=self.vocabulary, 
+            classification=False, 
+            max_seq_len=self.max_seq_len, 
+            ngrams=self.ngrams
+            )
+        y_train = lstm_ae().txt_vec(lstm_ae.call(inputs=x_train))
+        print("y_train", y_train)
+        # y_train = y_train.txt_vec(x_train)
+        # y_test = lstm_ae.txt_vec(lstm_ae.inputs(x_test))
+
+        # y_train = text_vectorizer.predict(x_train)
+        # y_test = text_vectorizer.predict(x_test)
+        
 
         if return_tensors:
             train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
