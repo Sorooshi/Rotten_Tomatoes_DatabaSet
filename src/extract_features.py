@@ -303,16 +303,26 @@ class FineTuneLstmAe(TrainTestLstmAe):
             self.dir_path = "./"
 
     def build_model(self, hp):
-        hp_units = hp.Int('units', min_value=32, max_value=256, step=32)
-        hp_latent_dim = hp.Int('units', min_value=10, max_value=50, step=5)
-        hp_activation = hp.Choice('activation', values = ["relu", "tanh", ] )
-        hp_learning_rate = hp.Choice('learning_rate', values=[1e-3, 1e-4, 1e-5, 1e-6])
-        hp_dropout = hp.Choice('dropout', values=[0.0, 0.1, 0.4])
-
+        hp_units = hp.Int(
+            'units', min_value=32, max_value=256, step=32
+            )
+        hp_latent_dim = hp.Int(
+            'units', min_value=10, max_value=50, step=5
+            )
+        hp_activation = hp.Choice(
+            'activation', values = ["relu", "tanh", ] 
+            )
+        hp_learning_rate = hp.Choice(
+            'learning_rate', values=[1e-3, 1e-4, 1e-5, 1e-6]
+            )
+        hp_dropout = hp.Choice(
+            'dropout', values=[0.0, 0.1, 0.4]
+            )
 
         model = tfk.Sequential()
         model.add(
-            tfkl.Input(shape=(1,), dtype=tf.string,)
+            tfkl.InputLayer(input_shape=(1,),
+                             dtype=tf.string,)
         )
         model.add(
             tfkl.TextVectorization(
