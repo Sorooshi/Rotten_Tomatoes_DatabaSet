@@ -29,7 +29,7 @@ class LstmAe(tfk.Model):
             pred_activation = "tanh"
 
         self.inputs = tfkl.InputLayer(
-            input_shape=(1,), dtype=tf.string,
+            input_shape=(1,), #dtype=tf.string,
             )
         self.txt_vec = tfkl.TextVectorization(
             max_tokens=None, 
