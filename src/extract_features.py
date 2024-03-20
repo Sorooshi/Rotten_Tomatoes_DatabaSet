@@ -303,6 +303,8 @@ class FineTuneLstmAe(TrainTestLstmAe):
             self.dir_path = "./"
     
     class MyHyperModel(kt.HyperModel):
+        def __init__(self, *args, **kwargs):
+            super(FineTuneLstmAe, self).__init__(*args, **kwargs)
 
         def build(self, hp):
             hp_units = hp.Int(
