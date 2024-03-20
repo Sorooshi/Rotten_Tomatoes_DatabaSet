@@ -268,11 +268,13 @@ class TrainTestLstmAe(LstmAe):
             ngrams=ngrams
             )
         lstm_ae.compile()
-        lstm_ae.inputs(x_train)
-        lstm_ae.txt_vec(x_train)
+        lstm_ae.inputs(self.text_data)
+        lstm_ae.txt_vec(self.text_data)
         y_train = lstm_ae.predict(x_train)
+        y_test = lstm_ae.predict(x_test)
 
-        print("y_train", y_train)
+        print("y_train", y_train, y_train.shape, x_train.shape)
+        print("y_train", y_test, y_test.shape, x_test.shape)
         y_test = lstm_ae.txt_vec(lstm_ae.call(inputs=x_test))
         # y_train = y_train.txt_vec(x_train)
         # y_test = lstm_ae.txt_vec(lstm_ae.inputs(x_test))
