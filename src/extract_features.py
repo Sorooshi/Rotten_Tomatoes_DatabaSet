@@ -29,7 +29,7 @@ class LstmAe(tfk.Model):
             pred_activation = "tanh"
 
         self.inputs = tfkl.InputLayer(
-            input_shape=(None,), dtype=tf.string,
+            input_shape=(1,), dtype=tf.string,
             )
         self.txt_vec = tfkl.TextVectorization(
             max_tokens=None, 
@@ -154,7 +154,7 @@ class TrainTestLstmAe(LstmAe):
  
     def get_vocabulary(
             self, vocab_path = "../data/", 
-            max_seq_len: int = 200,
+            max_seq_len: int = 123,
             np_name = "medium.npz", 
             ngrams : int = 2, 
             ) -> tuple:
@@ -267,6 +267,7 @@ class TrainTestLstmAe(LstmAe):
             max_seq_len=max_seq_len, 
             ngrams=ngrams
             )
+        lstm_ae.compile()
         y_train = lstm_ae.txt_vec(lstm_ae.call(inputs=x_train))
         print("y_train", y_train)
         y_test = lstm_ae.txt_vec(lstm_ae.call(inputs=x_test))
