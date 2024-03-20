@@ -302,8 +302,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
         super(FineTuneLstmAe, self).__init__(*args, **kwargs)        
         self.classification = classification
         
-        self.vocabulary, self.max_seq_len, 
-        self.vocab_size, self.ngrams = TrainTestLstmAe().get_vocabulary()
+        self.vocabulary, self.max_seq_len, self.vocab_size, self.ngrams = TrainTestLstmAe().get_vocabulary()
 
         # self.latent_dim = latent_dim
 
