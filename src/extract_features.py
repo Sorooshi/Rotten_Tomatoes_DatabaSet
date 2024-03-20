@@ -395,7 +395,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
 
         def fit(self, hp, model, *args, **kwargs):
             return model.fit(
-                *args, **kwargs,
+                hp, *args, **kwargs, 
             )
 
     def fine_tune_the_model(self, return_tensors=False):
