@@ -237,30 +237,12 @@ class TrainTestLstmAe(LstmAe):
 
     def get_train_test_data(self, batch_size=8, return_tensors=True) -> tuple:
 
-        # self.get_text_and_labels()
-        vocab, vocab_size, max_seq_len, ngrams = self.get_vocabulary()
+        vocab, _, max_seq_len, ngrams = self.get_vocabulary()
 
         x_train, x_test, _, _ = train_test_split(
             self.text_data, self.labels, test_size=0.05
             )
         
-        # text_vectorizer = tfk.Sequential()
-        # text_vectorizer.add(
-        #     tfkl.InputLayer(
-        #         input_shape=(1,), dtype=tf.string,
-        #         )
-        #     )
-        # text_vectorizer.add(
-        #     tfkl.TextVectorization(
-        #     max_tokens=None, 
-        #     vocabulary=self.vocabulary,
-        #     split="whitespace", ngrams=2, 
-        #     output_mode="int", ragged=False,
-        #     output_sequence_length=self.max_seq_len,
-        #     standardize="lower_and_strip_punctuation",
-        #     )
-        # )
-
         lstm_ae = LstmAe(
             vocabulary=vocab, 
             classification=False, 
@@ -272,16 +254,6 @@ class TrainTestLstmAe(LstmAe):
         lstm_ae.txt_vec(self.text_data)
         y_train = lstm_ae.predict(x_train)
         y_test = lstm_ae.predict(x_test)
-
-        print("y_train", y_train, y_train.shape, x_train.shape)
-        print("y_train", y_test, y_test.shape, x_test.shape)
-
-        # y_train = y_train.txt_vec(x_train)
-        # y_test = lstm_ae.txt_vec(lstm_ae.inputs(x_test))
-
-        # y_train = text_vectorizer.predict(x_train)
-        # y_test = text_vectorizer.predict(x_test)
-        
 
         if return_tensors:
             train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
@@ -312,8 +284,6 @@ class FineTuneLstmAe(TrainTestLstmAe):
         
         self.vocabulary, self.max_seq_len, \
         self.vocab_size, self.ngrams = TrainTestLstmAe().get_vocabulary()
-
-        # self.latent_dim = latent_dim
 
         if self.classification:
             self.pred_activation = "softmax"
