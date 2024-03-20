@@ -403,7 +403,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
     
     def fine_tune_the_model(self, return_tensors=False):
 
-        hypermodel = self.MyHyperModel()
+        hypermodel = MyHyperModel()
         hp = kt.HyperParameters()
         model = hypermodel.build(hp)
         
