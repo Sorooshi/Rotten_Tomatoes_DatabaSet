@@ -34,7 +34,7 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
     adjacency = np.zeros(shape=(len(df_np), len(df_np)))
 
     for i in range(len(df_np)):
-        for j in range(i, len(df_np)):
+        for j in range(0, len(df_np)):
             if i != j:
                 # Directors
                 weight_dir = get_edge_weight(
@@ -58,7 +58,7 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
                 )
                 weight = weight_dir + weight_pro + weight_wri + weight_casts
             else:
-                weight = 1
+                weight = 0
             
             adjacency[i, j] = weight
             adjacency[j, i] = weight
