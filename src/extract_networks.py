@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import argparse
+import pickle
 
 parser = argparse.ArgumentParser(description="Convert JSON to DF")
 
@@ -30,7 +31,7 @@ def get_edge_weight(a, b):
 def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
     df_np = df.values
     adjacency = np.zeros(shape=(len(df_np), len(df_np)))
-
+    titles = []
     for i in range(len(df_np)):
         for j in range(len(df_np)):
             if i != j:
@@ -55,6 +56,8 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
                     b = get_list_of_casts(df_np[j, 7])
                 )
                 weight = weight_dir + weight_pro + weight_wri + weight_casts
+                if weight != 0:
+                    titles.append(df.iloc[i, "Title"])
             else:
                 weight = 0.
             
@@ -63,8 +66,8 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
 
     data_df_a = pd.DataFrame(
         data=adjacency, 
-        columns=df.Title.values,
-        index=df.Title.values,
+        columns=titles,
+        index=titles,
         )
     
     data_a = pd.DataFrame(
@@ -74,6 +77,8 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
     
     data_df_a.to_csv("./data/medium_data_df_a.csv", index=True)
     data_a.to_csv("./data/medium_data_a.csv", header=False, index=False)
+    with open ("./data/medium_data_no_edge_movies.pickle", "r") as fp:
+        pickle.dump(titles, fp)
 
     return data_df_a, data_a
 
