@@ -276,9 +276,8 @@ class ApplyLstmAe(LstmAe):
         else:
             return x_train, y_train, x_test, y_test
 
-
-    def build(self,):
-        hp = kt.HyperParameters()
+    @staticmethod
+    def build(hp):
         hp_units = hp.Int(
             'units', min_value=32, max_value=256, step=32
             )
@@ -295,6 +294,8 @@ class ApplyLstmAe(LstmAe):
             'dropout', values=[0.0, 0.1, 0.4]
             )
 
+        vocabulary = ['ab', "aaa", "bsa", "fdfd", ]
+
         model = tfk.Sequential()
         model.add(
             tfkl.Input(shape=(1,),
@@ -303,16 +304,16 @@ class ApplyLstmAe(LstmAe):
         model.add(
             tfkl.TextVectorization(
             max_tokens=None, 
-            vocabulary = self.vocabulary,
-            split="whitespace", ngrams=self.ngrams, 
+            vocabulary =vocabulary,  # self.vocabulary,
+            split="whitespace", ngrams=2, # self.ngrams, 
             output_mode="int", ragged=False,
-            output_sequence_length=self.max_seq_len,
+            output_sequence_length=20,  # self.max_seq_len,
             standardize="lower_and_strip_punctuation",
             )
         ) 
         model.add(
             tfkl.Embedding(
-            input_dim=self.txt_vec.vocabulary_size(),
+            input_dim=10, #  self.txt_vec.vocabulary_size(),
             output_dim=hp_latent_dim,
             )
         )
@@ -355,14 +356,15 @@ class ApplyLstmAe(LstmAe):
         )
         model.add(
             tfkl.Dense(
-            units=self.max_seq_len, activation=self.pred_activation,
+            units=20, #  self.max_seq_len, 
+            # activation=self.pred_activation,
             )
         )
 
         model.compile(
-            loss=self.loss_fn,
+            loss="mse", # self.loss_fn,
             optimizer=tfk.optimizers.SGD(learning_rate=hp_learning_rate),
-            metrics=self.metric,
+            metrics="mse", # self.metric,
         )
 
         return model
@@ -370,8 +372,8 @@ class ApplyLstmAe(LstmAe):
 
     def fine_tune_the_model(self, return_tensors=False):
         
-        # hps = kt.HyperParameters()
-        model = self.build()
+        hps = kt.HyperParameters()
+        model = self.build(hp=hps)
         
         tuner = kt.BayesianOptimization(
             hypermodel=model, 
