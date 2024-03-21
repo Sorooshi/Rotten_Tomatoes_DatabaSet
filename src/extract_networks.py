@@ -82,7 +82,7 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
     data_df_a.to_csv("./data/medium_data_df_a.csv", index=True)
     data_a.to_csv("./data/medium_data_a.csv", header=False, index=False)
 
-    with open ("./data/medium_data_no_link_movies.pickle", "rb") as fp:
+    with open ("./data/medium_data_no_link_movies.pickle", "w") as fp:
         pickle.dump(no_link_movies, fp)
         
     return data_df_a, data_a
