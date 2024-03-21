@@ -58,7 +58,7 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
                 )
                 weight = weight_dir + weight_pro + weight_wri + weight_casts
             else:
-                weight = 1e-5
+                weight = 1
             
             adjacency[i, j] = weight
             adjacency[j, i] = weight
