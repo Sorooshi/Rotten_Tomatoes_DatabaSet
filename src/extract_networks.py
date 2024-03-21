@@ -123,9 +123,21 @@ def get_large_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         columns=None,
         )
     
+    data_df_a = data_df_a.loc[data_df_a.sum(axis=1) != 0]
+    no_link_movies = list(data_df_a.loc[data_df_a.sum(axis=1) != 0].index)
+
+    data_a = pd.DataFrame(
+        data=adjacency, 
+        columns=None,
+        )
+    data_a = data_a.loc[data_a.sum(axis=1) != 0]
+
     data_df_a.to_csv("./data/large_data_df_a.csv", index=True)
     data_a.to_csv("./data/large_data_a.csv", header=False, index=False)
 
+    with open ("./data/large_data_no_link_movies.pickle", "wb") as fp:
+        pickle.dump(no_link_movies, fp)
+    
     return data_df_a, data_a
 
 
