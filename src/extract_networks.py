@@ -34,7 +34,7 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
     adjacency = np.zeros(shape=(len(df_np), len(df_np)))
 
     for i in range(len(df_np)):
-        for j in range(0, len(df_np)):
+        for j in range(i, len(df_np)):
             if i != j:
                 # Directors
                 weight_dir = get_edge_weight(
@@ -71,9 +71,10 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         )
     
     data_df_a = data_df_a.loc[
-        (data_df_a.sum(axis=1) != 0) & (data_df_a.sum(axis=0) != 0)
+        (data_df_a.sum(axis=0) != 0) & (data_df_a.sum(axis=1) != 0)
         ]
-    no_link_movies = list(data_df_a.loc[data_df_a.sum(axis=1) != 0].index)
+    print(data_df_a.shape)
+    no_link_movies = list(data_df_a.loc[data_df_a.sum(axis=0) != 0].index)
 
     data_a = pd.DataFrame(
         data=adjacency, 
@@ -97,7 +98,7 @@ def get_large_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
     adjacency = np.zeros(shape=(len(df_np), len(df_np)))
 
     for i in range(len(df_np)):
-        for j in range(len(df_np)):
+        for j in range(i, len(df_np)):
             if i != j:
                 # Directors
                 weight_dir = get_edge_weight(
@@ -114,6 +115,7 @@ def get_large_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
                 weight = 0.
             
             adjacency[i, j] = weight
+            adjacency[j, i] = weight
 
 
     data_df_a = pd.DataFrame(
