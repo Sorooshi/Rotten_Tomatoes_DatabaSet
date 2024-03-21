@@ -277,7 +277,8 @@ class ApplyLstmAe(LstmAe):
             return x_train, y_train, x_test, y_test
 
 
-    def build(self, hp):
+    def build(self,):
+        hp = kt.HyperParameters()
         hp_units = hp.Int(
             'units', min_value=32, max_value=256, step=32
             )
@@ -369,8 +370,8 @@ class ApplyLstmAe(LstmAe):
 
     def fine_tune_the_model(self, return_tensors=False):
         
-        hps = kt.HyperParameters()
-        model = self.build(hp=hps)
+        # hps = kt.HyperParameters()
+        model = self.build()
         
         tuner = kt.BayesianOptimization(
             hypermodel=model, 
