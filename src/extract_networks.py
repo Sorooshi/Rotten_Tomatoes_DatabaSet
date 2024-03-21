@@ -70,7 +70,7 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         )
     
     data_df_a = data_df_a.loc[data_df_a.sum(axis=1) != 0]
-    no_link_movies = list(data_df_a.loc[data_df_a.sum(axis=1) != 0].Title)
+    no_link_movies = list(df.loc[data_df_a.sum(axis=1) != 0].Title)
 
     data_a = pd.DataFrame(
         data=adjacency, 
@@ -81,6 +81,7 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
 
     data_df_a.to_csv("./data/medium_data_df_a.csv", index=True)
     data_a.to_csv("./data/medium_data_a.csv", header=False, index=False)
+
     with open ("./data/medium_data_no_link_movies.pickle", "r") as fp:
         pickle.dump(no_link_movies, fp)
         
