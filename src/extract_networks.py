@@ -71,10 +71,13 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         )
     
     data_df_a = data_df_a.loc[
-        (data_df_a.sum(axis=0) != 0) & (data_df_a.sum(axis=1) != 0)
+        (data_df_a.sum(axis=0) != 0) # & (data_df_a.sum(axis=1) != 0)
         ]
     print(data_df_a.shape)
     no_link_movies = list(data_df_a.loc[data_df_a.sum(axis=0) != 0].index)
+
+    data_df_a = data_df_a[~data_df_a.isin(no_link_movies)]
+    print("desired?: ", data_df_a.shape)
 
     data_a = pd.DataFrame(
         data=adjacency, 
