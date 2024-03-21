@@ -127,23 +127,40 @@ class LstmAe(tfk.Model):
 
         return train_total_loss, val_total_loss
 
-class TrainTestLstmAe(LstmAe):
-    def __init__(self, n_epochs: int= 1, *args, **kwargs):
-        super(TrainTestLstmAe, self).__init__(*args, **kwargs)
-        self.data = None
+
+class ApplyLstmAe(LstmAe):
+    def __init__(self, n_epochs: int= 1, 
+                 classification: bool = False, *args, **kwargs):
+        super(ApplyLstmAe, self).__init__(*args, **kwargs)
+        self.data_df = None
         self.labels = None 
         self.text_data = None
         self.vocabulary = None
         self.max_seq_len = None
         self.n_epochs = n_epochs
+        self.classification = classification
+
+        if self.classification:
+            self.pred_activation = "softmax"
+            self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="loss_fn")
+            self.metric = ["accuracy"]
+            self.proj_name = "LSTM_AE-Cls"
+            self.dir_path = "./"
+        else:
+            self.pred_activation = "tanh"
+            self.loss_fn = tfk.losses.Huber(name="loss_fn")
+            self.metric = ["logcosh"]
+            self.proj_name = "LSTM_AE-Reg"
+            self.dir_path = "./"
+        
     
     def get_text_and_labels(
             self, data_path: 
             str="../data/medium_movies_data.csv", ):
 
-        self.data = pd.read_csv(data_path)
-        self.labels = self.data.Genre.values
-        self.text_data = self.data.Synopsis.values
+        self.data_df = pd.read_csv(data_path)
+        self.labels = self.data_df.Genre.values
+        self.text_data = self.data_df.Synopsis.values
 
         print(
             f"text data head: \n {self.text_data[:3]} \n" 
@@ -152,6 +169,7 @@ class TrainTestLstmAe(LstmAe):
             f"labels shape: {self.labels.shape} \n"
         ) 
  
+
     def get_vocabulary(
             self, vocab_path = "../data/", 
             max_seq_len: int = 123,
@@ -221,17 +239,7 @@ class TrainTestLstmAe(LstmAe):
             self.max_seq_len = int(data_npz["max_seq_len"])
             self.vocab_size = int(data_npz["vocab_size"])
             self.ngrams = int(data_npz["ngrams"])
-            
-        # txt_vec = tfkl.TextVectorization(
-        #     max_tokens=vocab_size, 
-        #     vocabulary=vocabulary,
-        #     split="whitespace", ngrams=ngrams, 
-        #     output_mode="int", ragged=True,
-        #     standardize="lower_and_strip_punctuation",
-        # )
-        # # txt_vec.adapt(
-        #     data=self.text_data, batch_size=8, steps=None
-        # )
+
         return self.vocabulary, self.vocab_size, self.max_seq_len, self.ngrams
     
 
@@ -267,22 +275,9 @@ class TrainTestLstmAe(LstmAe):
             return train_data, test_data, 
         else:
             return x_train, y_train, x_test, y_test
-            
 
 
-    def train_test_tuned_model(self,):
-        vectorized_text, labels, max_len = self.get_preprocess_data(
-            data_path="../data/medium_movies_data.scv",
-        )
-        
-        for k in range(5):
-            print(" to be completed ....")
-
-class MyHyperModel(kt.HyperModel):
-    def __init__(self, *args, **kwargs):
-        super(TrainTestLstmAe, self).__init__(*args, **kwargs)
-
-    def build(self, hp):
+    def build_model(self, hp):
         hp_units = hp.Int(
             'units', min_value=32, max_value=256, step=32
             )
@@ -371,131 +366,11 @@ class MyHyperModel(kt.HyperModel):
 
         return model
 
-    def fit(self, hp, model, *args, **kwargs):
-        return model.fit(
-            hp, *args, **kwargs, 
-        )
 
-
-
-class FineTuneLstmAe(TrainTestLstmAe):
-    def __init__(self,  
-                 classification: bool = True, 
-                 *args, **kwargs):
-        super(FineTuneLstmAe, self).__init__(*args, **kwargs)        
-        self.classification = classification
-        
-        self.vocabulary, self.max_seq_len, \
-        self.vocab_size, self.ngrams = TrainTestLstmAe().get_vocabulary()
-
-        if self.classification:
-            self.pred_activation = "softmax"
-            self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="loss_fn")
-            self.metric = ["accuracy"]
-            self.proj_name = "LSTM_AE-Cls"
-            self.dir_path = "./"
-        else:
-            self.pred_activation = "tanh"
-            self.loss_fn = tfk.losses.Huber(name="loss_fn")
-            self.metric = ["logcosh"]
-            self.proj_name = "LSTM_AE-Reg"
-            self.dir_path = "./"
-
-    def build(self, hp):
-        hp_units = hp.Int(
-            'units', min_value=32, max_value=256, step=32
-            )
-        hp_latent_dim = hp.Int(
-            'units', min_value=10, max_value=50, step=5
-            )
-        hp_activation = hp.Choice(
-            'activation', values = ["relu", "tanh", ] 
-            )
-        hp_learning_rate = hp.Choice(
-            'learning_rate', values=[1e-3, 1e-4, 1e-5, 1e-6]
-            )
-        hp_dropout = hp.Choice(
-            'dropout', values=[0.0, 0.1, 0.4]
-            )
-
-        model = tfk.Sequential()
-        model.add(
-            tfkl.InputLayer(input_shape=(1,),
-                            dtype=tf.string,)
-        )
-        model.add(
-            tfkl.TextVectorization(
-            max_tokens=None, 
-            vocabulary = self.vocabulary,
-            split="whitespace", ngrams=self.ngrams, 
-            output_mode="int", ragged=False,
-            output_sequence_length=self.max_seq_len,
-            standardize="lower_and_strip_punctuation",
-            )
-        ) 
-        model.add(
-            tfkl.Embedding(
-            input_dim=self.txt_vec.vocabulary_size(),
-            output_dim=hp_latent_dim,
-            )
-        )
-        model.add( 
-            tfkl.Bidirectional(
-                tfkl.LSTM(
-                units=hp_units,  
-                activation=hp_activation,  
-                dropout=hp_dropout,
-                return_sequences=True,
-                name="encoder1"
-                )
-            )
-        )
-        model.add(
-            tfkl.Bidirectional(
-            tfkl.LSTM(
-                units=hp_units,  
-                activation=hp_activation, 
-                dropout=hp_dropout,
-                return_sequences=True,
-                name="decoder1")
-                )
-        )
-        model.add(
-            tfkl.Bidirectional(
-            tfkl.LSTM(
-                units=hp_units,  
-                activation=hp_activation, 
-                dropout=hp_dropout,
-                return_sequences=True,
-                name="decoder2")
-                )
-        )
-        model.add(
-            tfkl.Dense(
-            units=hp_units, 
-            activation=hp_activation,
-            )
-        )
-        model.add(
-            tfkl.Dense(
-            units=self.max_seq_len, activation=self.pred_activation,
-            )
-        )
-
-        model.compile(
-            loss=self.loss_fn,
-            optimizer=tfk.optimizers.SGD(learning_rate=hp_learning_rate),
-            metrics=self.metric,
-        )
-
-        return model
-
-    
     def fine_tune_the_model(self, return_tensors=False):
-
         
-        hp = kt.HyperParameters()
-        model = self.build(hp)
+        hps = kt.HyperParameters()
+        model = self.build_model(hp=hps)
         
         tuner = kt.BayesianOptimization(
             hypermodel=model, 
@@ -510,7 +385,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
         print(tuner.search_space_summary())
 
         if return_tensors:
-            train_data, val_data = TrainTestLstmAe().get_train_test_data(
+            train_data, val_data = self.get_train_test_data(
                 batch_size=8, return_tensors=True
                 )
             tuner.search(
@@ -518,7 +393,7 @@ class FineTuneLstmAe(TrainTestLstmAe):
             )
         else:
             x_train, y_train, x_test, \
-                y_test = TrainTestLstmAe().get_train_test_data(return_tensors=False)
+                y_test = self.get_train_test_data(return_tensors=False)
             
             tuner.search(
             x_train, y_train, epochs=10, validation_data=(x_test, y_test)
@@ -533,5 +408,11 @@ class FineTuneLstmAe(TrainTestLstmAe):
         return best_hps
 
 
-    
+    def train_test_tuned_model(self,):
+        vectorized_text, labels, max_len = self.get_preprocess_data(
+            data_path="../data/medium_movies_data.scv",
+        )
+        
+        for k in range(5):
+            print(" to be completed ....")
 
