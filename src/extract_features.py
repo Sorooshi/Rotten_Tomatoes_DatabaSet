@@ -277,7 +277,7 @@ class ApplyLstmAe(LstmAe):
             return x_train, y_train, x_test, y_test
 
 
-    def build_model(self, hp):
+    def build(self, hp):
         hp_units = hp.Int(
             'units', min_value=32, max_value=256, step=32
             )
@@ -296,8 +296,8 @@ class ApplyLstmAe(LstmAe):
 
         model = tfk.Sequential()
         model.add(
-            tfkl.InputLayer(input_shape=(1,),
-                            dtype=tf.string,)
+            tfkl.Input(shape=(1,),
+                       dtype=tf.string,)
         )
         model.add(
             tfkl.TextVectorization(
@@ -369,8 +369,8 @@ class ApplyLstmAe(LstmAe):
 
     def fine_tune_the_model(self, return_tensors=False):
         
-        hp = kt.HyperParameters()
-        model = self.build_model(hp)
+        hps = kt.HyperParameters()
+        model = self.build(hp=hps)
         
         tuner = kt.BayesianOptimization(
             hypermodel=model, 
