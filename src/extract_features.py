@@ -276,8 +276,8 @@ class ApplyLstmAe(LstmAe):
         else:
             return x_train, y_train, x_test, y_test
 
-    @staticmethod
-    def build(hp):
+
+    def build(self, hp):
         hp_units = hp.Int(
             'units', min_value=32, max_value=256, step=32
             )
@@ -294,8 +294,6 @@ class ApplyLstmAe(LstmAe):
             'dropout', values=[0.0, 0.1, 0.4]
             )
 
-        vocabulary = ['ab', "aaa", "bsa", "fdfd", ]
-
         model = tfk.Sequential()
         model.add(
             tfkl.Input(shape=(1,),
@@ -304,16 +302,16 @@ class ApplyLstmAe(LstmAe):
         model.add(
             tfkl.TextVectorization(
             max_tokens=None, 
-            vocabulary =vocabulary,  # self.vocabulary,
-            split="whitespace", ngrams=2, # self.ngrams, 
+            vocabulary = self.vocabulary,
+            split="whitespace", ngrams=self.ngrams, 
             output_mode="int", ragged=False,
-            output_sequence_length=20,  # self.max_seq_len,
+            output_sequence_length=self.max_seq_len,
             standardize="lower_and_strip_punctuation",
             )
         ) 
         model.add(
             tfkl.Embedding(
-            input_dim=10, #  self.txt_vec.vocabulary_size(),
+            input_dim=self.txt_vec.vocabulary_size(),
             output_dim=hp_latent_dim,
             )
         )
@@ -356,15 +354,14 @@ class ApplyLstmAe(LstmAe):
         )
         model.add(
             tfkl.Dense(
-            units=20, #  self.max_seq_len, 
-            # activation=self.pred_activation,
+            units=self.max_seq_len, activation=self.pred_activation,
             )
         )
 
         model.compile(
-            loss="mse", # self.loss_fn,
+            loss=self.loss_fn,
             optimizer=tfk.optimizers.SGD(learning_rate=hp_learning_rate),
-            metrics="mse", # self.metric,
+            metrics=self.metric,
         )
 
         return model
