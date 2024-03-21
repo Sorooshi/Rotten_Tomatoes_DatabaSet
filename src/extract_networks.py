@@ -57,7 +57,7 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
                 )
                 weight = weight_dir + weight_pro + weight_wri + weight_casts
                 if weight != 0:
-                    titles.append(df.iloc[i, "Title"])
+                    titles.append(df.loc[i, "Title"])
             else:
                 weight = 0.
             
