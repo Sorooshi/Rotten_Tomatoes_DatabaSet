@@ -54,7 +54,7 @@ class LstmAe(tfk.Model):
                 name="encoder1"
                 )
             )     
-        self.enc1 = tfkl.Bidirectional(
+        self.enc2 = tfkl.Bidirectional(
             tfkl.LSTM(
                 units=int(latent_dim/2),  
                 activation="relu",  
@@ -90,6 +90,7 @@ class LstmAe(tfk.Model):
         x = self.txt_vec(x)
         x = self.emb(x)
         x = self.enc1(x)
+        x = self.enc2(x)
         x = self.dec1(x)
         x = self.dec2(x)
         x = self.outputs(x)
@@ -98,7 +99,7 @@ class LstmAe(tfk.Model):
     @tf.function
     def train_step(self, x, y):
         with tf.GradientTape() as tape:
-            y_pred = self(x, training=True)
+            y_pred = self.call(x, training=True)
             # y_true = self.inputs(self.txt_vec(x))
             loss_value = self.loss_fn(y, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
