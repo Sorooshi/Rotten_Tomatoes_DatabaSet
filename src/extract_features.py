@@ -20,12 +20,16 @@ class LstmAe(tfk.Model):
         if classification:
             self.train_metric = tfk.metrics.Accuracy(name="acc")
             self.val_metric = tfk.metrics.Accuracy(name="acc_val")
-            self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="loss_fn")
+            self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(
+                name="loss_fn", reduction=tfk.losses_utils.ReductionV2.SUM
+            )
             pred_activation = "softmax"
         else:
             self.train_metric = tfk.metrics.LogCoshError()
             self.val_metric = tfk.metrics.LogCoshError()
-            self.loss_fn = tfk.losses.Huber(name="loss_fn")  
+            self.loss_fn = tfk.losses.Huber(
+                 name="loss_fn", reduction=tfk.losses_utils.ReductionV2.SUM
+            )  
             pred_activation = "tanh"
 
         assert vocabulary is not None, "you should pass a valid vocabulary!"
@@ -156,13 +160,17 @@ class TuneApplyLstmAe():
 
         if self.classification:
             self.pred_activation = "softmax"
-            self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(name="loss_fn")
+            self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(
+                name="loss_fn", reduction=tfk.losses_utils.ReductionV2.SUM
+            )
             self.metric = ["accuracy"]
             self.proj_name = "LSTM_AE-Cls"
             self.dir_path = "./"
         else:
             self.pred_activation = "tanh"
-            self.loss_fn = tfk.losses.Huber(name="loss_fn")
+            self.loss_fn = tfk.losses.Huber(
+                name="loss_fn", reduction=tfk.losses_utils.ReductionV2.SUM,
+            )
             self.metric = ["logcosh"]
             self.proj_name = "LSTM_AE-Reg"
             self.dir_path = "./"
