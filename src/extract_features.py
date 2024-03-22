@@ -21,7 +21,7 @@ class LstmAe(tfk.Model):
             self.train_metric = tfk.metrics.Accuracy(name="acc")
             self.val_metric = tfk.metrics.Accuracy(name="acc_val")
             self.loss_fn = tf.losses.SparseCategoricalCrossentropy(
-                name="loss_fn", reduction='none',
+                name="loss_fn", reduction='sum_over_batch_size',
             )
             pred_activation = "softmax"
         else:
@@ -104,9 +104,14 @@ class LstmAe(tfk.Model):
     def train_step(self, x, y):
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
-            # y_true = self.inputs(self.txt_vec(x))
-            y_true = y
-            print("train_step:", x.shape, y_pred.shape, y_true.shape, y.shape)
+            y_true = self.inputs(self.txt_vec(x))
+            print(
+                f"train_step: \n",
+                f"x.shape: {x.shape} \n", 
+                f"y_pred.shape {y_pred.shape} \n",
+                f"y_true.shape {y_true.shape} \n",
+                f"y.shape {y.shape} \n"
+                )
             loss_value = self.loss_fn(y_true, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
