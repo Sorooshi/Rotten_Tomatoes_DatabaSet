@@ -85,8 +85,8 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
     print(
         f"zero_rows: {zero_rows} \n", 
         f"zero_cols: {zero_cols} \n"
-        f"size of zero_rows: {len(zero_rows)}" 
-        f"size of zero_cols: {len(zero_rows)}" 
+        f"size of zero_rows: {len(zero_rows)} " 
+        f"size of zero_cols: {len(zero_rows)} " 
         f"size of no_link movies {len(no_link_movies)}"
     )
 
@@ -153,9 +153,9 @@ def get_large_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
     print(
         f"zero_rows: {zero_rows} \n", 
         f"zero_cols: {zero_cols} \n"
-        f"size of zero_rows: {len(zero_rows)}" 
-        f"size of zero_cols: {len(zero_rows)}" 
-        f"size of no_link movies {len(no_link_movies)}"
+        f"size of zero_rows: {len(zero_rows)} " 
+        f"size of zero_cols: {len(zero_rows)} " 
+        f"size of no_link movies {len(no_link_movies)} "
         )
     
     data_df_a.drop(index=zero_rows, columns=zero_cols, inplace=True)
