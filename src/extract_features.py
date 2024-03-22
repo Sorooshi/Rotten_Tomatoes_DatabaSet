@@ -96,7 +96,7 @@ class LstmAe(tfk.Model):
     @tf.function
     def train_step(self, x, y):
         with tf.GradientTape() as tape:
-            y_pred = self(x, training=True)
+            y_pred = self.call(x, training=True)
             # y_true = self.inputs(self.txt_vec(x))
             loss_value = self.loss_fn(y, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
