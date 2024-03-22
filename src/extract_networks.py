@@ -134,20 +134,21 @@ def get_large_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         index=df.Title.values,
         )
     
+    zero_rows, zero_cols = get_isolated_nodes(df=data_df_a)
+    print(zero_rows, "\n", zero_cols)
+    data_df_a.drop(index=zero_rows, columns=zero_cols, inplace=True)
+    print(data_df_a.shape)
+
+    no_link_movies = list(data_df_a.loc[data_df_a.sum(axis=0) == 0].index)
+
     data_a = pd.DataFrame(
         data=adjacency, 
         columns=None,
         )
+    zero_rows, zero_cols = get_isolated_nodes(df=data_a)
+    data_a.drop(index=zero_rows, columns=zero_cols, inplace=True)
+    print(data_a.shape)
     
-    data_df_a = data_df_a.loc[data_df_a.sum(axis=1) != 0]
-    no_link_movies = list(data_df_a.loc[data_df_a.sum(axis=1) != 0].index)
-
-    data_a = pd.DataFrame(
-        data=adjacency, 
-        columns=None,
-        )
-    data_a = data_a.loc[data_a.sum(axis=1) != 0]
-
     data_df_a.to_csv("./data/large_data_df_a.csv", index=True)
     data_a.to_csv("./data/large_data_a.csv", header=False, index=False)
 
