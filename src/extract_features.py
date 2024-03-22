@@ -145,7 +145,6 @@ class TuneApplyLstmAe(LstmAe):
         self.labels = None 
         self.text_data = None
         self.vocabulary = None
-        self.max_seq_len = None
         self.n_epochs = n_epochs
         self.classification = classification
 
@@ -181,7 +180,7 @@ class TuneApplyLstmAe(LstmAe):
 
     def get_vocabulary(
             self, vocab_path = "../data/", 
-            max_seq_len: int = 123,
+            max_seq_len: int = 150,
             np_name = "medium.npz", 
             ngrams : int = 2, 
             ) -> tuple:
@@ -229,7 +228,9 @@ class TuneApplyLstmAe(LstmAe):
 
     def get_train_test_data(self, batch_size=8, return_tensors=True) -> tuple:
 
-        vocab, _, max_seq_len, ngrams = self.get_vocabulary()
+        vocab, _, max_seq_len, ngrams = self.get_vocabulary(
+            vocab_path="../data/", max_seq_len=150, np_name="medium", ngrams=2,
+        )
 
         x_train, x_test, _, _ = train_test_split(
             self.text_data, self.labels, test_size=0.05
