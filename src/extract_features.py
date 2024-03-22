@@ -137,10 +137,10 @@ class LstmAe(tfk.Model):
         return train_total_loss, val_total_loss
 
 
-class TuneLstmAe(LstmAe):
+class TuneApplyLstmAe(LstmAe):
     def __init__(self, n_epochs: int= 1, 
                  classification: bool = False, *args, **kwargs):
-        super(ApplyLstmAe, self).__init__(*args, **kwargs)
+        super(TuneApplyLstmAe, self).__init__(*args, **kwargs)
         self.data_df = None
         self.labels = None 
         self.text_data = None
