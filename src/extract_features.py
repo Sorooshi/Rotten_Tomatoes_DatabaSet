@@ -128,7 +128,7 @@ class LstmAe(tfk.Model):
         return train_total_loss, val_total_loss
 
 
-class ApplyLstmAe(LstmAe):
+class TuneLstmAe(LstmAe):
     def __init__(self, n_epochs: int= 1, 
                  classification: bool = False, *args, **kwargs):
         super(ApplyLstmAe, self).__init__(*args, **kwargs)
@@ -205,32 +205,7 @@ class ApplyLstmAe(LstmAe):
                 vocab_size=self.vocab_size,
                 ngrams = self.ngrams,
                 )
-            
-            # vocabulary = []
-            # max_seq_len = 0
-            # for synopsis in self.text_data:
-            #     parsed_synopsis = np.unique(
-            #         synopsis.lower().strip().split(" ")
-            #         ).tolist()
-            #     if len(parsed_synopsis) > max_seq_len:
-            #         max_seq_len = len(parsed_synopsis)
-            #     for word in parsed_synopsis:
-            #         if word not in vocabulary:
-            #             vocabulary.append(vocabulary)            
-            # vocab_size = len(vocabulary)
-            # n_classes = [i.lower() for i in np.unique(self.labels)]
-            # print(
-            #     f"vocabulary size {len(vocabulary)}"
-            #     f"Number of classes: {n_classes}"
-            #     )
-            
-            # np.savez(os.path.join(
-            #     vocab_path, np_name), 
-            #     vocabulary=self.vocabulary, 
-            #     vocab_size=vocab_size,
-            #     max_len_seq=max_seq_len,
-            #     n_classes=n_classes,
-            #     )
+
         else:
             data_npz = np.load(
                 os.path.join(vocab_path, np_name)
