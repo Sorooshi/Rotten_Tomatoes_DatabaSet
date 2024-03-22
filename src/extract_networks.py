@@ -79,12 +79,19 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         index=df.Title.values,
         )
     
-    zero_rows, zero_cols = get_isolated_nodes(df=data_df_a)
-    print(zero_rows, "\n", zero_cols)
-    data_df_a.drop(index=zero_rows, columns=zero_cols, inplace=True)
-    print(data_df_a.shape)
-
     no_link_movies = list(data_df_a.loc[data_df_a.sum(axis=0) == 0].index)
+    zero_rows, zero_cols = get_isolated_nodes(df=data_df_a)
+    
+    print(
+        f"zero_rows: {zero_rows} \n", 
+        f"zero_cols: {zero_cols} \n"
+        f"size of zero_rows: {len(zero_rows)}" 
+        f"size of zero_cols: {len(zero_rows)}" 
+        f"size of no_link movies {len(no_link_movies)}"
+    )
+
+    data_df_a.drop(index=zero_rows, columns=zero_cols, inplace=True)
+
 
     data_a = pd.DataFrame(
         data=adjacency, 
@@ -92,13 +99,19 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         )
     zero_rows, zero_cols = get_isolated_nodes(df=data_a)
     data_a.drop(index=zero_rows, columns=zero_cols, inplace=True)
-    print(data_a.shape)
+    print(
+        f"cleaned data shapes: {data_df_a.shape, data_a.shape}"
+    )
 
     data_df_a.to_csv("./data/medium_data_df_a.csv", index=True)
     data_a.to_csv("./data/medium_data_a.csv", header=False, index=False)
 
     with open ("./data/medium_data_no_link_movies.pickle", "wb") as fp:
         pickle.dump(no_link_movies, fp)
+    
+    print(
+        f"cleaned data shapes: {data_df_a.shape, data_a.shape}"
+    )
         
     return data_df_a, data_a
 
@@ -134,12 +147,19 @@ def get_large_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         index=df.Title.values,
         )
     
+    no_link_movies = list(data_df_a.loc[data_df_a.sum(axis=0) == 0].index)
     zero_rows, zero_cols = get_isolated_nodes(df=data_df_a)
-    print(zero_rows, "\n", zero_cols)
+
+    print(
+        f"zero_rows: {zero_rows} \n", 
+        f"zero_cols: {zero_cols} \n"
+        f"size of zero_rows: {len(zero_rows)}" 
+        f"size of zero_cols: {len(zero_rows)}" 
+        f"size of no_link movies {len(no_link_movies)}"
+        )
+    
     data_df_a.drop(index=zero_rows, columns=zero_cols, inplace=True)
     print(data_df_a.shape)
-
-    no_link_movies = list(data_df_a.loc[data_df_a.sum(axis=0) == 0].index)
 
     data_a = pd.DataFrame(
         data=adjacency, 
