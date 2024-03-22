@@ -300,7 +300,7 @@ class TuneApplyLstmAe():
         ) 
         model.add(
             tfkl.Embedding(
-            input_dim=self.txt_vec.vocabulary_size(),
+            input_dim=self.lstm_ae.txt_vec.vocabulary_size(),
             output_dim=hp_latent_dim,
             )
         )
