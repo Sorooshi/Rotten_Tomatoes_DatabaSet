@@ -45,7 +45,16 @@ class LstmAe(tfk.Model):
             )
         self.enc1 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=150,  
+                units=latent_dim,  
+                activation="relu",  
+                dropout=0.1,
+                return_sequences=True,
+                name="encoder1"
+                )
+            )     
+        self.enc1 = tfkl.Bidirectional(
+            tfkl.LSTM(
+                units=int(latent_dim/2),  
                 activation="relu",  
                 dropout=0.1,
                 return_sequences=True,
@@ -54,7 +63,7 @@ class LstmAe(tfk.Model):
             )       
         self.dec1 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=50,  
+                units=int(latent_dim/2),  
                 activation="relu", 
                 dropout=0.1,
                 return_sequences=True,
@@ -63,7 +72,7 @@ class LstmAe(tfk.Model):
         )
         self.dec2 = tfkl.Bidirectional(
             tfkl.LSTM(
-                units=100,  
+                units=latent_dim,  
                 activation="tanh", 
                 dropout=0.1,
                 return_sequences=False,
