@@ -263,7 +263,7 @@ class TuneApplyLstmAe():
             train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
             train_data = train_data.shuffle(buffer_size=len(x_train)).batch(batch_size=batch_size)
             test_data = tf.data.Dataset.from_tensor_slices((x_test, y_test))
-            test_data = test_data.shuffle(buffer_size=len(len(x_test))).batch(batch_size=batch_size)
+            test_data = test_data.shuffle(buffer_size=len((x_test)).batch(batch_size=batch_size)
             return train_data, test_data, 
         else:
             return x_train, y_train, x_test, y_test
