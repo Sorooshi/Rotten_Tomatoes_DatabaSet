@@ -101,7 +101,7 @@ class LstmAe(tfk.Model):
         with tf.GradientTape() as tape:
             y_pred = self.call(x, training=True)
             y_true = self.inputs(self.txt_vec(x))
-            print(y_pred.shape, y_true.shape)
+            print(y_pred.shape, y_true.shape, y.shape)
             loss_value = self.loss_fn(y_true, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
@@ -261,9 +261,9 @@ class TuneApplyLstmAe():
 
         if return_tensors:
             train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-            train_data = train_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
+            train_data = train_data.shuffle(buffer_size=len(x_train)).batch(batch_size=batch_size)
             test_data = tf.data.Dataset.from_tensor_slices((x_test, y_test))
-            test_data = test_data.shuffle(buffer_size=1024).batch(batch_size=batch_size)
+            test_data = test_data.shuffle(buffer_size=len(len(x_test))).batch(batch_size=batch_size)
             return train_data, test_data, 
         else:
             return x_train, y_train, x_test, y_test
