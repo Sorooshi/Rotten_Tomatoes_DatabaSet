@@ -80,6 +80,7 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         )
     
     zero_rows, zero_cols = get_isolated_nodes(df=data_df_a)
+    print(zero_rows, "\n", zero_cols)
     data_df_a.drop(index=zero_rows, columns=zero_cols)
     print(data_df_a.shape)
 
