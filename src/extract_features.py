@@ -149,6 +149,7 @@ class TuneApplyLstmAe():
         self.vocabulary = None
         self.n_epochs = n_epochs
         self.classification = classification
+        self.lstm_ae = None
 
         if self.classification:
             self.pred_activation = "softmax"
@@ -244,11 +245,12 @@ class TuneApplyLstmAe():
             max_seq_len=max_seq_len, 
             ngrams=ngrams
             )
-        lstm_ae.compile()
-        lstm_ae.inputs(self.text_data)
-        lstm_ae.txt_vec(self.text_data)
+        self.lstm_ae.compile()
+        self.lstm_ae.inputs(self.text_data)
+        self.lstm_ae.txt_vec(self.text_data)
         y_train = lstm_ae.predict(x_train)
         y_test = lstm_ae.predict(x_test)
+
         print(
             f"x_train and y_train shapes: {x_train.shape, y_train.shape}"
             f"x_test and y_test shapes: {x_test.shape, y_test.shape}"
