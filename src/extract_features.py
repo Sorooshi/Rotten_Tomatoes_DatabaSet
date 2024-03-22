@@ -28,6 +28,8 @@ class LstmAe(tfk.Model):
             self.loss_fn = tfk.losses.Huber(name="loss_fn")  
             pred_activation = "tanh"
 
+        assert vocabulary is not None, "you should pass a valid vocabulary!"
+
         self.inputs = tfkl.InputLayer(
             input_shape=(1,), dtype=tf.string,
             )
