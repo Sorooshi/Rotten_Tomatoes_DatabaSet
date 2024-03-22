@@ -239,7 +239,7 @@ class TuneApplyLstmAe():
             self.text_data, self.labels, test_size=0.05
             )
         
-        lstm_ae = LstmAe(
+        self.lstm_ae = LstmAe(
             vocabulary=vocab, 
             classification=False, 
             max_seq_len=max_seq_len, 
