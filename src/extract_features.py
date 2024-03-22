@@ -103,7 +103,7 @@ class LstmAe(tfk.Model):
     @tf.function
     def train_step(self, x, y):
         with tf.GradientTape() as tape:
-            y_pred = self(x, training=True)
+            y_pred = tf.expand_dims(self(x, training=True), axis=-1)
             y_true = tf.expand_dims(self.inputs(self.txt_vec(x)), axis=-1)
             print(
                 f"train_step: \n",
