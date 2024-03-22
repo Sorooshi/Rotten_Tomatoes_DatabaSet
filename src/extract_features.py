@@ -98,7 +98,7 @@ class LstmAe(tfk.Model):
     @tf.function
     def train_step(self, x, y):
         with tf.GradientTape() as tape:
-            y_pred = self.call(x, training=True)
+            y_pred = self(x, training=True)
             # y_true = self.inputs(self.txt_vec(x))
             loss_value = self.loss_fn(y, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
@@ -116,6 +116,7 @@ class LstmAe(tfk.Model):
         for epoch in range(n_epochs):
             print(f"epoch: {epoch+1}")
             for step, (x_batch_train, y_batch_train) in enumerate(train_data):
+                print(x_batch_train.shape, y_batch_train.shape)
                 loss_value = self.train_step(x_batch_train, y_batch_train)
                 if step % 50 == 0:
                     print(
