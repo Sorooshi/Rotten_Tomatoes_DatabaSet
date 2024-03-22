@@ -21,7 +21,7 @@ class LstmAe(tfk.Model):
             self.train_metric = tfk.metrics.Accuracy(name="acc")
             self.val_metric = tfk.metrics.Accuracy(name="acc_val")
             self.loss_fn = tf.losses.SparseCategoricalCrossentropy(
-                name="loss_fn", reduction=None,
+                name="loss_fn", reduction='none',
             )
             pred_activation = "softmax"
         else:
