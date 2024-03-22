@@ -161,7 +161,7 @@ class TuneApplyLstmAe():
         if self.classification:
             self.pred_activation = "softmax"
             self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(
-                name="loss_fn", reduction=tfk.losses.ReductionV2.SUM
+                name="loss_fn", reduction="sum_over_batch_size"
             )
             self.metric = ["accuracy"]
             self.proj_name = "LSTM_AE-Cls"
@@ -169,7 +169,7 @@ class TuneApplyLstmAe():
         else:
             self.pred_activation = "tanh"
             self.loss_fn = tfk.losses.Huber(
-                name="loss_fn", reduction=tfk.losses.ReductionV2.SUM,
+                name="loss_fn", reduction="sum_over_batch_size",
             )
             self.metric = ["logcosh"]
             self.proj_name = "LSTM_AE-Reg"
