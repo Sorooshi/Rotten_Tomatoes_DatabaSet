@@ -11,6 +11,15 @@ parser.add_argument(
         help="To extract large-size data when it is set to 1, and medium-size else."
         )
 
+def get_isolated_nodes(df):
+
+    zero_rows = df.sum(axis=1) == 0
+    zero_rows = zero_rows.loc[zero_rows == True].index
+    zero_cols = df.sum(axis=0) == 0
+    zero_cols = zero_cols.loc[zero_cols == True].index
+
+    return zero_rows, zero_cols
+
 def get_list_of_casts(x):
     x = x.split(", ")
     xx = []
@@ -70,22 +79,19 @@ def get_medium_adjacency_matrix(df: pd.DataFrame) -> pd.DataFrame:
         index=df.Title.values,
         )
     
-    data_df_a = data_df_a.loc[
-        (data_df_a.sum(axis=0) != 0) # & (data_df_a.sum(axis=1) != 0)
-        ]
+    zero_rows, zero_cols = get_isolated_nodes(df=data_df_a)
+    data_df_a.drop(index=zero_rows, columns=zero_cols)
     print(data_df_a.shape)
-    no_link_movies = list(data_df_a.loc[data_df_a.sum(axis=0) != 0].index)
 
-    data_df_a = data_df_a.columns[~data_df_a.isin(no_link_movies)]
-    print("desired?: ", data_df_a.shape)
+    no_link_movies = list(data_df_a.loc[data_df_a.sum(axis=0) == 0].index)
 
     data_a = pd.DataFrame(
         data=adjacency, 
         columns=None,
         )
-    data_a = data_a.loc[
-        (data_a.sum(axis=1) != 0) & (data_a.sum(axis=0) != 0)
-        ]
+    zero_rows, zero_cols = get_isolated_nodes(df=data_a)
+    data_a.drop(index=zero_rows, columns=zero_cols)
+    print(data_a.shape)
 
     data_df_a.to_csv("./data/medium_data_df_a.csv", index=True)
     data_a.to_csv("./data/medium_data_a.csv", header=False, index=False)
