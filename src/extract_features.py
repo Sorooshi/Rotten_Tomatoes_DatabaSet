@@ -139,7 +139,7 @@ class LstmAe(tfk.Model):
         return train_total_loss, val_total_loss
 
 
-class TuneApplyLstmAe(LstmAe):
+class TuneApplyLstmAe():
     def __init__(self, n_epochs: int= 1, 
                  classification: bool = False, *args, **kwargs):
         super(TuneApplyLstmAe, self).__init__(*args, **kwargs)
