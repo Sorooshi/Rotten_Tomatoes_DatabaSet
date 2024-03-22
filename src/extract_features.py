@@ -248,8 +248,8 @@ class TuneApplyLstmAe():
         self.lstm_ae.compile()
         self.lstm_ae.inputs(self.text_data)
         self.lstm_ae.txt_vec(self.text_data)
-        y_train = lstm_ae.predict(x_train)
-        y_test = lstm_ae.predict(x_test)
+        y_train = self.lstm_ae.predict(x_train)
+        y_test = self.lstm_ae.predict(x_test)
 
         print(
             f"x_train and y_train shapes: {x_train.shape, y_train.shape}"
