@@ -21,14 +21,14 @@ class LstmAe(tfk.Model):
             self.train_metric = tfk.metrics.Accuracy(name="acc")
             self.val_metric = tfk.metrics.Accuracy(name="acc_val")
             self.loss_fn = tf.losses.SparseCategoricalCrossentropy(
-                name="loss_fn", reduction=tfk.losses.ReductionV2.SUM
+                name="loss_fn", reduction="sum_over_batch_size",
             )
             pred_activation = "softmax"
         else:
             self.train_metric = tfk.metrics.LogCoshError()
             self.val_metric = tfk.metrics.LogCoshError()
             self.loss_fn = tfk.losses.Huber(
-                 name="loss_fn", reduction=tfk.losses.ReductionV2.SUM
+                 name="loss_fn", reduction="sum_over_batch_size",
             )  
             pred_activation = "tanh"
 
