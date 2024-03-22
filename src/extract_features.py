@@ -101,6 +101,7 @@ class LstmAe(tfk.Model):
         with tf.GradientTape() as tape:
             y_pred = self.call(x, training=True)
             y_true = self.inputs(self.txt_vec(x))
+            print(y_pred.shape, y_true.shape)
             loss_value = self.loss_fn(y_true, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
