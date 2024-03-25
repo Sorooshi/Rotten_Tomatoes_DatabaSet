@@ -107,6 +107,7 @@ class LstmAe(tfk.Model):
             y_pred = self.call(x, training=True)
             y_true = self.inputs(self.txt_vec(x))
             loss_value = self.loss_fn(y_true, y_pred)
+            self.train_metric.update_state(y_true, y_pred)
             print(
                 f"train_step: \n",
                 f"x.shape: {x.shape} \n", 
@@ -118,8 +119,7 @@ class LstmAe(tfk.Model):
                 )
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
-        self.train_metric.update_state(y_true, y_pred)
-        return loss_value
+        return loss_value,
     
     @tf.function
     def test_step(self, x, y):
@@ -137,8 +137,10 @@ class LstmAe(tfk.Model):
                 if step % 50 == 0:
                     print(
                         "Training loss (for one batch) at step %d: %.4f"
-                        % (step, loss_value)
+                        % (step, loss_value, )
                     )
+                    self.train_metric.update_state()
+
             train_metric = self.train_metric.result()
             train_total_loss.append(train_metric)
             print("Training metric over epoch: %.3f" % (float(train_metric),))
