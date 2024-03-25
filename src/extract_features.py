@@ -140,10 +140,10 @@ class LstmAe(tfk.Model):
                         "Training loss (for one batch) at step %d: %.4f"
                         % (step, loss_value)
                     )
-
+            print(f"self.train_metric {self.train_metric}")
             train_metric = self.train_metric.result()
             train_total_loss.append(train_metric)
-            print("Training metric over epoch: %.3f" % (float(train_metric),))
+            print("Training metric over epoch: %.3f" % (float(train_metric)))
             self.train_metric.reset_states()
 
             # Run a validation loop at the end of each epoch.
