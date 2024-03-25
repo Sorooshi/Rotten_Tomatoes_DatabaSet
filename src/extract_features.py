@@ -128,7 +128,7 @@ class LstmAe(tfk.Model):
             for step, (x_batch_train, y_batch_train) in enumerate(train_data):
                 # print(x_batch_train.shape, y_batch_train.shape)
                 loss_value, train_metric = self.train_step(x=x_batch_train, y=y_batch_train)
-                tmp_train_metric.append(train_metric)
+                tmp_train_metric.append(loss_value)  # train_metric)
                 if step % 50 == 0:
                     print(
                         "Training loss and metric (for one batch) at step %d: %.3f, %.3f"
@@ -136,7 +136,6 @@ class LstmAe(tfk.Model):
                     )
             tmp_train_metric = np.asarray(tmp_train_metric)
             train_total_loss.append(tmp_train_metric.mean())
-            # print("Training metric over epoch: %.3f" % (float(train_metric)))
             self.train_metric.reset_states()
 
             # Run a validation loop at the end of each epoch.
@@ -144,7 +143,6 @@ class LstmAe(tfk.Model):
                 val_metric = self.test_step(x_batch_val, y_batch_val)
                 tmp_val_metric.append(val_metric)
             tmp_val_metric = np.asarray(tmp_val_metric)
-            # val_metric = self.val_metric.result()
             val_total_loss.append(tmp_val_metric.mean())
             self.val_metric.reset_states()
             print("Validation metric: %.3f" % tmp_val_metric.mean(),)
