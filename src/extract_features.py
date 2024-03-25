@@ -111,8 +111,8 @@ class LstmAe(tfk.Model):
                 f"x.shape: {x.shape} \n", 
                 f"y_pred.shape {y_pred.shape} \n",
                 f"y_true.shape {y.shape} \n",
-                f"y_true: {y[:2]} \n"
-                f"y_pred: {y_pred[:2]} \n"
+                f"y_true: {y[:2].numpy()} \n"
+                f" y_pred: {y_pred[:2].numpy()} \n"
                 )
             loss_value = self.loss_fn(y, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
