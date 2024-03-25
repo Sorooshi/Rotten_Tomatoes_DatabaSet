@@ -108,16 +108,7 @@ class LstmAe(tfk.Model):
             y_true = self.inputs(self.txt_vec(x))
             loss_value = self.loss_fn(y_true, y_pred)
             train_metric = self.train_metric.update_state(y_true, y_pred)
-            print(
-                f"train_step: \n",
-                # f"x.shape: {x.shape} \n", 
-                # f"y_pred.shape {y_pred.shape} \n",
-                # f"y_true.shape {y.shape} \n",
-                # f"y_true: {y} \n"
-                # f" y_pred: {y_pred} \n"
-                f"loss_value {loss_value} \n"
-                f"metric values {train_metric.result()} \n"
-                )
+
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
         return loss_value, train_metric
@@ -126,13 +117,14 @@ class LstmAe(tfk.Model):
     def test_step(self, x, y):
         y_pred = self(x, training=False)
         y_true = self.inputs(self.txt_vec(x))
-        self.val_metric(y_true, y_pred)
+        return self.val_metric(y_true, y_pred)
+        
 
     def fit(self, train_data, test_data, n_epochs):
         train_total_loss, val_total_loss = [], []
         for epoch in range(n_epochs):
             print(f"epoch: {epoch+1}")
-            tmp_train_metric = []
+            tmp_train_metric, tmp_val_metric = [], []
             for step, (x_batch_train, y_batch_train) in enumerate(train_data):
                 # print(x_batch_train.shape, y_batch_train.shape)
                 loss_value, train_metric = self.train_step(x=x_batch_train, y=y_batch_train)
@@ -149,12 +141,13 @@ class LstmAe(tfk.Model):
 
             # Run a validation loop at the end of each epoch.
             for x_batch_val, y_batch_val in test_data:
-                self.test_step(x_batch_val, y_batch_val)
-
-            val_metric = self.val_metric.result()
-            val_total_loss.append(val_metric)
+                val_metric = self.test_step(x_batch_val, y_batch_val)
+                tmp_val_metric.append(val_metric)
+            tmp_val_metric = np.asarray(tmp_val_metric)
+            # val_metric = self.val_metric.result()
+            val_total_loss.append(tmp_val_metric.mean())
             self.val_metric.reset_states()
-            print("Validation metric: %.3f" % (float(val_metric),))
+            print("Validation metric: %.3f" % (float(tmp_val_metric),))
 
         return train_total_loss, val_total_loss
 
