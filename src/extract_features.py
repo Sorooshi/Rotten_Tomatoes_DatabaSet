@@ -137,7 +137,7 @@ class LstmAe(tfk.Model):
                 if step % 50 == 0:
                     print(
                         "Training loss (for one batch) at step %d: %.4f"
-                        % (step, loss_value, )
+                        % (step, loss_value)
                     )
                     self.train_metric.update_state()
 
