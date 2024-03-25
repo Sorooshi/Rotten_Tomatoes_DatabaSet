@@ -28,8 +28,8 @@ class LstmAe(tfk.Model):
         else:
             self.train_metric = tfk.metrics.LogCoshError()
             self.val_metric = tfk.metrics.LogCoshError()
-            self.loss_fn = tfk.losses.Huber(
-                 name="huber_loss", 
+            self.loss_fn = tfk.losses.LogCoshError(
+                 name="loss_fn", 
             )  
             pred_activation = "tanh"
 
