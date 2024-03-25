@@ -107,7 +107,7 @@ class LstmAe(tfk.Model):
             y_pred = self.call(x, training=True)
             y_true = self.inputs(self.txt_vec(x))
             loss_value = self.loss_fn(y_true, y_pred)
-            self.train_metric.update_state(y_true, y_pred)
+            train_metric = self.train_metric.update_state(y_true, y_pred)
             print(
                 f"train_step: \n",
                 f"x.shape: {x.shape} \n", 
@@ -116,11 +116,11 @@ class LstmAe(tfk.Model):
                 f"y_true: {y} \n"
                 f" y_pred: {y_pred} \n"
                 f"loss_value {loss_value} \n"
-                f"metric values {self.train_metric.result()} \n"
+                f"metric values {train_metric.result()} \n"
                 )
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
-        return loss_value
+        return loss_value, train_metric
     
     @tf.function
     def test_step(self, x, y):
@@ -134,16 +134,15 @@ class LstmAe(tfk.Model):
             print(f"epoch: {epoch+1}")
             for step, (x_batch_train, y_batch_train) in enumerate(train_data):
                 # print(x_batch_train.shape, y_batch_train.shape)
-                loss_value = self.train_step(x=x_batch_train, y=y_batch_train)
+                loss_value, train_metric = self.train_step(x=x_batch_train, y=y_batch_train)
                 if step % 50 == 0:
                     print(
-                        "Training loss (for one batch) at step %d: %.4f"
-                        % (step, loss_value)
+                        "Training loss and metric (for one batch) at step %d: %.3f %4.3f"
+                        % (step, loss_value, train_metric)
                     )
-            print(f"self.train_metric {self.train_metric}")
-            train_metric = self.train_metric.result()
+
             train_total_loss.append(train_metric)
-            print("Training metric over epoch: %.3f" % (float(train_metric)))
+            # print("Training metric over epoch: %.3f" % (float(train_metric)))
             self.train_metric.reset_states()
 
             # Run a validation loop at the end of each epoch.
