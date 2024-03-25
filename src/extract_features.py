@@ -129,7 +129,7 @@ class LstmAe(tfk.Model):
                 # print(x_batch_train.shape, y_batch_train.shape)
                 loss_value, train_metric = self.train_step(x=x_batch_train, y=y_batch_train)
                 tmp_train_metric.append(train_metric)
-                if step % 50 == 0:
+                if step % 200 == 0:
                     print(
                         "Training loss and metric (for one batch) at step %d: %.3f, %4.3f"
                         % (step, loss_value, train_metric)
