@@ -18,6 +18,7 @@ class LstmAe(tfk.Model):
         super(LstmAe, self).__init__(*args, **kwargs)
         self.max_seq_len = max_seq_len
         if classification:
+            assert classification is not True, "there are some fundamental theoretical issues to be address."
             self.train_metric = tfk.metrics.Accuracy(name="acc")
             self.val_metric = tfk.metrics.Accuracy(name="acc_val")
             self.loss_fn = tf.losses.SparseCategoricalCrossentropy(
@@ -104,18 +105,18 @@ class LstmAe(tfk.Model):
     def train_step(self, x, y):
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
-            y_true = self.inputs(self.txt_vec(x))
-            print(
-                f"train_step: \n",
-                f"x.shape: {x.shape} \n", 
-                f"y_pred.shape {y_pred.shape} \n",
-                f"y_true.shape {y_true.shape} \n",
-                f"y.shape {y.shape} \n"
-                )
-            loss_value = self.loss_fn(y_true, y_pred)
+            # y_true = self.inputs(self.txt_vec(x))
+            # print(
+            #     f"train_step: \n",
+            #     f"x.shape: {x.shape} \n", 
+            #     f"y_pred.shape {y_pred.shape} \n",
+            #     f"y_true.shape {y_true.shape} \n",
+            #     f"y.shape {y.shape} \n"
+            #     )
+            loss_value = self.loss_fn(y, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
-        self.train_metric.update_state(y_true, y_pred)
+        self.train_metric.update_state(y, y_pred)
         return loss_value
     
     @tf.function
@@ -128,7 +129,7 @@ class LstmAe(tfk.Model):
         for epoch in range(n_epochs):
             print(f"epoch: {epoch+1}")
             for step, (x_batch_train, y_batch_train) in enumerate(train_data):
-                print(x_batch_train.shape, y_batch_train.shape)
+                # print(x_batch_train.shape, y_batch_train.shape)
                 loss_value = self.train_step(x=x_batch_train, y=y_batch_train)
                 if step % 50 == 0:
                     print(
@@ -165,6 +166,7 @@ class TuneApplyLstmAe():
         self.lstm_ae = None
 
         if self.classification:
+            assert classification is not True, "there are some fundamental theoretical issues to be address."
             self.pred_activation = "softmax"
             self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(
                 name="loss_fn", reduction="sum_over_batch_size"
