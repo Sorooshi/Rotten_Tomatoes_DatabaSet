@@ -26,8 +26,8 @@ class LstmAe(tfk.Model):
             )
             pred_activation = "softmax"
         else:
-            self.train_metric = tfk.metrics.LogCoshError()
-            self.val_metric = tfk.metrics.LogCoshError()
+            self.train_metric = tfk.metrics.MeanAbsoluteError()
+            self.val_metric = tfk.metrics.MeanAbsoluteError()
             self.loss_fn = tfk.losses.LogCosh(
                  name="loss_fn", 
             )  
