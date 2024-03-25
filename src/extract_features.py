@@ -119,7 +119,7 @@ class LstmAe(tfk.Model):
                 )
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
-        return loss_value,
+        return loss_value
     
     @tf.function
     def test_step(self, x, y):
