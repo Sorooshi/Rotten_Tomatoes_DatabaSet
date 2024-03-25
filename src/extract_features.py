@@ -139,7 +139,6 @@ class LstmAe(tfk.Model):
                         "Training loss (for one batch) at step %d: %.4f"
                         % (step, loss_value)
                     )
-                    self.train_metric.update_state()
 
             train_metric = self.train_metric.result()
             train_total_loss.append(train_metric)
