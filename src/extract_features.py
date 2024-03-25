@@ -124,7 +124,8 @@ class LstmAe(tfk.Model):
     @tf.function
     def test_step(self, x, y):
         y_pred = self(x, training=False)
-        self.val_metric(y, y_pred)
+        y_true = self.inputs(self.txt_vec(x))
+        self.val_metric(y_true, y_pred)
 
     def fit(self, train_data, test_data, n_epochs):
         train_total_loss, val_total_loss = [], []
