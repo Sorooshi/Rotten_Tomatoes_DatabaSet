@@ -104,7 +104,7 @@ class LstmAe(tfk.Model):
     @tf.function
     def train_step(self, x, y):
         with tf.GradientTape() as tape:
-            y_pred = self(x, training=True)
+            y_pred = self.call(x, training=True)
             # y_true = self.inputs(self.txt_vec(x))
             # print(
             #     f"train_step: \n",
