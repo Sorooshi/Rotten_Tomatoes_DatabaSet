@@ -115,8 +115,8 @@ class LstmAe(tfk.Model):
                 f"y_true.shape {y.shape} \n",
                 f"y_true: {y} \n"
                 f" y_pred: {y_pred} \n"
-                f"loss_value {loss_value} \n"
-                f"metric values {self.train_metric} \n"
+                f"loss_value {loss_value.numpy()} \n"
+                f"metric values {self.train_metric.result()} \n"
                 )
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
