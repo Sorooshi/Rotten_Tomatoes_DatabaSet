@@ -29,7 +29,7 @@ class LstmAe(tfk.Model):
             self.train_metric = tfk.metrics.LogCoshError()
             self.val_metric = tfk.metrics.LogCoshError()
             self.loss_fn = tfk.losses.Huber(
-                 name="loss_fn", 
+                 name="loss_fn", reduction="sum_over_batch_size",
             )  
             pred_activation = "tanh"
 
@@ -105,7 +105,8 @@ class LstmAe(tfk.Model):
     def train_step(self, x, y):
         with tf.GradientTape() as tape:
             y_pred = self.call(x, training=True)
-            # y_true = self.inputs(self.txt_vec(x))
+            y_true = self.inputs(self.txt_vec(x))
+            loss_value = self.loss_fn(y_true, y_pred)
             print(
                 f"train_step: \n",
                 f"x.shape: {x.shape} \n", 
@@ -113,11 +114,11 @@ class LstmAe(tfk.Model):
                 f"y_true.shape {y.shape} \n",
                 f"y_true: {y} \n"
                 f" y_pred: {y_pred} \n"
+                f"loss_value {loss_value} \n"
                 )
-            loss_value = self.loss_fn(y, y_pred)
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
-        self.train_metric.update_state(y, y_pred)
+        self.train_metric.update_state(y_true, y_pred)
         return loss_value
     
     @tf.function
