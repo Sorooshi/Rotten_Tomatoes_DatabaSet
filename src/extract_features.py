@@ -131,7 +131,7 @@ class LstmAe(tfk.Model):
                 tmp_train_metric.append(train_metric)
                 if step % 50 == 0:
                     print(
-                        "Training loss and metric (for one batch) at step %d: %.3f %4.3f"
+                        "Training loss and metric (for one batch) at step %d: %.3f, %4.3f"
                         % (step, loss_value, train_metric)
                     )
             tmp_train_metric = np.asarray(tmp_train_metric)
@@ -147,7 +147,7 @@ class LstmAe(tfk.Model):
             # val_metric = self.val_metric.result()
             val_total_loss.append(tmp_val_metric.mean())
             self.val_metric.reset_states()
-            print("Validation metric: %.3f" % (float(tmp_val_metric),))
+            print("Validation metric: %.3f" % tmp_val_metric,)
 
         return train_total_loss, val_total_loss
 
