@@ -28,7 +28,7 @@ class LstmAe(tfk.Model):
         else:
             self.train_metric = tfk.metrics.MeanAbsoluteError()
             self.val_metric = tfk.metrics.MeanAbsoluteError()
-            self.loss_fn = tfk.losses.LogCosh(
+            self.loss_fn = tfk.losses.MeanAbsoluteError(  # LogCosh
                  name="loss_fn", 
             )  
             pred_activation = "tanh"
