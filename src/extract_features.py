@@ -29,7 +29,7 @@ class LstmAe(tfk.Model):
             self.train_metric = tfk.metrics.LogCoshError()
             self.val_metric = tfk.metrics.LogCoshError()
             self.loss_fn = tfk.losses.Huber(
-                 name="loss_fn", reduction="sum_over_batch_size",
+                 name="huber_loss", 
             )  
             pred_activation = "tanh"
 
@@ -115,7 +115,7 @@ class LstmAe(tfk.Model):
                 f"y_true.shape {y.shape} \n",
                 f"y_true: {y} \n"
                 f" y_pred: {y_pred} \n"
-                f"loss_value {loss_value.numpy} \n"
+                f"loss_value {loss_value.result()} \n"
                 f"metric values {self.train_metric.result()} \n"
                 )
         grads = tape.gradient(loss_value, self.trainable_weights)
