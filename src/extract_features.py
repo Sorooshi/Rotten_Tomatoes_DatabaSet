@@ -1,11 +1,13 @@
 import os
+import pickle
+import itertools
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 import keras_tuner as kt 
 from sklearn.model_selection import train_test_split
 
-
+verbose = 1
 tfk = tf.keras 
 tfkl = tf.keras.layers
 
@@ -189,12 +191,13 @@ class TuneApplyLstmAe():
         self.labels = self.data_df.Genre.values
         self.text_data = self.data_df.Synopsis.values
 
-        print(
-            f"text data head: \n {self.text_data[:3]} \n" 
-            f"text data shape: {self.text_data.shape} \n"
-            f"labels head: \n {self.labels[:3]} \n"
-            f"labels shape: {self.labels.shape} \n"
-        ) 
+        if verbose >= 4:
+            print(
+                f"text data head: \n {self.text_data[:3]} \n" 
+                f"text data shape: {self.text_data.shape} \n"
+                f"labels head: \n {self.labels[:3]} \n"
+                f"labels shape: {self.labels.shape} \n"
+            ) 
  
 
     def get_vocabulary(
@@ -267,10 +270,11 @@ class TuneApplyLstmAe():
         y_train = self.lstm_ae.predict(x_train)
         y_test = self.lstm_ae.predict(x_test)
 
-        print(
-            f"x_train and y_train shapes: {x_train.shape, y_train.shape}"
-            f"x_test and y_test shapes: {x_test.shape, y_test.shape}"
-            )
+        if verbose >= 3:
+            print(
+                f"x_train and y_train shapes: {x_train.shape, y_train.shape}"
+                f"x_test and y_test shapes: {x_test.shape, y_test.shape}"
+                )
 
         if return_tensors:
             train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
@@ -421,3 +425,76 @@ class TuneApplyLstmAe():
         for k in range(5):
             print(" to be completed ....")
 
+
+if __name__ == "__main__":
+
+    return_tensors = True
+    results = {}
+    learning_rate = [1e-5, 1e-6]
+    epochs = [100, 1000, 10000]
+    latent_dim = [10, 50, ]
+    ngrams = [1, 2, ]
+    max_sequence_length = [50, 100, 175,]
+
+    configs = itertools.product(
+        learning_rate, epochs, 
+        latent_dim, ngrams,
+        max_sequence_length
+    )
+    
+    for config in configs:
+
+        results[config] = {}
+        learning_rate = config[0]
+        n_epochs = config[1]
+        latent_dim = config[2]
+        ngrams = config[3]
+        max_seq_len = config[4]
+
+        print(
+            f"configuration {config} being applied"
+        )
+
+        if latent_dim <= max_seq_len:
+
+            tuner_applier = TuneApplyLstmAe()
+            vocab, vocab_size, max_seq_len, ngrams = tuner_applier.get_vocabulary(
+                vocab_path="../data/", 
+                max_seq_len=max_seq_len, 
+                np_name="medium", ngrams=ngrams,
+            )
+            if return_tensors is False:
+                x_train, y_train, x_test, y_test = tuner_applier.get_train_test_data(
+                    return_tensors=False
+                )
+            else:
+                train_data, val_data = tuner_applier.get_train_test_data(
+                    return_tensors=True
+                )
+
+            mdl = LstmAe(
+                latent_dim=latent_dim, ngrams=ngrams, 
+                classification=False, vocabulary=vocab, 
+                max_seq_len=max_seq_len, 
+            )
+
+            optimizer = tfk.optimizers.SGD(learning_rate=learning_rate)
+            mdl.compile(optimizer=optimizer)
+
+            train_loss, val_loss = mdl.fit(
+                train_data=train_data, test_data=val_data, n_epochs=n_epochs
+                )
+            
+            results[config]["train_loss"] = train_loss
+            results[config]["val_loss"] = val_loss
+            results[config]["config"] = config
+
+        else:
+            print(
+                f"Not a reasonable config"
+            )
+
+    with open("./LSTM-AE_configs.pickle", "w") as fp:
+        pickle.dump(results, fp)
+    
+    
