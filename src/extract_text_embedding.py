@@ -421,10 +421,10 @@ class TuneApplyLstmAe():
         return_tensors = True
         results = {}
         learning_rate = [1e-5, 1e-6]
-        epochs = [2] # [100, 1000, 10000]
-        latent_dim = [10]  #[10, 50, ]
-        ngrams = [1] # [1, 2, ]
-        max_sequence_length = [20]  #[50, 100, 175,]
+        epochs = [100, 1000, 10000]
+        latent_dim = [10, 50, ]
+        ngrams = [1, 2, ]
+        max_sequence_length = [50, 100, 175,]
 
         configs = itertools.product(
             learning_rate, epochs, 
@@ -487,7 +487,7 @@ class TuneApplyLstmAe():
         return results
 
 
-    def train_test_tuned_model(self,):
+    def train_test_tuned_model(self, congifs):
         vectorized_text, labels, max_len = self.get_preprocess_data(
             data_path="./data/medium_movies_data.scv",
         )
