@@ -201,13 +201,15 @@ class GetConvertedData():
                 f"labels head: \n {self.labels[:3]} \n"
                 f"labels shape: {self.labels.shape} \n"
             ) 
+        
+        return self.data_df, self.text_data, self.labels
  
 
     def get_vocabulary(self,) -> tuple:
         """ returns, as attributes, the vocabulary (np.arr), its size (int),
         the maximum sequence length (int) and applied ngrams (int). """
 
-        self.get_text_and_labels()
+        _, _, _ = self.get_text_and_labels()
         
         # check whether the vocabulary exists (in npz format):
         if not os.path.isfile(os.path.join(self.data_path, self.vocab_np_name)): 
@@ -450,13 +452,13 @@ class TuneApplyLstmAe():
                 train_data=train_data, test_data=val_data, n_epochs=n_epochs
                 )
 
-            data_getter.get_text_and_labels()
+            data_df, _, _ = data_getter.get_text_and_labels()
 
             with open("./data/medium_data_no_link_movies.pickle", "rb") as fp:
                 no_link_movies = pickle.load(fp)
 
 
-            data_df = self.data_df.loc[~self.data_df.Title.isin(no_link_movies)]
+            data_df = data_df.loc[~data_df.Title.isin(no_link_movies)]
 
             text_data = data_df.Synopsis.values
 
