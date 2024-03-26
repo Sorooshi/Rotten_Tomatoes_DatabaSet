@@ -190,6 +190,7 @@ class TuneApplyLstmAe():
         self.data_df = pd.read_csv(data_path)
         self.labels = self.data_df.Genre.values
         self.text_data = self.data_df.Synopsis.values
+        self.data_path = data_path
 
         if verbose >= 4:
             print(
@@ -209,7 +210,7 @@ class TuneApplyLstmAe():
         """ returns, as attributes, the vocabulary (np.arr), its size (int),
         the maximum sequence length (int) and applied ngrams (int). """
 
-        self.get_text_and_labels()
+        self.get_text_and_labels(data_path=self.data_path)
 
         if not os.path.isfile(os.path.join(vocab_path, np_name)): 
             txt_vec = tfkl.TextVectorization(
@@ -447,7 +448,6 @@ class TuneApplyLstmAe():
 
             if latent_dim <= max_seq_len:
 
-                tuner_applier = TuneApplyLstmAe()
                 vocab, _, max_seq_len, ngrams = self.get_vocabulary(
                     vocab_path="./data/", 
                     max_seq_len=max_seq_len, 
@@ -487,13 +487,53 @@ class TuneApplyLstmAe():
         return results
 
 
-    def train_test_tuned_model(self, congifs):
-        vectorized_text, labels, max_len = self.get_preprocess_data(
-            data_path="./data/medium_movies_data.scv",
-        )
-        
-        for k in range(5):
-            print(" to be completed ....")
+    def train_test_tuned_model(self, configs):
+
+        for k in range(1, 2):  
+
+            print(
+                f"configuration {configs} in {k} fold being applied"
+            )
+
+            learning_rate = configs[0]
+            n_epochs = configs[1]
+            latent_dim = configs[2]
+            ngrams = configs[3]
+            max_seq_len = configs[4]
+
+            if latent_dim <= max_seq_len:
+
+                vocab, _, max_seq_len, ngrams = self.get_vocabulary(
+                    vocab_path="./data/", 
+                    max_seq_len=max_seq_len, 
+                    np_name="medium", ngrams=ngrams,
+                )
+                train_data, val_data = self.get_train_test_data(
+                    return_tensors=True
+                )
+
+                mdl = LstmAe(
+                    latent_dim=latent_dim, ngrams=ngrams, 
+                    classification=False, vocabulary=vocab, 
+                    max_seq_len=max_seq_len, 
+                )
+
+                optimizer = tfk.optimizers.SGD(learning_rate=learning_rate)
+                mdl.compile(optimizer=optimizer)
+
+                train_loss, val_loss = mdl.fit(
+                    train_data=train_data, test_data=val_data, n_epochs=n_epochs
+                    )
+
+                data_df = self.data_df
+
+                with open("./data/medium_data_no_link_movies.pickle", "r") as fp:
+                    no_link_movies = pickle.load(fp)
+
+                
+
+
+            
     
     
 if __name__ == "__main__":
