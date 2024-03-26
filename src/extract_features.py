@@ -494,7 +494,7 @@ if __name__ == "__main__":
                 f"Not a reasonable config"
             )
 
-    with open("./LSTM-AE_configs.pickle", "w") as fp:
+    with open("./LSTM-AE_configs.pickle", "wb") as fp:
         pickle.dump(results, fp)
     
     
