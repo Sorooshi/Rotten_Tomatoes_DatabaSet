@@ -431,10 +431,10 @@ if __name__ == "__main__":
     return_tensors = True
     results = {}
     learning_rate = [1e-5, 1e-6]
-    epochs = [2]  # [100, 1000, 10000]
-    latent_dim = [10] # [10, 50, ]
-    ngrams = [1] # [1, 2, ]
-    max_sequence_length = [50] # [50, 100, 175,]
+    epochs = [100, 1000, 10000]
+    latent_dim = [10, 50, ]
+    ngrams = [1, 2, ]
+    max_sequence_length = [50, 100, 175,]
 
     configs = itertools.product(
         learning_rate, epochs, 
