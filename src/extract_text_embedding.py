@@ -199,7 +199,8 @@ class GetConvertedData():
 
         self.get_text_and_labels()
         
-        if not os.path.isfile(os.path.join(self.vocab_path, self.vocab_np_name)): 
+        # check whether the vocabulary exists (in npz format):
+        if not os.path.isfile(os.path.join(self.data_path, self.vocab_np_name)): 
             txt_vec = tfkl.TextVectorization(
                 max_tokens=None, 
                 vocabulary = None,
@@ -216,8 +217,9 @@ class GetConvertedData():
             self.max_seq_len = self.max_seq_len
             self.ngrams = self.ngrams
             
+            # saving vocab as npy
             np.savez(os.path.join(
-                self.vocab_path, self.vocab_np_name), 
+                self.data_path, self.vocab_np_name), 
                 max_seq_len = self.max_seq_len,
                 vocabulary=self.vocabulary, 
                 vocab_size=self.vocab_size,
@@ -225,8 +227,9 @@ class GetConvertedData():
                 )
 
         else:
+            # loading the saved vocab as npy
             data_npz = np.load(
-                os.path.join(self.vocab_path, self.vocab_np_name)
+                os.path.join(self.data_path, self.vocab_np_name)
                 )
             self.vocabulary = data_npz["vocabulary"]
             self.max_seq_len = int(data_npz["max_seq_len"])
