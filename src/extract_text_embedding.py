@@ -58,7 +58,7 @@ class LstmAe(tfk.Model):
                 units=latent_dim,  
                 activation="relu",  
                 dropout=0.1,
-                return_sequences=True,
+                return_sequences=False,
                 name="encoder1"
                 )
             )     
@@ -67,7 +67,7 @@ class LstmAe(tfk.Model):
                 units=int(latent_dim/2),  
                 activation="relu",  
                 dropout=0.1,
-                return_sequences=True,
+                return_sequences=False,
                 name="encoder1"
                 )
             )       
@@ -76,7 +76,7 @@ class LstmAe(tfk.Model):
                 units=int(latent_dim/2),  
                 activation="relu", 
                 dropout=0.1,
-                return_sequences=True,
+                return_sequences=False,
                 name="decoder1"
             )
         )
@@ -441,14 +441,15 @@ class TuneApplyLstmAe():
 
             data_df = self.data_df
 
-            with open("./data/medium_data_no_link_movies.pickle", "r") as fp:
+            with open("./data/medium_data_no_link_movies.pickle", "rb") as fp:
                 no_link_movies = pickle.load(fp)
 
 
             data_df = self.data_df.loc[~self.data_df.Title.isin(no_link_movies)]
 
-            text
+            text_data = data_df.Synopsis.values
 
+            mdl.predict()
 
                  
 
