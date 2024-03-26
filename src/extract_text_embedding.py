@@ -276,9 +276,9 @@ class TuneApplyLstmAe():
                  ngrams : int = 1, 
                  max_seq_len: int = 12, 
                  vocab_np_name: str = "medium.npz", 
-                 data_path: str = "../data",
+                 data_path: str = ".,/data",
                  classification: bool = False, 
-                 data_name: str = "medium_movie_data", 
+                 data_name: str = "medium_movies_data", 
                  verbose: int = 1,
                  *args, **kwargs):
         
