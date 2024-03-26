@@ -163,7 +163,7 @@ class GetConvertedData():
                  verbose: int = 1,
                  *args, **kwargs):
         
-        super(TuneApplyLstmAe, self).__init__(*args, **kwargs)
+        super(GetConvertedData, self).__init__(*args, **kwargs)
         self.labels = None 
         self.data_df = None
         self.text_data = None
@@ -343,9 +343,9 @@ class TuneApplyLstmAe():
             data_getter  = GetConvertedData(
                  ngrams=ngrams, 
                  max_seq_len=max_seq_len, 
-                 vocab_np_name="medium.npz", 
-                 data_path= "../data",
-                 data_name="medium_movie_data", 
+                 vocab_np_name=self.vocab_np_name, 
+                 data_path= self.data_path,
+                 data_name=self.data_name, 
                  verbose=1,
             )
 
@@ -385,7 +385,7 @@ class TuneApplyLstmAe():
 
                 with open("./LSTM-AE_" + str(config) +".pickle", "wb") as fp:
                     pickle.dump(results, fp)
-                    
+
             else:
                 print(
                     f"Not a reasonable config"
