@@ -58,7 +58,7 @@ class LstmAe(tfk.Model):
                 units=latent_dim,  
                 activation="relu",  
                 dropout=0.1,
-                return_sequences=False,
+                return_sequences=True,
                 name="encoder1"
                 )
             )     
@@ -67,7 +67,7 @@ class LstmAe(tfk.Model):
                 units=int(latent_dim/2),  
                 activation="relu",  
                 dropout=0.1,
-                return_sequences=False,
+                return_sequences=True,
                 name="encoder1"
                 )
             )       
@@ -76,7 +76,7 @@ class LstmAe(tfk.Model):
                 units=int(latent_dim/2),  
                 activation="relu", 
                 dropout=0.1,
-                return_sequences=False,
+                return_sequences=True,
                 name="decoder1"
             )
         )
