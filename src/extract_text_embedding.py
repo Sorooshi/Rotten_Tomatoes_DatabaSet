@@ -452,10 +452,6 @@ class TuneApplyLstmAe():
             mdl.predict()
 
                  
-
-            
-    
-    
 if __name__ == "__main__":
     
     tuner_applier = TuneApplyLstmAe(data_path="./data")
