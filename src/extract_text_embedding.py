@@ -450,7 +450,7 @@ class TuneApplyLstmAe():
                 train_data=train_data, test_data=val_data, n_epochs=n_epochs
                 )
 
-            data_df = self.data_df
+            data_getter.get_text_and_labels()
 
             with open("./data/medium_data_no_link_movies.pickle", "rb") as fp:
                 no_link_movies = pickle.load(fp)
