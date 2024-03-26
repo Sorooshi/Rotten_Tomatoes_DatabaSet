@@ -397,7 +397,7 @@ class TuneApplyLstmAe():
         return results
 
 
-    def train_test_tuned_model(self, configs):
+    def train_and_extract_features_tuned_model(self, configs):
 
         for k in range(1, 2):  
 
@@ -421,8 +421,8 @@ class TuneApplyLstmAe():
             )
 
 
-            vocab, _, max_seq_len, ngrams = self.get_vocabulary()
-            train_data, val_data = self.get_train_test_data(
+            vocab, _, max_seq_len, ngrams = data_getter.get_vocabulary()
+            train_data, val_data = data_getter.get_train_test_data(
                 return_tensors=True, batch_size=2,
             )
 
@@ -449,13 +449,50 @@ class TuneApplyLstmAe():
 
             text_data = data_df.Synopsis.values
 
-            mdl.predict()
+            y_preds = mdl.predict(text_data)
+            x = mdl.inputs(text_data)
+            x = mdl.txt_vec(x)
+            embeddings = mdl.emb(x)
+            print(
+                f"embedding {embeddings.shape}"
+            )
+
+            # embeddings is of the size N * max_seq_len * latent_dim
+            # to convert each synopsis embedding into a feature vector,
+            # we compute the average the embedding of each synopsis text over 
+            # the max_seq_len size, i.e., embeddings[i, :].mean(axis=0)
+
+            embedding_features = embeddings.numpy().mean(axis=1)
+            
+            data_df = data_df.join(
+                pd.DataFrame(
+                    data=embedding_features, index=data_df.index,
+                    columns=["Embedding-"+ str(f) for f in range(embedding_features.shape[1])]
+                )
+            )
+            features = ["Runtime", "Box Office (Gross USA)", "Tomato Meter", "Audience Score", 
+            "No. Reviews", "Genre"
+            ]
+            features += ["Embedding-"+ str(f) for f in range(embedding_features.shape[1])]
+
+            data_df_x = data_df[features]
+
+            data_df_x.to_csv("./data/medium_data_df_x.csv", index=True, columns=features)
+            data_df_x.to_csv("./data/medium_data_x.csv", header=False, index=False)
+            
 
                  
 if __name__ == "__main__":
     
     tuner_applier = TuneApplyLstmAe(data_path="./data")
     results = tuner_applier.grid_search_model_hps()
-    
+
     with open("./LSTM-AE_configs.pickle", "wb") as fp:
         pickle.dump(results, fp)
+    
+    # best config
+    config = (1e-5, 5, 5, 1, 10)
+    tuner_applier.train_and_extract_features_tuned_model(configs=config)
+    
+    
+   
