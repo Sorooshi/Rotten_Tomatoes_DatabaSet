@@ -158,7 +158,7 @@ class GetConvertedData():
                  ngrams : int = 1, 
                  max_seq_len: int = 12, 
                  vocab_np_name: str = "medium.npz", 
-                 data_path: str = "../data",
+                 data_path: str = "./data",
                  data_name: str = "medium_movie_data", 
                  verbose: int = 1,
                  *args, **kwargs):
@@ -440,7 +440,7 @@ class TuneApplyLstmAe():
     
 if __name__ == "__main__":
     
-    tuner_applier = TuneApplyLstmAe()
+    tuner_applier = TuneApplyLstmAe(data_path="./data")
     results = tuner_applier.grid_search_model_hps()
     
     with open("./LSTM-AE_configs.pickle", "wb") as fp:
