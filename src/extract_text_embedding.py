@@ -283,6 +283,7 @@ class GetConvertedData():
         else:
             return x_train, y_train, x_test, y_test
 
+
 class TuneApplyLstmAe():
     def __init__(self, 
                  n_epochs: int= 1, 
@@ -506,7 +507,8 @@ if __name__ == "__main__":
             pickle.dump(results, fp)
     else:
         # best config
-        config = (1e-5, 5, 5, 1, 10)
+        # lr, epochs, latent_dim, ngrams, max_seq_len
+        config = (1e-5, 2, 5, 1, 10)
         tuner_applier.train_and_extract_features_tuned_model(configs=config)
 
     
