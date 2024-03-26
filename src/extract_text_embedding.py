@@ -211,8 +211,9 @@ class TuneApplyLstmAe():
         the maximum sequence length (int) and applied ngrams (int). """
 
         self.get_text_and_labels(data_path=self.data_path)
+        self.vocab_path = vocab_path
 
-        if not os.path.isfile(os.path.join(vocab_path, np_name)): 
+        if not os.path.isfile(os.path.join(self.vocab_path, np_name)): 
             txt_vec = tfkl.TextVectorization(
                 max_tokens=None, 
                 vocabulary = None,
@@ -230,7 +231,7 @@ class TuneApplyLstmAe():
             self.ngrams = ngrams
             
             np.savez(os.path.join(
-                vocab_path, np_name), 
+                self.vocab_path, np_name), 
                 max_seq_len = self.max_seq_len,
                 vocabulary=self.vocabulary, 
                 vocab_size=self.vocab_size,
@@ -239,7 +240,7 @@ class TuneApplyLstmAe():
 
         else:
             data_npz = np.load(
-                os.path.join(vocab_path, np_name)
+                os.path.join(self.vocab_path, np_name)
                 )
             self.vocabulary = data_npz["vocabulary"]
             self.max_seq_len = int(data_npz["max_seq_len"])
