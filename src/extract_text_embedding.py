@@ -417,6 +417,76 @@ class TuneApplyLstmAe():
         return best_hps
 
 
+    def grid_search_model_hps(self, ):
+        return_tensors = True
+        results = {}
+        learning_rate = [1e-5, 1e-6]
+        epochs = [100] # [100, 1000, 10000]
+        latent_dim = [10]  #[10, 50, ]
+        ngrams = [1] # [1, 2, ]
+        max_sequence_length = [20]  #[50, 100, 175,]
+
+        configs = itertools.product(
+            learning_rate, epochs, 
+            latent_dim, ngrams,
+            max_sequence_length
+        )
+        
+        for config in configs:
+
+            results[config] = {}
+            learning_rate = config[0]
+            n_epochs = config[1]
+            latent_dim = config[2]
+            ngrams = config[3]
+            max_seq_len = config[4]
+
+            print(
+                f"configuration {config} being applied"
+            )
+
+            if latent_dim <= max_seq_len:
+
+                tuner_applier = TuneApplyLstmAe()
+                vocab, _, max_seq_len, ngrams = self.get_vocabulary(
+                    vocab_path="./data/", 
+                    max_seq_len=max_seq_len, 
+                    np_name="medium", ngrams=ngrams,
+                )
+                if return_tensors is False:
+                    x_train, y_train, x_test, y_test = self.get_train_test_data(
+                        return_tensors=False
+                    )
+                else:
+                    train_data, val_data = self.get_train_test_data(
+                        return_tensors=True
+                    )
+
+                mdl = LstmAe(
+                    latent_dim=latent_dim, ngrams=ngrams, 
+                    classification=False, vocabulary=vocab, 
+                    max_seq_len=max_seq_len, 
+                )
+
+                optimizer = tfk.optimizers.SGD(learning_rate=learning_rate)
+                mdl.compile(optimizer=optimizer)
+
+                train_loss, val_loss = mdl.fit(
+                    train_data=train_data, test_data=val_data, n_epochs=n_epochs
+                    )
+                
+                results[config]["train_loss"] = train_loss
+                results[config]["val_loss"] = val_loss
+                results[config]["config"] = config
+
+            else:
+                print(
+                    f"Not a reasonable config"
+                )
+
+        return results
+
+
     def train_test_tuned_model(self,):
         vectorized_text, labels, max_len = self.get_preprocess_data(
             data_path="./data/medium_movies_data.scv",
@@ -424,77 +494,12 @@ class TuneApplyLstmAe():
         
         for k in range(5):
             print(" to be completed ....")
-
-
-if __name__ == "__main__":
-
-    return_tensors = True
-    results = {}
-    learning_rate = [1e-5, 1e-6]
-    epochs = [100, 1000, 10000]
-    latent_dim = [10, 50, ]
-    ngrams = [1, 2, ]
-    max_sequence_length = [50, 100, 175,]
-
-    configs = itertools.product(
-        learning_rate, epochs, 
-        latent_dim, ngrams,
-        max_sequence_length
-    )
     
-    for config in configs:
-
-        results[config] = {}
-        learning_rate = config[0]
-        n_epochs = config[1]
-        latent_dim = config[2]
-        ngrams = config[3]
-        max_seq_len = config[4]
-
-        print(
-            f"configuration {config} being applied"
-        )
-
-        if latent_dim <= max_seq_len:
-
-            tuner_applier = TuneApplyLstmAe()
-            vocab, vocab_size, max_seq_len, ngrams = tuner_applier.get_vocabulary(
-                vocab_path="./data/", 
-                max_seq_len=max_seq_len, 
-                np_name="medium", ngrams=ngrams,
-            )
-            if return_tensors is False:
-                x_train, y_train, x_test, y_test = tuner_applier.get_train_test_data(
-                    return_tensors=False
-                )
-            else:
-                train_data, val_data = tuner_applier.get_train_test_data(
-                    return_tensors=True
-                )
-
-            mdl = LstmAe(
-                latent_dim=latent_dim, ngrams=ngrams, 
-                classification=False, vocabulary=vocab, 
-                max_seq_len=max_seq_len, 
-            )
-
-            optimizer = tfk.optimizers.SGD(learning_rate=learning_rate)
-            mdl.compile(optimizer=optimizer)
-
-            train_loss, val_loss = mdl.fit(
-                train_data=train_data, test_data=val_data, n_epochs=n_epochs
-                )
-            
-            results[config]["train_loss"] = train_loss
-            results[config]["val_loss"] = val_loss
-            results[config]["config"] = config
-
-        else:
-            print(
-                f"Not a reasonable config"
-            )
-
+    
+if __name__ == "__main__":
+    
+    tuner_applier = TuneApplyLstmAe()
+    results = tuner_applier.grid_search_model_hps()
+    
     with open("./LSTM-AE_configs.pickle", "wb") as fp:
         pickle.dump(results, fp)
-    
-    
