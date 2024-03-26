@@ -201,7 +201,7 @@ class TuneApplyLstmAe():
  
 
     def get_vocabulary(
-            self, vocab_path = "../data/", 
+            self, vocab_path = "./data/", 
             max_seq_len: int = 150,
             np_name = "medium.npz", 
             ngrams : int = 2, 
@@ -251,7 +251,7 @@ class TuneApplyLstmAe():
     def get_train_test_data(self, batch_size=8, return_tensors=True) -> tuple:
 
         vocab, _, max_seq_len, ngrams = self.get_vocabulary(
-            vocab_path="../data/", max_seq_len=150, np_name="medium", ngrams=2,
+            vocab_path="./data/", max_seq_len=150, np_name="medium", ngrams=2,
         )
 
         x_train, x_test, _, _ = train_test_split(
