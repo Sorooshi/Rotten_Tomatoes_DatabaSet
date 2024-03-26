@@ -386,7 +386,7 @@ class TuneApplyLstmAe():
                 results[config]["val_loss"] = val_loss
                 results[config]["config"] = config
 
-                with open("./LSTM-AE_" + str(config) +".pickle", "wb") as fp:
+                with open("./tmp_results/LSTM-AE_" + str(config) +".pickle", "wb") as fp:
                     pickle.dump(results, fp)
 
             else:
@@ -411,30 +411,42 @@ class TuneApplyLstmAe():
             ngrams = configs[3]
             max_seq_len = configs[4]
 
-            if latent_dim <= max_seq_len:
+            data_getter  = GetConvertedData(
+                 ngrams=ngrams, 
+                 max_seq_len=max_seq_len, 
+                 vocab_np_name=self.vocab_np_name, 
+                 data_path= self.data_path,
+                 data_name=self.data_name, 
+                 verbose=1,
+            )
 
-                vocab, _, max_seq_len, ngrams = self.get_vocabulary()
-                train_data, val_data = self.get_train_test_data(
-                    return_tensors=True
+
+            vocab, _, max_seq_len, ngrams = self.get_vocabulary()
+            train_data, val_data = self.get_train_test_data(
+                return_tensors=True, batch_size=2,
+            )
+
+            mdl = LstmAe(
+                latent_dim=latent_dim, ngrams=ngrams, 
+                classification=False, vocabulary=vocab, 
+                max_seq_len=max_seq_len, 
+            )
+
+            optimizer = tfk.optimizers.SGD(learning_rate=learning_rate)
+            mdl.compile(optimizer=optimizer)
+
+            train_loss, val_loss = mdl.fit(
+                train_data=train_data, test_data=val_data, n_epochs=n_epochs
                 )
 
-                mdl = LstmAe(
-                    latent_dim=latent_dim, ngrams=ngrams, 
-                    classification=False, vocabulary=vocab, 
-                    max_seq_len=max_seq_len, 
-                )
+            data_df = self.data_df
 
-                optimizer = tfk.optimizers.SGD(learning_rate=learning_rate)
-                mdl.compile(optimizer=optimizer)
+            with open("./data/medium_data_no_link_movies.pickle", "r") as fp:
+                no_link_movies = pickle.load(fp)
 
-                train_loss, val_loss = mdl.fit(
-                    train_data=train_data, test_data=val_data, n_epochs=n_epochs
-                    )
+            
+            data_df = data_df.drop(no_link_movies)
 
-                data_df = self.data_df
-
-                with open("./data/medium_data_no_link_movies.pickle", "r") as fp:
-                    no_link_movies = pickle.load(fp)
 
                  
 
