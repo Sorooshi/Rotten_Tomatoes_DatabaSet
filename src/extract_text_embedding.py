@@ -202,10 +202,10 @@ class TuneApplyLstmAe():
  
 
     def get_vocabulary(
-            self, vocab_path = "./data/", 
-            max_seq_len: int = 150,
-            np_name = "medium.npz", 
-            ngrams : int = 2, 
+            self, vocab_path: str, 
+            max_seq_len: int,
+            np_name : str, 
+            ngrams : int, 
             ) -> tuple:
         """ returns, as attributes, the vocabulary (np.arr), its size (int),
         the maximum sequence length (int) and applied ngrams (int). """
@@ -223,7 +223,7 @@ class TuneApplyLstmAe():
                 standardize="lower_and_strip_punctuation",
                 )
             txt_vec.adapt(
-                data=self.text_data, batch_size=2, steps=None
+                data=self.text_data, batch_size=1, steps=None
                 )
             self.vocabulary = txt_vec.get_vocabulary()
             self.vocab_size = txt_vec.vocabulary_size()
