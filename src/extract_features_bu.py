@@ -432,7 +432,6 @@ class FineTuneLstmAe(TrainTestLstmAe):
 
         return best_hps
 
-
 class TuneApplyLstmAe():
     def __init__(self, 
                  n_epochs: int= 1, 
