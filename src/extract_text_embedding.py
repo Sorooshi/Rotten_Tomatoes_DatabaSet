@@ -324,9 +324,9 @@ class TuneApplyLstmAe():
         results = {}
         learning_rate = [1e-5, 1e-6]
         epochs = [100, 1000, 10000]
-        latent_dim = [5, 10, 40]
+        latent_dim = [5, 10, 50]
         ngrams = [1, 2, ]
-        max_sequence_length = [10, 50, 100, 175]
+        max_sequence_length = [10, 100, 175]
 
         configs = itertools.product(
             learning_rate, epochs, 
