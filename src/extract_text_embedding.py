@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(description="Extract DF Features")
 parser.add_argument(
         "-tt", "--to_tune", default=0, type=int,
         help="To fine-tune the model, when it is set to 1, "
-        "or to extract with fine-tuned hyper-params."
+        "or to extract with fine-tuned hyper-params, o.w."
         )
 
 
