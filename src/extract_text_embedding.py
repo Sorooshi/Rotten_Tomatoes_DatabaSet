@@ -495,7 +495,7 @@ class TuneApplyLstmAe():
 if __name__ == "__main__":
     
     args = parser.parse_args()
-    to_tune = args.size
+    to_tune = args.to_tune
     
     tuner_applier = TuneApplyLstmAe(data_path="./data")
     if to_tune == 1:
