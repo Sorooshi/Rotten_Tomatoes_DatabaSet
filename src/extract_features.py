@@ -107,10 +107,9 @@ class LstmAe(tfk.Model):
             y_pred = self.call(x, training=True)
             y_true = self.inputs(self.txt_vec(x))
             loss_value = self.loss_fn(y_true, y_pred)
-            train_metric = self.train_metric.update_state(y_true, y_pred)
-
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
+        train_metric = self.train_metric(y_true, y_pred)
         return loss_value, train_metric
     
     @tf.function
