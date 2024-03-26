@@ -459,7 +459,7 @@ if __name__ == "__main__":
 
             tuner_applier = TuneApplyLstmAe()
             vocab, vocab_size, max_seq_len, ngrams = tuner_applier.get_vocabulary(
-                vocab_path="../data/", 
+                vocab_path="./data/", 
                 max_seq_len=max_seq_len, 
                 np_name="medium", ngrams=ngrams,
             )
