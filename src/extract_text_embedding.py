@@ -197,7 +197,7 @@ class GetConvertedData():
         """ returns, as attributes, the vocabulary (np.arr), its size (int),
         the maximum sequence length (int) and applied ngrams (int). """
 
-        self.get_text_and_labels(data_path=self.data_path)
+        self.get_text_and_labels()
         
         if not os.path.isfile(os.path.join(self.vocab_path, self.vocab_np_name)): 
             txt_vec = tfkl.TextVectorization(
