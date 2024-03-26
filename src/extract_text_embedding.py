@@ -221,7 +221,7 @@ class TuneApplyLstmAe():
                 standardize="lower_and_strip_punctuation",
                 )
             txt_vec.adapt(
-                data=self.text_data, batch_size=8, steps=None
+                data=self.text_data, batch_size=2, steps=None
                 )
             self.vocabulary = txt_vec.get_vocabulary()
             self.vocab_size = txt_vec.vocabulary_size()
@@ -421,7 +421,7 @@ class TuneApplyLstmAe():
         return_tensors = True
         results = {}
         learning_rate = [1e-5, 1e-6]
-        epochs = [100] # [100, 1000, 10000]
+        epochs = [2] # [100, 1000, 10000]
         latent_dim = [10]  #[10, 50, ]
         ngrams = [1] # [1, 2, ]
         max_sequence_length = [20]  #[50, 100, 175,]
