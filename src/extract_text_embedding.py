@@ -252,10 +252,7 @@ class TuneApplyLstmAe():
 
     def get_train_test_data(self, batch_size=8, return_tensors=True) -> tuple:
 
-        vocab, _, max_seq_len, ngrams = self.get_vocabulary(
-            vocab_path="./data/", max_seq_len=150, np_name="medium", ngrams=2,
-        )
-
+        vocab, _, max_seq_len, ngrams = self.get_vocabulary()
         x_train, x_test, _, _ = train_test_split(
             self.text_data, self.labels, test_size=0.05
             )
