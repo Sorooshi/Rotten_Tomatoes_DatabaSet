@@ -185,7 +185,7 @@ class TuneApplyLstmAe():
     
     def get_text_and_labels(
             self, data_path: 
-            str="../data/medium_movies_data.csv", ):
+            str="./data/medium_movies_data.csv", ):
 
         self.data_df = pd.read_csv(data_path)
         self.labels = self.data_df.Genre.values
@@ -419,7 +419,7 @@ class TuneApplyLstmAe():
 
     def train_test_tuned_model(self,):
         vectorized_text, labels, max_len = self.get_preprocess_data(
-            data_path="../data/medium_movies_data.scv",
+            data_path="./data/medium_movies_data.scv",
         )
         
         for k in range(5):
