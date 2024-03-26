@@ -16,7 +16,8 @@ class LstmAe(tfk.Model):
                  ngrams : int = 2,
                  vocabulary: list = None,
                  classification: bool = True, 
-                 max_seq_len: int = 100, *args, **kwargs):
+                 max_seq_len: int = 100, 
+                 *args, **kwargs):
         super(LstmAe, self).__init__(*args, **kwargs)
         self.max_seq_len = max_seq_len
         if classification:
@@ -152,46 +153,37 @@ class LstmAe(tfk.Model):
         return train_total_loss, val_total_loss
 
 
-class TuneApplyLstmAe():
-    def __init__(self, n_epochs: int= 1, 
-                 classification: bool = False, *args, **kwargs):
-        super(TuneApplyLstmAe, self).__init__(*args, **kwargs)
-        self.data_df = None
-        self.labels = None 
-        self.text_data = None
-        self.vocabulary = None
-        self.n_epochs = n_epochs
-        self.classification = classification
-        self.lstm_ae = None
-
-        if self.classification:
-            assert classification is not True, "there are some fundamental theoretical issues to be address."
-            self.pred_activation = "softmax"
-            self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(
-                name="loss_fn", reduction="sum_over_batch_size"
-            )
-            self.metric = ["accuracy"]
-            self.proj_name = "LSTM_AE-Cls"
-            self.dir_path = "./"
-        else:
-            self.pred_activation = "tanh"
-            self.loss_fn = tfk.losses.Huber(
-                name="loss_fn", reduction="sum_over_batch_size",
-            )
-            self.metric = ["logcosh"]
-            self.proj_name = "LSTM_AE-Reg"
-            self.dir_path = "./"
+class GetConvertedData():
+    def __init__(self, 
+                 ngrams : int = 1, 
+                 max_seq_len: int = 12, 
+                 vocab_np_name: str = "medium.npz", 
+                 data_path: str = "../data",
+                 data_name: str = "medium_movie_data", 
+                 verbose: int = 1,
+                 *args, **kwargs):
         
+        super(TuneApplyLstmAe, self).__init__(*args, **kwargs)
+        self.labels = None 
+        self.data_df = None
+        self.text_data = None
+        self.ngrams =  ngrams 
+        self.vocabulary = None
+        self.verbose = verbose
+        self.data_path = data_path
+        self.data_name = data_name
+        self.max_seq_len = max_seq_len
+        self.vocab_np_name = vocab_np_name
     
-    def get_text_and_labels(
-            self, data_path: 
-            str="./data/medium_movies_data.csv", ):
-
-        self.data_df = pd.read_csv(data_path)
+    def get_text_and_labels(self,):
+        """ returns, as attributes, data_df, synopsis (np.arr), and labels (np.arr)"""
+        self.data_df = pd.read_csv(os.path.join(
+            self.data_path, self.data_name + ".csv"
+            )
+        )
         self.labels = self.data_df.Genre.values
         self.text_data = self.data_df.Synopsis.values
-        self.data_path = data_path
-
+        
         if verbose >= 4:
             print(
                 f"text data head: \n {self.text_data[:3]} \n" 
@@ -201,24 +193,18 @@ class TuneApplyLstmAe():
             ) 
  
 
-    def get_vocabulary(
-            self, vocab_path: str, 
-            max_seq_len: int,
-            np_name : str, 
-            ngrams : int, 
-            ) -> tuple:
+    def get_vocabulary(self,) -> tuple:
         """ returns, as attributes, the vocabulary (np.arr), its size (int),
         the maximum sequence length (int) and applied ngrams (int). """
 
         self.get_text_and_labels(data_path=self.data_path)
-        self.vocab_path = vocab_path
-
-        if not os.path.isfile(os.path.join(self.vocab_path, np_name)): 
+        
+        if not os.path.isfile(os.path.join(self.vocab_path, self.vocab_np_name)): 
             txt_vec = tfkl.TextVectorization(
                 max_tokens=None, 
                 vocabulary = None,
                 output_sequence_length=None,  # max_seq_len
-                split="whitespace", ngrams=ngrams, 
+                split="whitespace", ngrams=self.ngrams, 
                 output_mode="int", ragged=False,
                 standardize="lower_and_strip_punctuation",
                 )
@@ -227,11 +213,11 @@ class TuneApplyLstmAe():
                 )
             self.vocabulary = txt_vec.get_vocabulary()
             self.vocab_size = txt_vec.vocabulary_size()
-            self.max_seq_len = max_seq_len
-            self.ngrams = ngrams
+            self.max_seq_len = self.max_seq_len
+            self.ngrams = self.ngrams
             
             np.savez(os.path.join(
-                self.vocab_path, np_name), 
+                self.vocab_path, self.vocab_np_name), 
                 max_seq_len = self.max_seq_len,
                 vocabulary=self.vocabulary, 
                 vocab_size=self.vocab_size,
@@ -240,7 +226,7 @@ class TuneApplyLstmAe():
 
         else:
             data_npz = np.load(
-                os.path.join(self.vocab_path, np_name)
+                os.path.join(self.vocab_path, self.vocab_np_name)
                 )
             self.vocabulary = data_npz["vocabulary"]
             self.max_seq_len = int(data_npz["max_seq_len"])
@@ -250,9 +236,9 @@ class TuneApplyLstmAe():
         return self.vocabulary, self.vocab_size, self.max_seq_len, self.ngrams
     
 
-    def get_train_test_data(self, batch_size=8, return_tensors=True) -> tuple:
+    def get_train_test_data(self, batch_size=2, return_tensors=True) -> tuple:
 
-        vocab, _, max_seq_len, ngrams = self.get_vocabulary()
+        vocab, vocab_size, max_seq_len, ngrams = self.get_vocabulary()
         x_train, x_test, _, _ = train_test_split(
             self.text_data, self.labels, test_size=0.05
             )
@@ -284,146 +270,60 @@ class TuneApplyLstmAe():
         else:
             return x_train, y_train, x_test, y_test
 
-
-    def build(self, hp):
-        hp_units = hp.Int(
-            'units', min_value=32, max_value=256, step=32
-            )
-        hp_latent_dim = hp.Int(
-            'units', min_value=10, max_value=50, step=5
-            )
-        hp_activation = hp.Choice(
-            'activation', values = ["relu", "tanh", ] 
-            )
-        hp_learning_rate = hp.Choice(
-            'learning_rate', values=[1e-3, 1e-4, 1e-5, 1e-6]
-            )
-        hp_dropout = hp.Choice(
-            'dropout', values=[0.0, 0.1, 0.4]
-            )
-
-        model = tfk.Sequential()
-        model.add(
-            tfkl.Input(shape=(1,),
-                       dtype=tf.string,)
-        )
-        model.add(
-            tfkl.TextVectorization(
-            max_tokens=None, 
-            vocabulary = self.vocabulary,
-            split="whitespace", ngrams=self.ngrams, 
-            output_mode="int", ragged=False,
-            output_sequence_length=self.max_seq_len,
-            standardize="lower_and_strip_punctuation",
-            )
-        ) 
-        model.add(
-            tfkl.Embedding(
-            input_dim=self.lstm_ae.txt_vec.vocabulary_size(),
-            output_dim=hp_latent_dim,
-            )
-        )
-        model.add( 
-            tfkl.Bidirectional(
-                tfkl.LSTM(
-                units=hp_units,  
-                activation=hp_activation,  
-                dropout=hp_dropout,
-                return_sequences=True,
-                name="encoder1"
-                )
-            )
-        )
-        model.add(
-            tfkl.Bidirectional(
-            tfkl.LSTM(
-                units=hp_units,  
-                activation=hp_activation, 
-                dropout=hp_dropout,
-                return_sequences=True,
-                name="decoder1")
-                )
-        )
-        model.add(
-            tfkl.Bidirectional(
-            tfkl.LSTM(
-                units=hp_units,  
-                activation=hp_activation, 
-                dropout=hp_dropout,
-                return_sequences=True,
-                name="decoder2")
-                )
-        )
-        model.add(
-            tfkl.Dense(
-            units=hp_units, 
-            activation=hp_activation,
-            )
-        )
-        model.add(
-            tfkl.Dense(
-            units=self.max_seq_len, activation=self.pred_activation,
-            )
-        )
-
-        model.compile(
-            loss=self.loss_fn,
-            optimizer=tfk.optimizers.SGD(learning_rate=hp_learning_rate),
-            metrics=self.metric,
-        )
-
-        return model
-
-
-    def fine_tune_the_model(self, return_tensors=False):
+class TuneApplyLstmAe():
+    def __init__(self, 
+                 n_epochs: int= 1, 
+                 ngrams : int = 1, 
+                 max_seq_len: int = 12, 
+                 vocab_np_name: str = "medium.npz", 
+                 data_path: str = "../data",
+                 classification: bool = False, 
+                 data_name: str = "medium_movie_data", 
+                 verbose: int = 1,
+                 *args, **kwargs):
         
-        hps = kt.HyperParameters()
-        model = self.build(hp=hps)
+        super(TuneApplyLstmAe, self).__init__(*args, **kwargs)
+        self.labels = None 
+        self.lstm_ae = None
+        self.data_df = None
+        self.text_data = None
+        self.ngrams =  ngrams 
+        self.vocabulary = None
+        self.verbose = verbose
+        self.n_epochs = n_epochs
+        self.data_path = data_path
+        self.data_name = data_name
+        self.max_seq_len = max_seq_len
+        self.vocab_np_name = vocab_np_name
+        self.classification = classification
         
-        tuner = kt.BayesianOptimization(
-            hypermodel=model, 
-            objective="val_accuracy", 
-            max_trials=10, 
-            executions_per_trial=5,
-            overwrite=True,
-            directory=self.dir_path,
-            project_name=self.proj_name,
+        if self.classification:
+            assert classification is not True, "there are some fundamental theoretical issues to be address."
+            self.pred_activation = "softmax"
+            self.loss_fn = tfk.losses.SparseCategoricalCrossentropy(
+                name="loss_fn", reduction="sum_over_batch_size"
             )
-
-        print(tuner.search_space_summary())
-
-        if return_tensors:
-            train_data, val_data = self.get_train_test_data(
-                batch_size=8, return_tensors=True
-                )
-            tuner.search(
-            train_data, epochs=10, validation_data=val_data
-            )
+            self.metric = ["accuracy"]
+            self.proj_name = "LSTM_AE-Cls"
+            self.dir_path = "./"
         else:
-            x_train, y_train, x_test, \
-                y_test = self.get_train_test_data(return_tensors=False)
-            
-            tuner.search(
-            x_train, y_train, epochs=10, validation_data=(x_test, y_test)
+            self.pred_activation = "tanh"
+            self.loss_fn = tfk.losses.Huber(
+                name="loss_fn", reduction="sum_over_batch_size",
             )
+            self.metric = ["logcosh"]
+            self.proj_name = "LSTM_AE-Reg"
+            self.dir_path = "./"
         
-        # models = tuner.get_best_models(num_models=1)
-        best_hps = tuner.get_best_hyperparameters(2)
-        
-        with open(os.path.join("./best_hps" + self.proj_name), 'r') as fp:
-            fp.pickle(best_hps)
-
-        return best_hps
-
-
     def grid_search_model_hps(self, ):
+
         return_tensors = True
         results = {}
         learning_rate = [1e-5, 1e-6]
-        epochs = [100, 1000, 10000]
-        latent_dim = [10, 50, ]
-        ngrams = [1, 2, ]
-        max_sequence_length = [50, 100, 175,]
+        epochs = [2] # [100, 1000, 10000]
+        latent_dim = [10] # [10, 50, ]
+        ngrams = [1] # [1, 2, ]
+        max_sequence_length = [12] # [50, 100, 175,]
 
         configs = itertools.product(
             learning_rate, epochs, 
@@ -440,24 +340,30 @@ class TuneApplyLstmAe():
             ngrams = config[3]
             max_seq_len = config[4]
 
+            data_getter  = GetConvertedData(
+                 ngrams=ngrams, 
+                 max_seq_len=max_seq_len, 
+                 vocab_np_name="medium.npz", 
+                 data_path= "../data",
+                 data_name="medium_movie_data", 
+                 verbose=1,
+            )
+
             print(
                 f"configuration {config} being applied"
             )
 
             if latent_dim <= max_seq_len:
 
-                vocab, _, max_seq_len, ngrams = self.get_vocabulary(
-                    vocab_path="./data/", 
-                    max_seq_len=max_seq_len, 
-                    np_name="medium", ngrams=ngrams,
-                )
+                vocab, _, max_seq_len, ngrams = data_getter.get_vocabulary()
+
                 if return_tensors is False:
-                    x_train, y_train, x_test, y_test = self.get_train_test_data(
+                    x_train, y_train, x_test, y_test = data_getter.get_train_test_data(
                         return_tensors=False
                     )
                 else:
-                    train_data, val_data = self.get_train_test_data(
-                        return_tensors=True
+                    train_data, val_data = data_getter.get_train_test_data(
+                        return_tensors=True, batch_size=2,
                     )
 
                 mdl = LstmAe(
@@ -477,6 +383,9 @@ class TuneApplyLstmAe():
                 results[config]["val_loss"] = val_loss
                 results[config]["config"] = config
 
+                with open("./LSTM-AE_" + str(config) +".pickle", "wb") as fp:
+                    pickle.dump(results, fp)
+                    
             else:
                 print(
                     f"Not a reasonable config"
@@ -501,11 +410,7 @@ class TuneApplyLstmAe():
 
             if latent_dim <= max_seq_len:
 
-                vocab, _, max_seq_len, ngrams = self.get_vocabulary(
-                    vocab_path="./data/", 
-                    max_seq_len=max_seq_len, 
-                    np_name="medium", ngrams=ngrams,
-                )
+                vocab, _, max_seq_len, ngrams = self.get_vocabulary()
                 train_data, val_data = self.get_train_test_data(
                     return_tensors=True
                 )
@@ -528,8 +433,7 @@ class TuneApplyLstmAe():
                 with open("./data/medium_data_no_link_movies.pickle", "r") as fp:
                     no_link_movies = pickle.load(fp)
 
-                
-
+                 
 
             
     
