@@ -1,5 +1,6 @@
 import os
 import pickle
+import argparse
 import itertools
 import numpy as np
 import pandas as pd
@@ -10,6 +11,15 @@ from sklearn.model_selection import train_test_split
 verbose = 1
 tfk = tf.keras 
 tfkl = tf.keras.layers
+
+parser = argparse.ArgumentParser(description="Extract DF Features")
+
+parser.add_argument(
+        "-tt", "--to_tune", default=0, type=int,
+        help="To fine-tune the model, when it is set to 1, "
+        "or to extract with fine-tuned hyper-params."
+        )
+
 
 class LstmAe(tfk.Model):
     def __init__(self, latent_dim: int = 50, 
@@ -484,15 +494,20 @@ class TuneApplyLstmAe():
                  
 if __name__ == "__main__":
     
+    args = parser.parse_args()
+    to_tune = args.size
+    
     tuner_applier = TuneApplyLstmAe(data_path="./data")
-    results = tuner_applier.grid_search_model_hps()
+    if to_tune == 1:
 
-    with open("./LSTM-AE_configs.pickle", "wb") as fp:
-        pickle.dump(results, fp)
-    
-    # best config
-    config = (1e-5, 5, 5, 1, 10)
-    tuner_applier.train_and_extract_features_tuned_model(configs=config)
-    
+        results = tuner_applier.grid_search_model_hps()
+
+        with open("./LSTM-AE_configs.pickle", "wb") as fp:
+            pickle.dump(results, fp)
+    else:
+        # best config
+        config = (1e-5, 5, 5, 1, 10)
+        tuner_applier.train_and_extract_features_tuned_model(configs=config)
+
     
    
