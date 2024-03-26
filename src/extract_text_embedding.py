@@ -132,7 +132,7 @@ class LstmAe(tfk.Model):
                 # print(x_batch_train.shape, y_batch_train.shape)
                 loss_value, train_metric = self.train_step(x=x_batch_train, y=y_batch_train)
                 tmp_train_metric.append(train_metric) 
-                if step % 50 == 0:
+                if step % 200 == 0:
                     print(
                         "Training loss and metric (for one batch) at step %d: %.3f, %.3f"
                         % (step, loss_value, train_metric)
@@ -159,7 +159,7 @@ class GetConvertedData():
                  max_seq_len: int = 12, 
                  vocab_np_name: str = "medium.npz", 
                  data_path: str = "./data",
-                 data_name: str = "medium_movie_data", 
+                 data_name: str = "medium_movies_data", 
                  verbose: int = 1,
                  *args, **kwargs):
         
@@ -323,10 +323,10 @@ class TuneApplyLstmAe():
         return_tensors = True
         results = {}
         learning_rate = [1e-5, 1e-6]
-        epochs = [2] # [100, 1000, 10000]
-        latent_dim = [10] # [10, 50, ]
-        ngrams = [1] # [1, 2, ]
-        max_sequence_length = [12] # [50, 100, 175,]
+        epochs = [100, 1000, 10000]
+        latent_dim = [10, 50, ]
+        ngrams = [1, 2, ]
+        max_sequence_length = [50, 100, 175,]
 
         configs = itertools.product(
             learning_rate, epochs, 
@@ -444,8 +444,10 @@ class TuneApplyLstmAe():
             with open("./data/medium_data_no_link_movies.pickle", "r") as fp:
                 no_link_movies = pickle.load(fp)
 
-            
-            data_df = data_df.drop(no_link_movies)
+
+            data_df = self.data_df.loc[~self.data_df.Title.isin(no_link_movies)]
+
+            text
 
 
                  
