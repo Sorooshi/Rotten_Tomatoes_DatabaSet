@@ -343,7 +343,7 @@ class TuneApplyLstmAe():
         return_tensors = True
         results = {}
         learning_rate = [1e-5, 1e-6]
-        epochs = [100, 1000, 10000]
+        epochs = [10, 100, 2000]
         latent_dim = [5, 10, 50]
         ngrams = [1, 2, ]
         max_sequence_length = [10, 100, 175]
