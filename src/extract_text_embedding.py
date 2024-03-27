@@ -217,13 +217,14 @@ class GetConvertedData():
         the maximum sequence length (int) and applied ngrams (int). """
 
         df, txt, labels = self.get_text_and_labels()
+        txt = tf.data.Dataset.from_tensor_slices(txt)
         
         # check whether the vocabulary exists (in npz format):
         if not os.path.isfile(os.path.join(self.data_path, self.vocab_np_name)): 
             txt_vec = tfkl.TextVectorization(
                 max_tokens=None, 
                 vocabulary = None,
-                output_sequence_length=None,  # max_seq_len
+                output_sequence_length=None, 
                 split="whitespace", ngrams=self.ngrams, 
                 output_mode="int", ragged=False,
                 standardize="lower_and_strip_punctuation",
@@ -231,7 +232,7 @@ class GetConvertedData():
             print("txt_vec:", txt_vec)
             print(self.text_data, self.text_data.shape, )
             txt_vec.adapt(
-                data=self.text_data, batch_size=1, steps=None
+                data=txt, batch_size=1, steps=None
                 )
             self.vocabulary = txt_vec.get_vocabulary()
             self.vocab_size = txt_vec.vocabulary_size()
