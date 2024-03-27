@@ -198,6 +198,7 @@ class GetConvertedData():
             self.data_path, self.data_name + ".csv"
             )
         )
+        self.data_df.dropna(inplace=True)
         self.labels = self.data_df.Genre.values
         self.text_data = self.data_df.Synopsis.values
         
@@ -221,6 +222,7 @@ class GetConvertedData():
         
         # check whether the vocabulary exists (in npz format):
         if not os.path.isfile(os.path.join(self.data_path, self.vocab_np_name)): 
+
             txt_vec = tfkl.TextVectorization(
                 max_tokens=None, 
                 vocabulary = None,
@@ -232,7 +234,7 @@ class GetConvertedData():
             print("txt_vec:", txt_vec)
             print(self.text_data, self.text_data.shape, )
             txt_vec.adapt(
-                data=txt, batch_size=1, steps=None
+                data=self.text_data, batch_size=1, steps=None
                 )
             self.vocabulary = txt_vec.get_vocabulary()
             self.vocab_size = txt_vec.vocabulary_size()
