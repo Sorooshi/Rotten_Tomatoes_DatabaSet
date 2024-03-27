@@ -231,8 +231,6 @@ class GetConvertedData():
                 output_mode="int", ragged=False,
                 standardize="lower_and_strip_punctuation",
                 )
-            print("txt_vec:", txt_vec)
-            print(self.text_data, self.text_data.shape, )
             txt_vec.adapt(
                 data=self.text_data, batch_size=1, steps=None
                 )
