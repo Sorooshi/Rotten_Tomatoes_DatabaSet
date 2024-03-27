@@ -498,9 +498,15 @@ class TuneApplyLstmAe():
                     columns=["Embedding-"+ str(f) for f in range(embedding_features.shape[1])]
                 )
             )
-            features = ["Runtime", "Box Office (Gross USA)", "Tomato Meter", "Audience Score", 
-            "No. Reviews", "Genre"
-            ]
+            if self.data_name == "medium_movies_data":
+                features = ["Runtime", "Box Office (Gross USA)", "Tomato Meter", "Audience Score", 
+                "No. Reviews", "Genre"
+                ]
+            elif self.data_name == "large_movies_data":
+                features = ["Runtime", "Tomato Meter", "Audience Score", 
+                "No. Reviews", "Genre"
+                ]
+
             features += ["Embedding-"+ str(f) for f in range(embedding_features.shape[1])]
 
             data_df_x = data_df[features]
