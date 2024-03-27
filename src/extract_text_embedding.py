@@ -12,12 +12,19 @@ verbose = 1
 tfk = tf.keras 
 tfkl = tf.keras.layers
 
-parser = argparse.ArgumentParser(description="Extract DF Features")
+parser = argparse.ArgumentParser(
+    description="Extract DF Features"
+    )
 
 parser.add_argument(
         "-tt", "--to_tune", default=0, type=int,
-        help="To fine-tune the model, when it is set to 1, "
-        "or to extract with fine-tuned hyper-params, o.w."
+        help="To fine-tune the model (1), or to "
+        "extract features with the fine-tuned hps (0)."
+        )
+
+parser.add_argument(
+        "-dn", "--data_name", default="medium", type=str,
+        help="The data set name, either, medium or large."
         )
 
 
@@ -499,13 +506,27 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     to_tune = args.to_tune
+    d_name = args.data_name
     
-    tuner_applier = TuneApplyLstmAe(data_path="./data")
+
+    if d_name == "medium":
+        data_name = "medium_movies_data"
+        vocab_np_name = "medium.npz"
+    elif d_name == "large":
+        data_name = "large_movies_data"
+        vocab_np_name = "large.npz"
+
+    tuner_applier = TuneApplyLstmAe(
+        data_path="./data",
+        data_name=data_name,  
+        vocab_np_name=vocab_np_name
+        )
+    
     if to_tune == 1:
 
         results = tuner_applier.grid_search_model_hps()
 
-        with open("./LSTM-AE_configs.pickle", "wb") as fp:
+        with open("./LSTM-AE_configs" + d_name +".pickle", "wb") as fp:
             pickle.dump(results, fp)
     else:
         # best config
