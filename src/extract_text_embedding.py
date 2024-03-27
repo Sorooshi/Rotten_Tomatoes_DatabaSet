@@ -201,7 +201,7 @@ class GetConvertedData():
         self.labels = self.data_df.Genre.values
         self.text_data = self.data_df.Synopsis.values
         
-        if verbose >= 4:
+        if verbose >= 0:
             print(
                 f"text data head: \n {self.text_data[:3]} \n" 
                 f"text data shape: {self.text_data.shape} \n"
