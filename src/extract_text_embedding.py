@@ -460,9 +460,14 @@ class TuneApplyLstmAe():
                 )
 
             data_df, _, _ = data_getter.get_text_and_labels()
-
-            with open("./data/medium_data_no_link_movies.pickle", "rb") as fp:
-                no_link_movies = pickle.load(fp)
+            
+            if self.data_name == "medium_movies_data":
+                with open("./data/medium_data_no_link_movies.pickle", "rb") as fp:
+                    no_link_movies = pickle.load(fp)
+                    
+            elif self.data_name == "large_movies_data":
+                with open("./data/large_data_no_link_movies.pickle", "rb") as fp:
+                    no_link_movies = pickle.load(fp)
 
 
             data_df = data_df.loc[~data_df.Title.isin(no_link_movies)]
