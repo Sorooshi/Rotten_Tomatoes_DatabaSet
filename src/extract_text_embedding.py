@@ -464,7 +464,7 @@ class TuneApplyLstmAe():
             if self.data_name == "medium_movies_data":
                 with open("./data/medium_data_no_link_movies.pickle", "rb") as fp:
                     no_link_movies = pickle.load(fp)
-                    
+
             elif self.data_name == "large_movies_data":
                 with open("./data/large_data_no_link_movies.pickle", "rb") as fp:
                     no_link_movies = pickle.load(fp)
@@ -501,12 +501,16 @@ class TuneApplyLstmAe():
             features += ["Embedding-"+ str(f) for f in range(embedding_features.shape[1])]
 
             data_df_x = data_df[features]
-
-            data_df_x.to_csv("./data/medium_data_df_x.csv", index=True, columns=features)
-            data_df_x.to_csv("./data/medium_data_x.csv", header=False, index=False)
             
+            if self.data_name == "medium_movies_data":
+                data_df_x.to_csv("./data/medium_data_df_x.csv", index=True, columns=features)
+                data_df_x.to_csv("./data/medium_data_x.csv", header=False, index=False)
 
-                 
+            elif self.data_name == "large_movies_data":
+                data_df_x.to_csv("./data/large_data_df_x.csv", index=True, columns=features)
+                data_df_x.to_csv("./data/large_data_x.csv", header=False, index=False)
+
+            
 if __name__ == "__main__":
     
     args = parser.parse_args()
