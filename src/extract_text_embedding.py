@@ -409,9 +409,10 @@ class TuneApplyLstmAe():
                 results[config]["val_loss"] = val_loss
                 results[config]["config"] = config
 
-                with open("./tmp_results/LSTM-AE_" + str(config) +".pickle", "wb") as fp:
+                with open(
+                    "./tmp_results/LSTM-AE_" + self.data_name + \
+                        str(config) + ".pickle", "wb" ) as fp:
                     pickle.dump(results, fp)
-
             else:
                 print(
                     f"Not a reasonable config"
