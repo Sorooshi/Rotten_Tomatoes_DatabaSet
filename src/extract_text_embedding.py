@@ -201,7 +201,7 @@ class GetConvertedData():
         self.labels = self.data_df.Genre.values
         self.text_data = self.data_df.Synopsis.values
         
-        if verbose >= 0:
+        if verbose >= 4:
             print(
                 f"text data head: \n {self.text_data[:3]} \n" 
                 f"text data shape: {self.text_data.shape} \n"
@@ -216,7 +216,7 @@ class GetConvertedData():
         """ returns, as attributes, the vocabulary (np.arr), its size (int),
         the maximum sequence length (int) and applied ngrams (int). """
 
-        _, _, _ = self.get_text_and_labels()
+        df, txt, labels = self.get_text_and_labels()
         
         # check whether the vocabulary exists (in npz format):
         if not os.path.isfile(os.path.join(self.data_path, self.vocab_np_name)): 
