@@ -172,6 +172,12 @@ if __name__ == "__main__":
         max_features=1000, 
     )
 
-    print("data_x_df is extracted!")
+    df = tfidf_getter.get_feature_data()
+    
+    print(
+        f"df.head: {df.head()} \n"
+        f"df.describe: {df.describe()} \n"
+        f"df.shape: {df.shape} \n"
+    )
 
 
