@@ -93,9 +93,9 @@ class ExtractTfIdf():
         print(x.toarray().shape)
 
         tf_idf = pd.DataFrame(
-            x.toarray(), index=self.data_df.Title, 
+            x.toarray(), index=self.data_df.index, 
             columns=vectorizer.get_feature_names()
-            )
+        )
         
         return tf_idf
     
