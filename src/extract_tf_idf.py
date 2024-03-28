@@ -181,7 +181,7 @@ if __name__ == "__main__":
     tfidf_getter = ExtractTfIdf(
         data_df=data_df, 
         corpus=text_data, 
-        max_features=1000, 
+        max_features=10, 
     )
 
     df = tfidf_getter.get_feature_data()
