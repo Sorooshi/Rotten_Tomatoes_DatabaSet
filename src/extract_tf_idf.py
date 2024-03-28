@@ -28,7 +28,7 @@ class ExtractTfIdf():
                 corpus: np.array, 
                 max_features: int,
                 data_df: pd.DataFrame, 
-                ngrams_rng: tuple = (1, 2), 
+                ngrams_rng: tuple = (2, 2), 
                 data_name: str = "medium_movies_data",
                 *args, **kwargs):
         super(*args, **kwargs).__init__()
@@ -184,7 +184,9 @@ if __name__ == "__main__":
     tfidf_getter = ExtractTfIdf(
         data_df=data_df, 
         corpus=text_data, 
-        max_features=10, 
+        max_features=10000, 
+        ngrams_rng=(2, 2),
+
     )
 
     df = tfidf_getter.get_feature_data()
