@@ -80,7 +80,7 @@ class ExtractTfIdf():
             decode_error="ignore",
             stop_words=None,
             lowercase=False,
-            max_df=1.0,
+            max_df=0.5,
             min_df=1,
             ngram_range=self.ngrams_rng,
             max_features=self.max_features, 
