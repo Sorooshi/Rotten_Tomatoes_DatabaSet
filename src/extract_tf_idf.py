@@ -4,15 +4,23 @@ import sys
 import nltk
 import pickle
 import string
-import itertools
+import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from nltk import word_tokenize          
 from nltk.stem import WordNetLemmatizer
 from extract_text_embedding import GetConvertedData
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+
+parser = argparse.ArgumentParser(
+     description="Extract TF-IDF"
+)
+
+parser.add_argument(
+        "-dn", "--data_name", default="medium", type=str,
+        help="The data set name, either, medium or large."
+        )
 
 
 class ExtractTfIdf():
@@ -28,9 +36,6 @@ class ExtractTfIdf():
         self.ngrams_rng = ngrams_rng
         self.wnl = WordNetLemmatizer()
         self.data_df = data_df
-        self.documents = list()
-        self.vocabulary = None
-        self.tf_idf = pd.DataFrame
         
         user_defined_stopwords = ["st","rd","hong","kong", "...", ] 
         a = nltk.corpus.stopwords.words('english')
@@ -42,7 +47,7 @@ class ExtractTfIdf():
         splitted, and lemmatized version of the original the synopsis text."""
 
         noises = ["$", ",", ".", ":", ";", "(", ")", "()" ]
-        # documents = []
+        documents = []
         for document in corpus:
             document = document.lower().strip().split()
             document = [re.sub(r"\[a-z0-9]+", "", word)  for word in document]
@@ -53,9 +58,9 @@ class ExtractTfIdf():
             if get_vocab is False:
                 document = " ".join(document)
             
-            self.documents.append(document)
+            documents.append(document)
 
-        # return documents
+        return documents
     
 
     def get_vocabulary(self, docs):
@@ -68,10 +73,10 @@ class ExtractTfIdf():
                 if word not in vocabulary.keys():
                     vocabulary[word] = cntr
                     cntr += 1
-        self.vocabulary = vocabulary
-        # return vocabulary
+
+        return vocabulary
     
-    def get_tf_idf(self,):
+    def get_tf_idf(self, docs, vocab):
 
         vectorizer = TfidfVectorizer(
             input="content", 
@@ -80,37 +85,32 @@ class ExtractTfIdf():
             decode_error="ignore",
             stop_words=None,
             lowercase=False,
-            max_df=1.0,
-            min_df=1,
+            max_df=10,
+            min_df=2,
             ngram_range=self.ngrams_rng,
             max_features=self.max_features, 
             sublinear_tf=False, 
             smooth_idf=True,
-            vocabulary=self.vocabulary,
+            vocabulary=vocab,
         )
 
-        x = vectorizer.fit_transform(self.documents)
-        print(x.toarray().shape)
+        x = vectorizer.fit_transform(docs)
 
         tf_idf = pd.DataFrame(
             x.toarray(), index=self.data_df.index, 
             columns=vectorizer.get_feature_names()
         )
         
-        self.tf_idf = tf_idf
-        # return tf_idf
+        return tf_idf
     
 
     def get_feature_data(self, data_name):
         
-        # vocab = self.get_vocabulary(
-        #     docs=self.preprocess(corpus=self.corpus, get_vocab=True)
-        #     )
-        # docs = self.preprocess(corpus=self.corpus, get_vocab=False)
-        # tf_idf = self.get_tf_idf(docs=docs, vocab=None)
-
-        self.preprocess(corpus=self.corpus, get_vocab=False)
-        self.get_tf_idf()
+        _ = self.get_vocabulary(
+            docs=self.preprocess(corpus=self.corpus, get_vocab=True)
+            )
+        docs = self.preprocess(corpus=self.corpus, get_vocab=False)
+        tf_idf = self.get_tf_idf(docs=docs, vocab=None)
 
         if data_name == "medium_movies_data":
                 features = ["Runtime", "Box Office (Gross USA)", "Tomato Meter", "Audience Score", 
@@ -122,6 +122,29 @@ class ExtractTfIdf():
                 ]
 
         data_x_df = self.data_df[features]
-        data_x_df = data_x_df.join(self.tf_idf)
+        data_x_df = data_x_df.join(tf_idf)
 
         return data_x_df
+    
+
+if __name__ == "__main__":
+
+    args = parser.parse_args()
+    d_name = args.data_name
+
+    if d_name == "medium":
+        data_name = "medium_movies_data"
+        vocab_np_name = "medium.npz"
+    elif d_name == "large":
+        data_name = "large_movies_data"
+        vocab_np_name = "large.npz"
+    
+    data_getter = GetConvertedData(
+        vocab_np_name=vocab_np_name, 
+        data_name=data_name,
+        )     
+    
+    data_df, text_data, _ = data_getter.get_text_and_labels()
+
+    tfidf_getter = ExtractTfIdf(corpus=text_data, max_features=)
+
