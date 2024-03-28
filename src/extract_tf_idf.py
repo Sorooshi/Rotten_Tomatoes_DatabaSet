@@ -63,7 +63,7 @@ class ExtractTfIdf():
         vocabulary = {}
         for document in docs:
             for word in document:
-                if word not in self.vocabulary.keys():
+                if word not in vocabulary.keys():
                     self.vocabulary[word] = cntr
                     cntr += 1
         return vocabulary
