@@ -184,7 +184,7 @@ if __name__ == "__main__":
     tfidf_getter = ExtractTfIdf(
         data_df=data_df, 
         corpus=text_data, 
-        max_features=10000, 
+        max_features=10, 
         ngrams_rng=(2, 2),
 
     )
