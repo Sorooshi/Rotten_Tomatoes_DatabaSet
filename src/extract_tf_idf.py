@@ -146,5 +146,5 @@ if __name__ == "__main__":
     
     data_df, text_data, _ = data_getter.get_text_and_labels()
 
-    tfidf_getter = ExtractTfIdf(corpus=text_data, max_features=)
+    tfidf_getter = ExtractTfIdf(corpus=text_data, max_features=None)
 
