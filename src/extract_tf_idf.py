@@ -28,6 +28,9 @@ class ExtractTfIdf():
         self.ngrams_rng = ngrams_rng
         self.wnl = WordNetLemmatizer()
         self.data_df = data_df
+        self.documents = list()
+        self.vocabulary = dict()
+        self.tf_idf = pd.DataFrame
         
         user_defined_stopwords = ["st","rd","hong","kong", "...", ] 
         a = nltk.corpus.stopwords.words('english')
@@ -39,7 +42,7 @@ class ExtractTfIdf():
         splitted, and lemmatized version of the original the synopsis text."""
 
         noises = ["$", ",", ".", ":", ";", "(", ")", "()" ]
-        documents = []
+        self.documents = []
         for document in corpus:
             document = document.lower().strip().split()
             document = [re.sub(r"\[a-z0-9]+", "", word)  for word in document]
@@ -51,9 +54,9 @@ class ExtractTfIdf():
             if get_vocab is not True:
                 document = " ".join(document)
             
-            documents.append(document)
+            self.documents.append(document)
 
-        return documents
+        # return self.documents
     
 
     def get_vocabulary(self, docs):
@@ -66,7 +69,9 @@ class ExtractTfIdf():
                 if word not in vocabulary.keys():
                     vocabulary[word] = cntr
                     cntr += 1
-        return vocabulary
+
+        self.vocabulary = vocabulary
+        # return vocabulary
     
     def get_tf_idf(self, docs, vocab):
 
@@ -99,11 +104,11 @@ class ExtractTfIdf():
 
     def get_feature_data(self, data_name):
         
-        vocab = self.get_vocabulary(docs=self.preprocess(corpus=self.corpus, get_vocab=True))
-        docs = self.preprocess(corpus=self.corpus, get_vocab=False)
-        print(len(docs))
-        tf_idf = self.get_tf_idf(docs=docs, vocab=None)
-        print(tf_idf.shape)
+        self.get_vocabulary(docs=self.preprocess(corpus=self.corpus, get_vocab=True))
+        self.preprocess(corpus=self.corpus, get_vocab=False)
+        print(self.documents, len(self.documents))
+        tf_idf = self.get_tf_idf(docs=self.documents, vocab=None)
+        print(tf_idf, tf_idf.shape)
 
         if data_name == "medium_movies_data":
                 features = ["Runtime", "Box Office (Gross USA)", "Tomato Meter", "Audience Score", 
