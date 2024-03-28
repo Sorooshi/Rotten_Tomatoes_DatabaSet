@@ -63,7 +63,7 @@ class ExtractTfIdf():
                     cntr += 1
         return self.vocabulary
     
-    def get_tf_idf(self, ):
+    def get_tf_idf(self,):
 
         vectorizer = TfidfVectorizer(
             input="content", 
@@ -92,7 +92,7 @@ class ExtractTfIdf():
 
     def get_feature_data(self, data_name):
         
-        docs = self.preprocess(corpus=self.corpus, get_vocab=False)
+        _ = self.preprocess(corpus=self.corpus, get_vocab=False)
         tf_idf = self.get_tf_idf()
 
         if data_name == "medium_movies_data":
