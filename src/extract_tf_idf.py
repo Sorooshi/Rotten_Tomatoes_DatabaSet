@@ -90,7 +90,10 @@ class ExtractTfIdf():
         return tf_idf
     
 
-    def get_feature_data(self, tf_idf, data_name):
+    def get_feature_data(self, data_name):
+        
+
+        tf_idf = self.get_tf_idf()
         
         if data_name == "medium_movies_data":
                 features = ["Runtime", "Box Office (Gross USA)", "Tomato Meter", "Audience Score", 
