@@ -50,9 +50,8 @@ class ExtractTfIdf():
                 document = [word.replace(noise, "")  for word in document]
             document = [word for word in document if word not in self.stopwords]
             document = [self.wnl.lemmatize(word) for word in document]
-            document = " ".join(document)
             if get_vocab is False:
-                document = "".join(document)
+                document = " ".join(document)
             
             documents.append(document)
 
