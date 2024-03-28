@@ -14,28 +14,30 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 parser = argparse.ArgumentParser(
-     description="Extract TF-IDF"
-)
+    description="Extract TF-IDF"
+    )
 
 parser.add_argument(
         "-dn", "--data_name", default="medium", type=str,
         help="The data set name, either, medium or large."
-        )
+    )
 
 
 class ExtractTfIdf():
     def __init__(self, 
-                 corpus: np.array, 
-                 max_features: int,
-                 data_df: pd.DataFrame, 
-                 ngrams_rng: tuple = (1, 2), 
-                 *args, **kwargs):
+                corpus: np.array, 
+                max_features: int,
+                data_df: pd.DataFrame, 
+                ngrams_rng: tuple = (1, 2), 
+                data_name: str = "medium_movies_data",
+                *args, **kwargs):
         super(*args, **kwargs).__init__()
         self.corpus = corpus
         self.max_features = max_features
         self.ngrams_rng = ngrams_rng
         self.wnl = WordNetLemmatizer()
         self.data_df = data_df
+        set.data_name = data_name
         
         user_defined_stopwords = ["st","rd","hong","kong", "...", ] 
         a = nltk.corpus.stopwords.words('english')
@@ -104,7 +106,7 @@ class ExtractTfIdf():
         return tf_idf
     
 
-    def get_feature_data(self, data_name):
+    def get_feature_data(self, ):
         
         _ = self.get_vocabulary(
             docs=self.preprocess(corpus=self.corpus, get_vocab=True)
@@ -112,19 +114,37 @@ class ExtractTfIdf():
         docs = self.preprocess(corpus=self.corpus, get_vocab=False)
         tf_idf = self.get_tf_idf(docs=docs, vocab=None)
 
-        if data_name == "medium_movies_data":
-                features = ["Runtime", "Box Office (Gross USA)", "Tomato Meter", "Audience Score", 
-                "No. Reviews", "Genre"
-                ]
-        elif data_name == "large_movies_data":
-                features = ["Runtime", "Tomato Meter", "Audience Score", 
-                "No. Reviews", "Genre"
-                ]
+        if self.data_name == "medium_movies_data":
+            features = [
+                "Runtime", "Box Office (Gross USA)", "Tomato Meter", 
+                "Audience Score", "No. Reviews", "Genre"
+            ]
+            with open("./data/medium_data_no_link_movies.pickle", "rb") as fp:
+                no_link_movies = pickle.load(fp)
 
-        data_x_df = self.data_df[features]
-        data_x_df = data_x_df.join(tf_idf)
+        elif self.data_name == "large_movies_data":
+            features = [
+                "Runtime", "Tomato Meter", "Audience Score", 
+                "No. Reviews", "Genre",
+            ]
+            with open("./data/large_data_no_link_movies.pickle", "rb") as fp:
+                no_link_movies = pickle.load(fp)
 
-        return data_x_df
+        
+        data_df = self.data_df.loc[~self.data_df.Title.isin(no_link_movies)]
+        data_df_x = data_df[features]
+
+        data_df_x = data_df_x.join(tf_idf)
+
+        if self.data_name == "medium_movies_data":
+            data_df_x.to_csv("./data/medium_data_df_x.csv", index=True, columns=features)
+            data_df_x.to_csv("./data/medium_data_x.csv", header=False, index=False)
+
+        elif self.data_name == "large_movies_data":
+            data_df_x.to_csv("./data/large_data_df_x.csv", index=True, columns=features)
+            data_df_x.to_csv("./data/large_data_x.csv", header=False, index=False)
+
+        return data_df_x
     
 
 if __name__ == "__main__":
@@ -142,9 +162,15 @@ if __name__ == "__main__":
     data_getter = GetConvertedData(
         vocab_np_name=vocab_np_name, 
         data_name=data_name,
-        )     
+    )     
     
     data_df, text_data, _ = data_getter.get_text_and_labels()
 
-    tfidf_getter = ExtractTfIdf(corpus=text_data, max_features=None)
+    tfidf_getter = ExtractTfIdf(
+        data_df=data_df, 
+        corpus=text_data, 
+        max_features=1000, 
+    )
+
+
 
