@@ -16,9 +16,12 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 class ExtractTfIdf():
-    def __init__(self, corpus, max_features,
+    def __init__(self, 
+                 corpus: np.array, 
+                 max_features: int,
+                 data_df: pd.DataFrame, 
                  ngrams_rng: tuple = (2, 2), 
-                 titles: np.array = None, *args, **kwargs):
+                 *args, **kwargs):
         super(*args, **kwargs).__init__()
         self.corpus = corpus
         self.max_features = max_features
@@ -27,7 +30,7 @@ class ExtractTfIdf():
         self.documents = list()
         self.vocabulary = dict()
         self.tf_idf = pd.DataFrame()
-        self.titles = titles
+        self.data_df = data_df
         
         user_defined_stopwords = ["st","rd","hong","kong", "...", ] 
         a = nltk.corpus.stopwords.words('english')
@@ -86,7 +89,7 @@ class ExtractTfIdf():
         x = vectorizer.fit_transform(self.documents)
 
         tf_idf = pd.DataFrame(
-            x.toarray(), index=self.titles, 
+            x.toarray(), index=self.data_df.Title, 
             columns=vectorizer.get_feature_names()
             )
         
@@ -108,7 +111,7 @@ class ExtractTfIdf():
                 "No. Reviews", "Genre"
                 ]
         
-        data_x_df = self.corpus[features]
+        data_x_df = self.data_df[features]
         data_x_df = pd.join(data_x_df, self.tf_idf)
 
         return data_x_df
