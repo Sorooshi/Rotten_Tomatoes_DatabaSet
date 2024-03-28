@@ -72,7 +72,6 @@ class ExtractTfIdf():
             max_df=10,
             min_df=2,
             ngram_range=ngrams_rng,
-            sublinear_tf=True,
             max_features=max_features, 
             sublinear_tf=False, 
             smooth_idf=True,
