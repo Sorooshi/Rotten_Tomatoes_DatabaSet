@@ -116,16 +116,17 @@ class ExtractTfIdf():
 
         if self.data_name == "medium_movies_data":
             features = [
-                "Runtime", "Box Office (Gross USA)", "Tomato Meter", 
+                "Title", "Runtime", "Box Office (Gross USA)", "Tomato Meter", 
                 "Audience Score", "No. Reviews", "Genre"
             ]
+
             with open("./data/medium_data_no_link_movies.pickle", "rb") as fp:
                 no_link_movies = pickle.load(fp)
 
         elif self.data_name == "large_movies_data":
             features = [
-                "Runtime", "Tomato Meter", "Audience Score", 
-                "No. Reviews", "Genre",
+                "Title", "Runtime", "Tomato Meter", 
+                "Audience Score", "No. Reviews", "Genre",
             ]
             with open("./data/large_data_no_link_movies.pickle", "rb") as fp:
                 no_link_movies = pickle.load(fp)
@@ -141,6 +142,7 @@ class ExtractTfIdf():
                 "./data/medium_data_tfidf_df_x.csv",
                 index=True, columns=data_df_x.columns
             )
+            data_df_x = data_df_x[features[1:]]  # dropping titles
             data_df_x.to_csv(
                 "./data/medium_data_tfidf_x.csv", 
                 header=False, index=False
@@ -151,6 +153,7 @@ class ExtractTfIdf():
                 "./data/large_data_tfidf_df_x.csv",
                 index=True, columns=data_df_x.columns
             )
+            data_df_x = data_df_x[features[1:]]  # dropping titles
             data_df_x.to_csv(
                 "./data/large_data_tfidf_x.csv", 
                 header=False, index=False
