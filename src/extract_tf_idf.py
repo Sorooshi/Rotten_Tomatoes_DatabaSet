@@ -25,6 +25,7 @@ class ExtractTfIdf():
         self.wnl = WordNetLemmatizer()
         self.documents = list()
         self.vocabulary = dict()
+        self.tf_idf = pd.DataFrame()
         
         user_defined_stopwords = ["st","rd","hong","kong", "...", ] 
         a = nltk.corpus.stopwords.words('english')
@@ -49,7 +50,7 @@ class ExtractTfIdf():
                 document = " ".join(document)
             self.documents.append(document)
 
-        return self.documents
+        # return self.documents
     
 
     def get_vocabulary(self,):
@@ -61,7 +62,7 @@ class ExtractTfIdf():
                 if word not in self.vocabulary.keys():
                     self.vocabulary[word] = cntr
                     cntr += 1
-        return self.vocabulary
+        # return self.vocabulary
     
     def get_tf_idf(self,):
 
@@ -87,13 +88,14 @@ class ExtractTfIdf():
             columns=vectorizer.get_feature_names()
             )
         
-        return tf_idf
+        # return tf_idf
     
 
     def get_feature_data(self, data_name):
         
-        _ = self.preprocess(corpus=self.corpus, get_vocab=False)
-        tf_idf = self.get_tf_idf()
+        self.preprocess(corpus=self.corpus, get_vocab=True)
+        self.preprocess(corpus=self.corpus, get_vocab=False)
+        self.get_tf_idf()
 
         if data_name == "medium_movies_data":
                 features = ["Runtime", "Box Office (Gross USA)", "Tomato Meter", "Audience Score", 
@@ -105,6 +107,6 @@ class ExtractTfIdf():
                 ]
         
         data_x_df = self.corpus[features]
-        data_x_df = pd.join(data_x_df, tf_idf)
+        data_x_df = pd.join(data_x_df, self.tf_idf)
 
         return data_x_df
