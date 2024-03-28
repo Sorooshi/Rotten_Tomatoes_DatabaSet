@@ -137,12 +137,12 @@ class ExtractTfIdf():
         data_df_x = data_df_x.join(tf_idf)
 
         if self.data_name == "medium_movies_data":
-            data_df_x.to_csv("./data/medium_data_df_x.csv", index=True, columns=features)
-            data_df_x.to_csv("./data/medium_data_x.csv", header=False, index=False)
+            data_df_x.to_csv("./data/medium_data_df_tfidf_x.csv", index=True, columns=features)
+            data_df_x.to_csv("./data/medium_data_tfidf_x.csv", header=False, index=False)
 
         elif self.data_name == "large_movies_data":
-            data_df_x.to_csv("./data/large_data_df_x.csv", index=True, columns=features)
-            data_df_x.to_csv("./data/large_data_x.csv", header=False, index=False)
+            data_df_x.to_csv("./data/large_data_df_tfidf_x.csv", index=True, columns=features)
+            data_df_x.to_csv("./data/large_data_tfidf_x.csv", header=False, index=False)
 
         return data_df_x
     
@@ -172,5 +172,6 @@ if __name__ == "__main__":
         max_features=1000, 
     )
 
+    print("data_x_df is extracted!")
 
 
