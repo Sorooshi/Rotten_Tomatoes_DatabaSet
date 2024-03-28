@@ -74,7 +74,7 @@ class ExtractTfIdf():
             lowercase=False,
             max_df=10,
             min_df=2,
-            ngram_range=ngrams_rng,
+            ngram_range=self.ngrams_rng,
             max_features=self.max_features, 
             sublinear_tf=False, 
             smooth_idf=True,
@@ -94,7 +94,7 @@ class ExtractTfIdf():
         
 
         tf_idf = self.get_tf_idf()
-        
+
         if data_name == "medium_movies_data":
                 features = ["Runtime", "Box Office (Gross USA)", "Tomato Meter", "Audience Score", 
                 "No. Reviews", "Genre"
