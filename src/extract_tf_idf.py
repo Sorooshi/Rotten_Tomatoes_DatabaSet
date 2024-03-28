@@ -99,8 +99,7 @@ class ExtractTfIdf():
 
     def get_feature_data(self, data_name):
         
-        docs = self.preprocess(corpus=self.corpus, get_vocab=True)
-        _ = self.get_vocabulary(docs=docs)
+        vocab = self.get_vocabulary(docs=self.preprocess(corpus=self.corpus, get_vocab=True))
         docs = self.preprocess(corpus=self.corpus, get_vocab=False)
         print(len(docs))
         tf_idf = self.get_tf_idf(docs=docs, vocab=None)
