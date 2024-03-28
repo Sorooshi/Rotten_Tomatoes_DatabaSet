@@ -16,13 +16,16 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 class ExtractTfIdf():
-    def __init__(self, corpus, max_n_features, *args, **kwargs):
+    def __init__(self, corpus, max_features,
+                 ngrams_rng: tuple = (2, 2), *args, **kwargs):
+        super(*args, **kwargs).__init__()
         self.corpus = corpus
-        self.max_n_features = max_n_features
+        self.max_features = max_features
+        self.ngrams_rng = ngrams_rng
         self.wnl = WordNetLemmatizer()
         self.documents = list()
         self.vocabulary = dict()
-
+        
         user_defined_stopwords = ["st","rd","hong","kong", "...", ] 
         a = nltk.corpus.stopwords.words('english')
         b = list(string.punctuation) + user_defined_stopwords
@@ -60,7 +63,7 @@ class ExtractTfIdf():
                     cntr += 1
         return self.vocabulary
     
-    def get_tf_idf(self, max_features: int = 100, ngrams_rng: tuple = (2, 2),):
+    def get_tf_idf(self, ):
 
         vectorizer = TfidfVectorizer(
             input="content", 
@@ -72,7 +75,7 @@ class ExtractTfIdf():
             max_df=10,
             min_df=2,
             ngram_range=ngrams_rng,
-            max_features=max_features, 
+            max_features=self.max_features, 
             sublinear_tf=False, 
             smooth_idf=True,
             vocabulary=None,
