@@ -102,7 +102,7 @@ class ExtractTfIdf():
         docs = self.preprocess(corpus=self.corpus, get_vocab=True)
         _ = self.get_vocabulary(docs=docs)
         docs = self.preprocess(corpus=self.corpus, get_vocab=False)
-        print(docs.shape)
+        print(len(docs))
         tf_idf = self.get_tf_idf(docs=docs, vocab=None)
         print(tf_idf.shape)
 
