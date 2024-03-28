@@ -18,7 +18,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 class ExtractTfIdf():
     def __init__(self, corpus, max_features,
                  ngrams_rng: tuple = (2, 2), 
-                 titles: np.array(), *args, **kwargs):
+                 titles: np.array() = None, *args, **kwargs):
         super(*args, **kwargs).__init__()
         self.corpus = corpus
         self.max_features = max_features
