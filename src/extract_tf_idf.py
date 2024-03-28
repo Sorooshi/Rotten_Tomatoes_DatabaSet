@@ -108,7 +108,7 @@ class ExtractTfIdf():
         print(vocab, len(vocab))
         docs = self.preprocess(corpus=self.corpus, get_vocab=False)
         print(docs, len(docs))
-        tf_idf = self.get_tf_idf(docs=self.documents, vocab=None)
+        tf_idf = self.get_tf_idf(docs=docs, vocab=None)
         print(tf_idf, len(tf_idf))
 
         if data_name == "medium_movies_data":
