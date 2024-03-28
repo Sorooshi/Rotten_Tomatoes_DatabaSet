@@ -121,6 +121,6 @@ class ExtractTfIdf():
                 ]
         
         data_x_df = self.data_df[features]
-        data_x_df = data_x_df.join(data_x_df, tf_idf, )
+        data_x_df = data_x_df.join(tf_idf)
 
         return data_x_df
