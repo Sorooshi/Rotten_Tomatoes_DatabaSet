@@ -192,7 +192,7 @@ if __name__ == "__main__":
         data_df=data_df, 
         corpus=text_data, 
         max_features=max_features, 
-        ngrams_rng=(2, 2),
+        ngrams_rng=(1, 1),
 
     )
 
