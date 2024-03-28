@@ -37,7 +37,7 @@ class ExtractTfIdf():
         self.ngrams_rng = ngrams_rng
         self.wnl = WordNetLemmatizer()
         self.data_df = data_df
-        set.data_name = data_name
+        self.data_name = data_name
         
         user_defined_stopwords = ["st","rd","hong","kong", "...", ] 
         a = nltk.corpus.stopwords.words('english')
