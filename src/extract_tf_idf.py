@@ -105,11 +105,11 @@ class ExtractTfIdf():
         vocab = self.get_vocabulary(
             docs=self.preprocess(corpus=self.corpus, get_vocab=True)
             )
-        print(vocab, len(vocab))
+        # print(vocab, len(vocab))
         docs = self.preprocess(corpus=self.corpus, get_vocab=False)
-        print(docs, len(docs))
+        # print(docs, len(docs))
         tf_idf = self.get_tf_idf(docs=docs, vocab=None)
-        print(tf_idf, len(tf_idf))
+        # print(tf_idf, len(tf_idf))
 
         if data_name == "medium_movies_data":
                 features = ["Runtime", "Box Office (Gross USA)", "Tomato Meter", "Audience Score", 
@@ -121,6 +121,6 @@ class ExtractTfIdf():
                 ]
         
         data_x_df = self.data_df[features]
-        data_x_df = pd.join(data_x_df, tf_idf)
+        data_x_df = data_x_df.join(data_x_df, tf_idf, )
 
         return data_x_df
