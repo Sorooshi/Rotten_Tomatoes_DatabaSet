@@ -27,9 +27,6 @@ class ExtractTfIdf():
         self.max_features = max_features
         self.ngrams_rng = ngrams_rng
         self.wnl = WordNetLemmatizer()
-        self.documents = list()
-        self.vocabulary = dict()
-        self.tf_idf = pd.DataFrame()
         self.data_df = data_df
         
         user_defined_stopwords = ["st","rd","hong","kong", "...", ] 
@@ -42,7 +39,7 @@ class ExtractTfIdf():
         splitted, and lemmatized version of the original the synopsis text."""
 
         noises = ["$", ",", ".", ":", ";", "(", ")", "()" ]
-        
+        documents = []
         for document in corpus:
             document = document.lower().strip().split()
             document = [re.sub(r"\[a-z0-9]+", "", word)  for word in document]
@@ -53,23 +50,25 @@ class ExtractTfIdf():
             document = " ".join(document)
             if get_vocab is not True:
                 document = " ".join(document)
-            self.documents.append(document)
+            
+            documents.append(document)
 
-        # return self.documents
+        return documents
     
 
-    def get_vocabulary(self,):
+    def get_vocabulary(self, docs):
         """returns a dict where keys are word and values are the integer indices."""
        
         cntr = 0
-        for document in self.documents:
+        vocabulary = {}
+        for document in docs:
             for word in document:
                 if word not in self.vocabulary.keys():
                     self.vocabulary[word] = cntr
                     cntr += 1
-        # return self.vocabulary
+        return vocabulary
     
-    def get_tf_idf(self,):
+    def get_tf_idf(self, docs, vocab):
 
         vectorizer = TfidfVectorizer(
             input="content", 
@@ -84,23 +83,25 @@ class ExtractTfIdf():
             max_features=self.max_features, 
             sublinear_tf=False, 
             smooth_idf=True,
-            vocabulary=None,
+            vocabulary=vocab,
         )
-        x = vectorizer.fit_transform(self.documents)
+
+        x = vectorizer.fit_transform(docs)
 
         tf_idf = pd.DataFrame(
             x.toarray(), index=self.data_df.Title, 
             columns=vectorizer.get_feature_names()
             )
         
-        # return tf_idf
+        return tf_idf
     
 
     def get_feature_data(self, data_name):
         
-        self.preprocess(corpus=self.corpus, get_vocab=True)
-        self.preprocess(corpus=self.corpus, get_vocab=False)
-        self.get_tf_idf()
+        docs = self.preprocess(corpus=self.corpus, get_vocab=True)
+        _ = self.get_vocabulary(docs=docs)
+        docs = self.preprocess(corpus=self.corpus, get_vocab=False)
+        tf_idf = self.get_tf_idf(docs=docs, vocab=None)
 
         if data_name == "medium_movies_data":
                 features = ["Runtime", "Box Office (Gross USA)", "Tomato Meter", "Audience Score", 
@@ -112,6 +113,6 @@ class ExtractTfIdf():
                 ]
         
         data_x_df = self.data_df[features]
-        data_x_df = pd.join(data_x_df, self.tf_idf)
+        data_x_df = pd.join(data_x_df, tf_idf)
 
         return data_x_df
