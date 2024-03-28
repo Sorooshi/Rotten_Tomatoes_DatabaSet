@@ -29,7 +29,7 @@ class ExtractTfIdf():
         self.wnl = WordNetLemmatizer()
         self.data_df = data_df
         self.documents = list()
-        self.vocabulary = dict()
+        self.vocabulary = None
         self.tf_idf = pd.DataFrame
         
         user_defined_stopwords = ["st","rd","hong","kong", "...", ] 
@@ -120,7 +120,7 @@ class ExtractTfIdf():
                 features = ["Runtime", "Tomato Meter", "Audience Score", 
                 "No. Reviews", "Genre"
                 ]
-        
+
         data_x_df = self.data_df[features]
         data_x_df = data_x_df.join(self.tf_idf)
 
