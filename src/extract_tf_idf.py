@@ -64,7 +64,7 @@ class ExtractTfIdf():
         for document in docs:
             for word in document:
                 if word not in vocabulary.keys():
-                    self.vocabulary[word] = cntr
+                    vocabulary[word] = cntr
                     cntr += 1
         return vocabulary
     
@@ -87,6 +87,7 @@ class ExtractTfIdf():
         )
 
         x = vectorizer.fit_transform(docs)
+        print(x.toarray().shape)
 
         tf_idf = pd.DataFrame(
             x.toarray(), index=self.data_df.Title, 
@@ -101,7 +102,9 @@ class ExtractTfIdf():
         docs = self.preprocess(corpus=self.corpus, get_vocab=True)
         _ = self.get_vocabulary(docs=docs)
         docs = self.preprocess(corpus=self.corpus, get_vocab=False)
+        print(docs.shape)
         tf_idf = self.get_tf_idf(docs=docs, vocab=None)
+        print(tf_idf.shape)
 
         if data_name == "medium_movies_data":
                 features = ["Runtime", "Box Office (Gross USA)", "Tomato Meter", "Audience Score", 
