@@ -22,6 +22,11 @@ parser.add_argument(
         help="The data set name, either, medium or large."
     )
 
+parser.add_argument(
+    "-mf", "--max_features", default="1000", type=int, 
+    help="maximum number of features to construct the vocabulary"
+    )
+
 
 class ExtractTfIdf():
     def __init__(self, 
@@ -166,6 +171,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     d_name = args.data_name
+    max_features = args.max_features 
+
 
     if d_name == "medium":
         data_name = "medium_movies_data"
@@ -184,7 +191,7 @@ if __name__ == "__main__":
     tfidf_getter = ExtractTfIdf(
         data_df=data_df, 
         corpus=text_data, 
-        max_features=10, 
+        max_features=max_features, 
         ngrams_rng=(2, 2),
 
     )
