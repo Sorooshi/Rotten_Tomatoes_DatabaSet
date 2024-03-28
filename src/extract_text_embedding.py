@@ -554,8 +554,7 @@ if __name__ == "__main__":
     else:
         # best config
         # lr, epochs, latent_dim, ngrams, max_seq_len
-        config = (1e-5, 2, 5, 1, 10)
+        config = (1e-5, 2000, 20, 2, 100)
         tuner_applier.train_and_extract_features_tuned_model(configs=config)
 
     
-   
