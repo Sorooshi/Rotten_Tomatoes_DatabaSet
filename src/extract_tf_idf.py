@@ -20,7 +20,7 @@ class ExtractTfIdf():
                  corpus: np.array, 
                  max_features: int,
                  data_df: pd.DataFrame, 
-                 ngrams_rng: tuple = (2, 2), 
+                 ngrams_rng: tuple = (1, 2), 
                  *args, **kwargs):
         super(*args, **kwargs).__init__()
         self.corpus = corpus
@@ -77,7 +77,7 @@ class ExtractTfIdf():
             decode_error="ignore",
             stop_words=None,
             lowercase=False,
-            max_df=1.,
+            max_df=1.0,
             min_df=1,
             ngram_range=self.ngrams_rng,
             max_features=self.max_features, 
