@@ -23,7 +23,7 @@ parser.add_argument(
     )
 
 parser.add_argument(
-    "-mf", "--max_features", default="1000", type=int, 
+    "-mf", "--max_features", default=None, type=int, 
     help="maximum number of features to construct the vocabulary"
     )
 
