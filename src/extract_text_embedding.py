@@ -515,14 +515,26 @@ class TuneApplyLstmAe():
             data_df_x = data_df[features]
             
             if self.data_name == "medium_movies_data":
-                data_df_x.to_csv("./data/medium_data_df_x.csv", index=True, columns=features)
+                data_df_x.to_csv(
+                    "./data/medium_data_df_x.csv", 
+                    index=False, columns=features
+                    )
                 data_df_x = data_df_x[features[1:]]  # dropping titles
-                data_df_x.to_csv("./data/medium_data_x.csv", header=False, index=False)
+                data_df_x.to_csv(
+                    "./data/medium_data_x.csv", 
+                    header=False, index=False
+                    )
 
             elif self.data_name == "large_movies_data":
-                data_df_x.to_csv("./data/large_data_df_x.csv", index=True, columns=features)
+                data_df_x.to_csv(
+                    "./data/large_data_df_x.csv",
+                    index=False, columns=features
+                    )
                 data_df_x = data_df_x[features[1:]]  # dropping titles
-                data_df_x.to_csv("./data/large_data_x.csv", header=False, index=False)
+                data_df_x.to_csv(
+                    "./data/large_data_x.csv", 
+                    header=False, index=False
+                    )
 
             
 if __name__ == "__main__":
