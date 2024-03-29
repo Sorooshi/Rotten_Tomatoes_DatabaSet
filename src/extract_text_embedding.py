@@ -566,7 +566,7 @@ class TuneApplyLstmAe():
                     "./data/medium_data_df_x.csv", 
                     index=False, columns=features
                     )
-                data_df_x = data_df_x.drop(columns="Title")  # dropping the titles
+                data_df_x.drop(columns="Title", inplace=True)  # dropping the titles
                 data_df_x.to_csv(
                     "./data/medium_data_x.csv", 
                     header=False, index=False
@@ -581,7 +581,7 @@ class TuneApplyLstmAe():
                     "./data/large_data_df_x.csv",
                     index=False, columns=features
                     )
-                data_df_x = data_df_x.iloc[:, 1:]  # dropping titles
+                data_df_x.drop(columns="Title", inplace=True)  # dropping the titles
                 data_df_x.to_csv(
                     "./data/large_data_x.csv", 
                     header=False, index=False
