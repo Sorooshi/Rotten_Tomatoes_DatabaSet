@@ -251,7 +251,7 @@ class GetConvertedData():
         if verbose >= 1:
             print(
                 f"text data head: \n {self.text_data[:3]} \n" 
-                f"text data shape: {self.text_data.shape} \n"
+                f"text data shape: {len(self.text_data)} \n"
                 f"labels head: \n {self.labels[:3]} \n"
                 f"labels shape: {self.labels.shape} \n"
             ) 
