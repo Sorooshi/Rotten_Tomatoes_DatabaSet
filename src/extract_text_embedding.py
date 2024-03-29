@@ -235,7 +235,7 @@ class GetConvertedData():
             
             documents.append(document)
 
-        return documents
+        return np.asarray(documents)
     
     
     def get_text_and_labels(self,):
@@ -248,10 +248,10 @@ class GetConvertedData():
         self.labels = self.data_df.Genre.values
         self.text_data = self.preprocess(corpus=self.data_df.Synopsis.values, get_vocab=False)
         
-        if verbose >= 1:
+        if verbose >= 4:
             print(
                 f"text data head: \n {self.text_data[:3]} \n" 
-                f"text data shape: {len(self.text_data)} \n"
+                f"text data shape: {self.text_data.shape} \n"
                 f"labels head: \n {self.labels[:3]} \n"
                 f"labels shape: {self.labels.shape} \n"
             ) 
