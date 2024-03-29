@@ -521,7 +521,6 @@ class TuneApplyLstmAe():
 
 
             data_df = data_df.loc[~data_df.Title.isin(no_link_movies)]
-
             text_data = data_df.Synopsis.values
 
             y_preds = mdl.predict(text_data)
@@ -557,19 +556,25 @@ class TuneApplyLstmAe():
                 ]
 
             features += ["Embedding-"+ str(f) for f in range(embedding_features.shape[1])]
-
+            
             data_df_x = data_df[features]
+            labels = data_df_x["Genre"].astype('category').cat.codes
+            data_df_x.drop(columns="Genre", inplace=True)
             
             if self.data_name == "medium_movies_data":
                 data_df_x.to_csv(
                     "./data/medium_data_df_x.csv", 
                     index=False, columns=features
                     )
-                data_df_x = data_df_x.iloc[:, 1:]  # dropping titles
+                data_df_x = data_df_x.drop(columns="Title")  # dropping the titles
                 data_df_x.to_csv(
                     "./data/medium_data_x.csv", 
                     header=False, index=False
                     )
+                labels.to_csv(
+                    "./data/medium_labels.csv", 
+                    header=False, index=False
+                    )                
 
             elif self.data_name == "large_movies_data":
                 data_df_x.to_csv(
@@ -581,6 +586,11 @@ class TuneApplyLstmAe():
                     "./data/large_data_x.csv", 
                     header=False, index=False
                     )
+                
+                labels.to_csv(
+                    "./data/large_labels.csv", 
+                    header=False, index=False
+                    )         
 
             
 if __name__ == "__main__":
