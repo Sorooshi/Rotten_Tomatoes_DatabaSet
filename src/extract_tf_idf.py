@@ -166,7 +166,7 @@ class ExtractTfIdf():
                 index=False, columns=data_df_x.columns
             )
 
-            data_df_x = data_df_x.drop(columns="Title")  # dropping the titles
+            data_df_x.drop(columns="Title", inplace=True)  # dropping the titles
             data_df_x.to_csv(
                 "./data/medium_data_tfidf_x.csv", 
                 header=False, index=False
@@ -181,7 +181,7 @@ class ExtractTfIdf():
                 "./data/large_data_tfidf_df_x.csv",
                 index=False, columns=data_df_x.columns
             )
-            data_df_x = data_df_x.iloc[:, 1:]  # dropping the titles
+            data_df_x.drop(columns="Title", inplace=True)  # dropping the titles
             data_df_x.to_csv(
                 "./data/large_data_tfidf_x.csv", 
                 header=False, index=False
