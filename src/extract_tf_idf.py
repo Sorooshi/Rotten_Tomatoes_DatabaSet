@@ -155,9 +155,7 @@ class ExtractTfIdf():
         data_df = self.data_df.loc[~self.data_df.Title.isin(no_link_movies)]
         
         data_df_x = data_df[features]
-        labels = data_df_x["Genre"].astype('category').cat.codes.values
-        data_df_x.drop(columns="Genre", inplace=True)
-
+        labels = data_df_x["Genre"].astype('category').cat.codes
         data_df_x = data_df_x.join(tf_idf)
 
         if self.data_name == "medium_movies_data":
@@ -165,8 +163,8 @@ class ExtractTfIdf():
                 "./data/medium_data_tfidf_df_x.csv",
                 index=False, columns=data_df_x.columns
             )
-
-            data_df_x.drop(columns="Title", inplace=True)  # dropping the titles
+            data_df_x.drop(columns=["Genre", "Title"], inplace=True)
+            # the two following CSV files will be used for clustering directly
             data_df_x.to_csv(
                 "./data/medium_data_tfidf_x.csv", 
                 header=False, index=False
@@ -181,12 +179,12 @@ class ExtractTfIdf():
                 "./data/large_data_tfidf_df_x.csv",
                 index=False, columns=data_df_x.columns
             )
-            data_df_x.drop(columns="Title", inplace=True)  # dropping the titles
+            data_df_x.drop(columns=["Genre", "Title"], inplace=True)
+            # the two following CSV files will be used for clustering directly
             data_df_x.to_csv(
                 "./data/large_data_tfidf_x.csv", 
                 header=False, index=False
             )
-
             labels.to_csv(
                     "./data/large_labels.csv", 
                     header=False, index=False
