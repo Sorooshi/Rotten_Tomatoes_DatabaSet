@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import keras_tuner as kt 
+from nltk.stem import WordNetLemmatizer
 from sklearn.model_selection import train_test_split
 
 verbose = 1
@@ -192,6 +193,7 @@ class GetConvertedData():
         self.verbose = verbose
         self.data_path = data_path
         self.data_name = data_name
+        self.wnl = WordNetLemmatizer()
         self.max_seq_len = max_seq_len
         self.vocab_np_name = vocab_np_name
 
