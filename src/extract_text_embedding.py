@@ -1,4 +1,7 @@
 import os
+import re
+import nltk
+import string
 import pickle
 import argparse
 import itertools
@@ -191,6 +194,47 @@ class GetConvertedData():
         self.data_name = data_name
         self.max_seq_len = max_seq_len
         self.vocab_np_name = vocab_np_name
+
+        user_defined_stopwords = [
+            '00', '100', '10000', '100th', '118th', '11th', '120', '1300',
+            '13th', '1429', '14th', '150', '1500', '1549', '155', '1558',
+            '1590s', '1621', '1770', '1774', '1788', '1804', '1805', '181st',
+            '1820', '1820s', '1823', '1830', '1836', '1840s', '1843', '1847',
+            '1850', '1851', '1857', '1863', '1865', '1869', '1870s', '1875',
+            '1878', '1879', '1880s', '1890s', '190', '1900s', '1909', '1912',
+            '1913', '1914', '1917', '1928', '1932', '1937', '1938', '1943',
+            '1947', '1953', '1956', '1957', '1959', '1966', '1986', '1989',
+            '1991', '1992', '1997', '2000s', '2011', '2012', '2016', '2018',
+            '2020', '2028', '2030s', '2035', '2045', '2054', '2077', '2084',
+            '20s', '2154', '21st', '23rd', '250', '2505', '26th', '27', '300',
+            '3000', '330000', '3po', '42', '48', '480', '4k', '500000', '54',
+            '54th', '60th', '64', '65th', '66', '6th', '700', '72', '72nd',
+            '79', '80s', '8th', '90s', '95'
+            ] 
+        a = nltk.corpus.stopwords.words('english')
+        b = list(string.punctuation) + user_defined_stopwords
+        self.stopwords = set(a).union(b)
+
+    def preprocess(self, corpus, get_vocab=False):
+        """returns a list of sets, where each set is lowercased, stripped, 
+        splitted, and lemmatized version of the original the synopsis text."""
+
+        noises = ["$", ",", ".", ":", ";", "(", ")", "()" ]
+        documents = []
+        for document in corpus:
+            document = document.lower().strip().split()
+            document = [re.sub(r"\[a-z0-9]+", "", word)  for word in document]
+            for noise in noises:
+                document = [word.replace(noise, "")  for word in document]
+            document = [word for word in document if word not in self.stopwords]
+            document = [self.wnl.lemmatize(word) for word in document]
+            if get_vocab is False:
+                document = " ".join(document)
+            
+            documents.append(document)
+
+        return documents
+    
     
     def get_text_and_labels(self,):
         """ returns, as attributes, data_df, synopsis (np.arr), and labels (np.arr)"""
@@ -200,9 +244,9 @@ class GetConvertedData():
         )
         self.data_df.dropna(inplace=True)
         self.labels = self.data_df.Genre.values
-        self.text_data = self.data_df.Synopsis.values
+        self.text_data = self.preprocess(corpus=self.data_df.Synopsis.values, get_vocab=False)
         
-        if verbose >= 4:
+        if verbose >= 1:
             print(
                 f"text data head: \n {self.text_data[:3]} \n" 
                 f"text data shape: {self.text_data.shape} \n"
@@ -211,7 +255,7 @@ class GetConvertedData():
             ) 
         
         return self.data_df, self.text_data, self.labels
- 
+    
 
     def get_vocabulary(self,) -> tuple:
         """ returns, as attributes, the vocabulary (np.arr), its size (int),
