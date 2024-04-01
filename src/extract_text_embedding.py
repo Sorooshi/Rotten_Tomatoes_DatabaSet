@@ -624,5 +624,6 @@ if __name__ == "__main__":
         # lr, epochs, latent_dim, ngrams, max_seq_len
         config = (1e-5, 2, 20, 2, 75)
         tuner_applier.train_and_extract_features_tuned_model(configs=config)
+        print("data extracted")
 
     
