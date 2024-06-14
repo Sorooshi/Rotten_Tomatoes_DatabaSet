@@ -26,10 +26,10 @@ def get_list_of_casts(x):
     for k in range(len(x)):
         if k == 0:
             xx.append(x[k].split("[")[1])
-        elif k == len(x):
-            xx.append(x.split("]")[0])
-        else:
+        elif k % 2 == 0 and k != 0:
             xx.append(x[k])
+        # elif k == len(x):
+        #     xx.append(x.split("]")[0])
     return set(xx)
 
 def get_list_of_others(x):
